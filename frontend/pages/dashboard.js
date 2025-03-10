@@ -66,7 +66,7 @@ export default function Dashboard() {
           </Link>
         </div>
         <div className={styles.userArea}>
-          <span className={styles.welcome}>Welcome, {user && user.username}</span>
+          <span className={styles.welcome}>Welcome, {user && user.first_name}</span>
           <button onClick={handleLogout} className={styles.logoutButton}>
             Logout
           </button>

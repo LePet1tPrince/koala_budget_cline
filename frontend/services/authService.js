@@ -14,7 +14,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
-    config.headers.Authorization = `JWT ${token}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
@@ -35,7 +35,7 @@ apiClient.interceptors.response.use(
           throw new Error('No refresh token available');
         }
 
-        const response = await axios.post(`${API_URL}/auth/jwt/refresh/`, {
+        const response = await axios.post(`${API_URL}/token/refresh/`, {
           refresh: refreshToken,
         });
 
@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
         localStorage.setItem('token', access);
 
         // Update the original request with new token
-        originalRequest.headers.Authorization = `JWT ${access}`;
+        originalRequest.headers.Authorization = `Bearer ${access}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
         // If refresh fails, logout the user
@@ -123,7 +123,7 @@ export const refreshToken = async (token) => {
 
 // Get current user
 export const getCurrentUser = async () => {
-  const response = await apiClient.get('/auth/users/me/');
+  const response = await apiClient.get('/users/me/');
   return response.data;
 };
 
