@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import styles from '../styles/Dashboard.module.css';
+import { FormStyles as styles } from '../styles/modules';
 
 const AccountForm = ({
   account = null,

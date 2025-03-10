@@ -1,0 +1,84 @@
+.accountForm,
+.transactionForm {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.input,
+.inputError {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  font-size: 1rem;
+}
+
+.inputError {
+  border-color: #f56565;
+}
+
+.errorText {
+  color: #f56565;
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  background-color: #fff5f5;
+  border-left: 4px solid #f56565;
+  border-radius: 4px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.submitButton,
+.cancelButton {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submitButton {
+  background-color: #4299e1;
+  color: white;
+  border: none;
+}
+
+.submitButton:hover {
+  background-color: #3182ce;
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+}
+
+.cancelButton:hover {
+  background-color: #f7fafc;
+}

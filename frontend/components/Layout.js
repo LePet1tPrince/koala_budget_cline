@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import Sidebar from './Sidebar';
-import styles from '../styles/Dashboard.module.css';
+import { LayoutStyles as styles } from '../styles/modules';
 import { useRouter } from 'next/router';
 
 export default function Layout({ children, title, activePage }) {

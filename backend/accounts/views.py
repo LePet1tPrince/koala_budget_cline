@@ -2,6 +2,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.contrib.auth import get_user_model
+from django.db import models
 from .models import SubAccountType, Account, Transaction
 from .serializers import (
     UserSerializer, UserCreateSerializer, SubAccountTypeSerializer,
@@ -75,7 +76,16 @@ class AccountViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
-        return Account.objects.filter(user=self.request.user)
+        queryset = Account.objects.filter(user=self.request.user)
+
+        # Filter by inBankFeed if specified
+        in_bank_feed = self.request.query_params.get('inBankFeed', None)
+        if in_bank_feed is not None:
+            # Convert string 'true'/'false' to boolean
+            in_bank_feed_bool = in_bank_feed.lower() == 'true'
+            queryset = queryset.filter(inBankFeed=in_bank_feed_bool)
+
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -95,4 +105,38 @@ class TransactionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
-        return Transaction.objects.filter(user=self.request.user)
+        queryset = Transaction.objects.filter(user=self.request.user)
+
+        # Filter by account if specified
+        account_id = self.request.query_params.get('account', None)
+        if account_id:
+            try:
+                # Convert to integer to avoid type issues
+                account_id = int(account_id)
+
+                # Match transactions where this account is either the debit or credit account
+                queryset = queryset.filter(
+                    models.Q(debit_id=account_id) | models.Q(credit_id=account_id)
+                )
+                print(f"Filtered transactions for account {account_id}: {queryset.count()}")
+            except (ValueError, TypeError) as e:
+                print(f"Invalid account_id parameter: {account_id}, error: {e}")
+                # Return empty queryset if account_id is invalid
+                return Transaction.objects.none()
+
+        return queryset.order_by('-date', '-updated')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            response = super().create(request, *args, **kwargs)
+            print(f"Created transaction: {response.data}")
+            return response
+        except Exception as e:
+            print(f"Error creating transaction: {e}")
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )

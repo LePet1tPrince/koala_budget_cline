@@ -1,0 +1,88 @@
+.accountCardsContainer {
+  display: flex;
+  overflow-x: auto;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+.accountCard {
+  min-width: 200px;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.accountCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.selectedCard {
+  box-shadow: 0 0 0 2px #2f80ed, 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.accountCardName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.accountCardNumber {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-bottom: 0.75rem;
+}
+
+.accountCardBalance {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.accountCardType {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Account card colors based on type */
+.assetCard {
+  background-color: #ebf8ff;
+  border-left: 4px solid #3182ce;
+}
+
+.liabilityCard {
+  background-color: #fff5f5;
+  border-left: 4px solid #e53e3e;
+}
+
+.incomeCard {
+  background-color: #f0fff4;
+  border-left: 4px solid #38a169;
+}
+
+.expenseCard {
+  background-color: #fffaf0;
+  border-left: 4px solid #dd6b20;
+}
+
+.equityCard {
+  background-color: #f7fafc;
+  border-left: 4px solid #4a5568;
+}
+
+.goalCard {
+  background-color: #ebf4ff;
+  border-left: 4px solid #4299e1;
+}

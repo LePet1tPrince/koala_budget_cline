@@ -73,3 +73,14 @@ export const deleteAccount = async (id) => {
     throw error;
   }
 };
+
+// Get bank feed accounts (accounts with inBankFeed=true)
+export const getBankFeedAccounts = async () => {
+  try {
+    const response = await apiClient.get('/accounts/?inBankFeed=true');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching bank feed accounts:', error);
+    throw error;
+  }
+};

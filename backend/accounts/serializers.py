@@ -47,9 +47,14 @@ class AccountSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'user')
 
 class TransactionSerializer(serializers.ModelSerializer):
+    debit_account = AccountSerializer(source='debit', read_only=True)
+    credit_account = AccountSerializer(source='credit', read_only=True)
+
     class Meta:
         model = Transaction
-        fields = ('id', 'date', 'amount', 'debit', 'credit', 'notes', 'is_reconciled', 'updated')
+        fields = ('id', 'date', 'amount', 'debit', 'credit', 'debit_account', 'credit_account',
+                 'notes', 'is_reconciled', 'updated', 'user')
+        read_only_fields = ('id', 'updated', 'user')
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user

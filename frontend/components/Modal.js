@@ -1,4 +1,4 @@
-import styles from '../styles/Dashboard.module.css';
+import { ModalStyles as styles } from '../styles/modules';
 import { useEffect } from 'react';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
