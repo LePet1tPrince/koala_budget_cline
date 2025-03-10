@@ -1,0 +1,129 @@
+.container {
+  min-height: 100vh;
+  padding: 0 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;
+}
+
+.main {
+  padding: 2rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.loginBox {
+  width: 100%;
+  padding: 2.5rem;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  margin: 0 0 1.5rem 0;
+  line-height: 1.15;
+  font-size: 2rem;
+  text-align: center;
+  color: #2f80ed;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #2f80ed;
+}
+
+.button {
+  padding: 0.75rem 1.5rem;
+  background-color: #2f80ed;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 1rem;
+}
+
+.button:hover:not(:disabled) {
+  background-color: #1c6fd9;
+}
+
+.button:disabled {
+  background-color: #a0c1e7;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #e53e3e;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: #fed7d7;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.success {
+  color: #2f855a;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: #c6f6d5;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.register {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.link {
+  color: #2f80ed;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.backLink {
+  display: block;
+  margin-top: 1.5rem;
+  text-align: center;
+  color: #718096;
+  cursor: pointer;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
