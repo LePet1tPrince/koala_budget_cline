@@ -32,13 +32,19 @@ class SubAccountTypeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AccountSerializer(serializers.ModelSerializer):
+    sub_type = SubAccountTypeSerializer(read_only=True)
+    sub_type_id = serializers.PrimaryKeyRelatedField(
+        queryset=SubAccountType.objects.all(),
+        source='sub_type',
+        write_only=True,
+        required=False,
+        allow_null=True
+    )
+
     class Meta:
         model = Account
-        fields = ('id', 'name', 'num', 'type', 'sub_type', 'inBankFeed', 'balance', 'reconciled_balance')
-
-    def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
-        return super().create(validated_data)
+        fields = ('id', 'name', 'num', 'type', 'sub_type', 'sub_type_id', 'inBankFeed', 'balance', 'reconciled_balance', 'user')
+        read_only_fields = ('id', 'user')
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:

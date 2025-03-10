@@ -46,12 +46,64 @@
   color: white;
 }
 
+.contentContainer {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #2d3748;
+  color: white;
+  padding: 1.5rem 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebarNav {
+  width: 100%;
+}
+
+.sidebarMenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebarMenuItem {
+  margin-bottom: 0.5rem;
+}
+
+.sidebarMenuLink {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  color: #cbd5e0;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.sidebarMenuLink:hover {
+  background-color: #4a5568;
+  color: white;
+}
+
+.sidebarMenuLink.active {
+  background-color: #2f80ed;
+  color: white;
+  border-left: 4px solid #90cdf4;
+}
+
+.sidebarMenuIcon {
+  margin-right: 0.75rem;
+  font-size: 1.25rem;
+}
+
 .main {
   flex: 1;
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  width: 100%;
+  width: calc(100% - 250px);
 }
 
 .title {
@@ -84,6 +136,249 @@
 .placeholder {
   color: #a0aec0;
   font-style: italic;
+}
+
+.profileInfo {
+  margin-top: 1rem;
+}
+
+.profileInfo p {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.profileInfo p:last-child {
+  border-bottom: none;
+}
+
+/* Account Table Styles */
+.accountsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.accountsTable th,
+.accountsTable td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.accountsTable th {
+  background-color: #f7fafc;
+  font-weight: 600;
+  color: #4a5568;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.accountsTable tr:last-child td {
+  border-bottom: none;
+}
+
+.accountsTable tr:hover {
+  background-color: #f7fafc;
+}
+
+.accountActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editButton,
+.deleteButton,
+.addButton {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.editButton {
+  background-color: #4299e1;
+  color: white;
+}
+
+.editButton:hover {
+  background-color: #3182ce;
+}
+
+.deleteButton {
+  background-color: #f56565;
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #e53e3e;
+}
+
+.addButton {
+  background-color: #48bb78;
+  color: white;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.addButton:hover {
+  background-color: #38a169;
+}
+
+/* Account Form Styles */
+.accountForm {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.input,
+.inputError {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  font-size: 1rem;
+}
+
+.inputError {
+  border-color: #f56565;
+}
+
+.errorText {
+  color: #f56565;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.submitButton,
+.cancelButton {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submitButton {
+  background-color: #4299e1;
+  color: white;
+  border: none;
+}
+
+.submitButton:hover {
+  background-color: #3182ce;
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+}
+
+.cancelButton:hover {
+  background-color: #f7fafc;
+}
+
+/* Modal Styles */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #a0aec0;
+}
+
+.closeButton:hover {
+  color: #4a5568;
+}
+
+.confirmDialog {
+  text-align: center;
+}
+
+.confirmDialog p {
+  margin-bottom: 1.5rem;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .footer {
@@ -122,6 +417,34 @@
 }
 
 @media (max-width: 768px) {
+  .contentContainer {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 1rem 0;
+  }
+
+  .sidebarMenu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .sidebarMenuItem {
+    margin: 0;
+  }
+
+  .sidebarMenuLink {
+    padding: 0.5rem 1rem;
+  }
+
+  .main {
+    width: 100%;
+    padding: 1.5rem 1rem;
+  }
+
   .dashboardContent {
     grid-template-columns: 1fr;
   }
@@ -130,9 +453,5 @@
     flex-direction: column;
     gap: 1rem;
     padding: 1rem;
-  }
-
-  .main {
-    padding: 1.5rem 1rem;
   }
 }
