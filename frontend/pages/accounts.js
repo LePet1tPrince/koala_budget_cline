@@ -1,10 +1,25 @@
+import {
+  AccountTableStyles,
+  ButtonStyles,
+  FormStyles,
+  LayoutStyles,
+  ModalStyles
+} from '../styles/modules';
 import { createAccount, deleteAccount, getAccounts, getSubAccountTypes, updateAccount } from '../services/accountService';
 import { useEffect, useState } from 'react';
 
-import AccountForm from '../components/AccountForm';
-import Layout from '../components/Layout';
-import Modal from '../components/Modal';
-import styles from '../styles/Dashboard.module.css';
+import AccountForm from '../components/accounts/AccountForm';
+import Layout from '../components/layout/Layout';
+import Modal from '../components/common/Modal';
+
+// Combine styles from different modules
+const styles = {
+  ...LayoutStyles,
+  ...ButtonStyles,
+  ...ModalStyles,
+  ...AccountTableStyles,
+  ...FormStyles
+};
 
 export default function Accounts() {
   const [accounts, setAccounts] = useState([]);
@@ -17,6 +32,21 @@ export default function Accounts() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentAccount, setCurrentAccount] = useState(null);
+
+  // Function to refresh accounts data
+  const refreshAccounts = async () => {
+    try {
+      setLoading(true);
+      const accountsData = await getAccounts();
+      setAccounts(accountsData);
+      setError(null);
+    } catch (err) {
+      console.error('Error refreshing accounts:', err);
+      setError('Failed to refresh accounts. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch accounts and account types on component mount
   useEffect(() => {
@@ -39,6 +69,12 @@ export default function Accounts() {
     };
 
     fetchData();
+
+    // Set up an interval to refresh accounts data every 5 seconds
+    const refreshInterval = setInterval(refreshAccounts, 5000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(refreshInterval);
   }, []);
 
   // Handle account creation
@@ -136,7 +172,25 @@ export default function Accounts() {
                 <td>{account.name}</td>
                 <td>{account.type}</td>
                 <td>{account.sub_type && typeof account.sub_type === 'object' ? account.sub_type.sub_type : '-'}</td>
-                <td>${typeof account.balance === 'number' ? account.balance.toFixed(2) : '0.00'}</td>
+                <td>${(() => {
+                  // Handle different types of balance values
+                  if (account.balance === null || account.balance === undefined) {
+                    return '0.00';
+                  }
+
+                  // If it's a number, format it
+                  if (typeof account.balance === 'number') {
+                    return account.balance.toFixed(2);
+                  }
+
+                  // If it's a string, try to parse it as a number
+                  const parsedBalance = parseFloat(account.balance);
+                  if (!isNaN(parsedBalance)) {
+                    return parsedBalance.toFixed(2);
+                  }
+
+                  return '0.00';
+                })()}</td>
                 <td>{account.inBankFeed ? 'Yes' : 'No'}</td>
                 <td className={styles.accountActions}>
                   <button

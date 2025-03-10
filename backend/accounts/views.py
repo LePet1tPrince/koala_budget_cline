@@ -107,6 +107,11 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Transaction.objects.filter(user=self.request.user)
 
+        # Filter by status if specified
+        status_param = self.request.query_params.get('status', None)
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+
         # Filter by account if specified
         account_id = self.request.query_params.get('account', None)
         if account_id:
@@ -140,3 +145,86 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 {"detail": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    @action(detail=True, methods=['patch'])
+    def update_status(self, request, pk=None):
+        transaction = self.get_object()
+        status_value = request.data.get('status')
+
+        # Validate status value
+        from .models import TransactionStatus
+        if status_value not in [choice[0] for choice in TransactionStatus.choices]:
+            return Response(
+                {"detail": f"Invalid status value. Must be one of: {[choice[0] for choice in TransactionStatus.choices]}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Update status and is_reconciled for backward compatibility
+        transaction.status = status_value
+        transaction.is_reconciled = (status_value == TransactionStatus.RECONCILED)
+        transaction.save()
+
+        serializer = self.get_serializer(transaction)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def upload_csv(self, request):
+        """
+        Upload and process a CSV file of transactions.
+
+        Expected request data:
+        - file_content: The CSV file content as a string
+        - column_mapping: Mapping of CSV columns to transaction fields
+            e.g. {'date': 0, 'description': 1, 'amount': 2, 'category': 3}
+        - selected_account_id: The ID of the account to associate transactions with
+        """
+        from .tasks import process_csv_transactions
+
+        # Get request data
+        file_content = request.data.get('file_content')
+        column_mapping = request.data.get('column_mapping')
+        selected_account_id = request.data.get('selected_account_id')
+
+        # Validate required fields
+        if not file_content:
+            return Response(
+                {"detail": "File content is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not column_mapping:
+            return Response(
+                {"detail": "Column mapping is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not selected_account_id:
+            return Response(
+                {"detail": "Selected account ID is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Validate that the account exists and belongs to the user
+        try:
+            account = Account.objects.get(id=selected_account_id, user=request.user)
+        except Account.DoesNotExist:
+            return Response(
+                {"detail": "Selected account not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Process the CSV file
+        # Note: We're calling the function directly instead of as a Celery task
+        # This is because we want to get the result immediately
+        result = process_csv_transactions(
+            file_content=file_content,
+            column_mapping=column_mapping,
+            selected_account_id=selected_account_id,
+            user_id=request.user.id
+        )
+
+        # Add debug logging
+        print(f"CSV processing result: {result}")
+
+        # Return the result
+        return Response(result)

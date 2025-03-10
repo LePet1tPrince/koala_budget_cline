@@ -1,4 +1,4 @@
-import { ModalStyles as styles } from '../styles/modules';
+import { ModalStyles as styles } from '../../styles/modules';
 import { useEffect } from 'react';
 
 const Modal = ({ isOpen, onClose, title, children }) => {

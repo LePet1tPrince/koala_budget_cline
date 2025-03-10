@@ -16,3 +16,6 @@ export { default as FormStyles } from './forms/Form.module.css';
 export { default as ModalStyles } from './common/Modal.module.css';
 export { default as ButtonStyles } from './common/Button.module.css';
 export { default as ProfileStyles } from './common/Profile.module.css';
+export { default as ToggleStyles } from './common/Toggle.module.css';
+export { default as StatusToggleStyles } from './common/StatusToggle.module.css';
+export { default as NotificationStyles } from './common/Notification.module.css';

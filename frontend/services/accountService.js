@@ -74,6 +74,17 @@ export const deleteAccount = async (id) => {
   }
 };
 
+// Get a specific account by ID (to refresh balance)
+export const getAccountById = async (id) => {
+  try {
+    const response = await apiClient.get(`/accounts/${id}/`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching account ${id}:`, error);
+    throw error;
+  }
+};
+
 // Get bank feed accounts (accounts with inBankFeed=true)
 export const getBankFeedAccounts = async () => {
   try {

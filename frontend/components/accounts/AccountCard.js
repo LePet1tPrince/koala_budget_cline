@@ -1,4 +1,4 @@
-import { AccountCardStyles as styles } from '../styles/modules';
+import { AccountCardStyles as styles } from '../../styles/modules';
 import { useState } from 'react';
 
 const AccountCard = ({ account, isSelected, onClick }) => {
@@ -30,7 +30,25 @@ const AccountCard = ({ account, isSelected, onClick }) => {
       <h3 className={styles.accountCardName}>{account.name}</h3>
       <div className={styles.accountCardNumber}>#{account.num}</div>
       <div className={styles.accountCardBalance}>
-        ${typeof account.balance === 'number' ? account.balance.toFixed(2) : '0.00'}
+        ${(() => {
+          // Handle different types of balance values
+          if (account.balance === null || account.balance === undefined) {
+            return '0.00';
+          }
+
+          // If it's a number, format it
+          if (typeof account.balance === 'number') {
+            return account.balance.toFixed(2);
+          }
+
+          // If it's a string, try to parse it as a number
+          const parsedBalance = parseFloat(account.balance);
+          if (!isNaN(parsedBalance)) {
+            return parsedBalance.toFixed(2);
+          }
+
+          return '0.00';
+        })()}
       </div>
       {account.sub_type && (
         <div className={styles.accountCardType}>

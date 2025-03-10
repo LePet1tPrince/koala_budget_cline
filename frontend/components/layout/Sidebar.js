@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SidebarStyles as styles } from '../styles/modules';
+import { SidebarStyles as styles } from '../../styles/modules';
 
 export default function Sidebar({ activePage }) {
   return (

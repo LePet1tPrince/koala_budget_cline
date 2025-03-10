@@ -1,27 +1,52 @@
 import {
-  AccountCardStyles,
-  ButtonStyles,
-  FormStyles,
-  LayoutStyles,
-  ModalStyles
-} from '../styles/modules';
-import { createTransaction, deleteTransaction, getTransactions, getTransactionsByAccount, updateTransaction } from '../services/transactionService';
-import { getAccounts, getBankFeedAccounts } from '../services/accountService';
+  createTransaction,
+  deleteTransaction,
+  getTransactions,
+  getTransactionsByAccount,
+  updateTransaction,
+  updateTransactionStatus,
+  uploadCSVTransactions
+} from '../services/transactionService';
+import {
+  getAccounts,
+  getBankFeedAccounts
+} from '../services/accountService';
 import { useEffect, useState } from 'react';
 
-import AccountCard from '../components/AccountCard';
-import Layout from '../components/Layout';
-import Modal from '../components/Modal';
-import TransactionForm from '../components/TransactionForm';
-import TransactionTable from '../components/TransactionTable';
+import BankFeedAccountsList from '../components/accounts/BankFeedAccountsList';
+import CSVUploadModal from '../components/transactions/CSVUploadModal';
+import DeleteTransactionModal from '../components/transactions/DeleteTransactionModal';
+import Layout from '../components/layout/Layout';
+import { LayoutStyles } from '../styles/modules';
+import Modal from '../components/common/Modal';
+import TransactionActionButtons from '../components/transactions/TransactionActionButtons';
+import TransactionFilters from '../components/transactions/TransactionFilters';
+import TransactionForm from '../components/transactions/TransactionForm';
+import TransactionList from '../components/transactions/TransactionList';
+import { useNotification } from '../contexts/NotificationContext';
 
-// Combine styles from different modules
+// Layout components
+
+
+
+// Account components
+
+
+// Transaction components
+
+
+
+
+
+
+
+// Services
+
+
+
+// Styles
 const styles = {
-  ...LayoutStyles,
-  ...AccountCardStyles,
-  ...ButtonStyles,
-  ...FormStyles,
-  ...ModalStyles
+  ...LayoutStyles
 };
 
 export default function Transactions() {
@@ -33,10 +58,44 @@ export default function Transactions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Status filter state
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'review', 'categorized', 'reconciled'
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Sorting state
+  const [sortField, setSortField] = useState('date'); // Default sort by date
+  const [sortDirection, setSortDirection] = useState('desc'); // Default newest first
+
+  // Reset to page 1 when filter or selected account changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, selectedAccountId]);
+
+  // Handle sorting
+  const handleSort = (field) => {
+    if (field === sortField) {
+      // Toggle direction if same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new field with default direction
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    // Reset to page 1 when sort changes
+    setCurrentPage(1);
+  };
+
   // Modal state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isCSVUploadModalOpen, setIsCSVUploadModalOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
+
+  // Notification context
+  const { showSuccess, showError } = useNotification();
 
   // Fetch accounts and transactions on component mount
   useEffect(() => {
@@ -63,6 +122,12 @@ export default function Transactions() {
             // Fetch transactions for the selected account
             const transactionsData = await getTransactionsByAccount(bankFeedData[0].id);
             console.log('Transactions for account:', transactionsData);
+            // Debug: Log individual transaction data to check amount field
+            if (transactionsData && transactionsData.length > 0) {
+              console.log('First transaction data:', transactionsData[0]);
+              console.log('Amount type:', typeof transactionsData[0].amount);
+              console.log('Amount value:', transactionsData[0].amount);
+            }
             setTransactions(transactionsData || []);
           } catch (transactionErr) {
             console.error('Error fetching transactions for account:', transactionErr);
@@ -126,6 +191,26 @@ export default function Transactions() {
     }
   };
 
+  // Helper function to refresh account balances
+  const refreshAccountBalances = async () => {
+    try {
+      // Refresh bank feed accounts to update balances
+      const updatedBankFeedAccounts = await getBankFeedAccounts();
+      setBankFeedAccounts(updatedBankFeedAccounts);
+    } catch (err) {
+      console.error('Error refreshing account balances:', err);
+    }
+  };
+
+  // Set up an interval to refresh account balances periodically
+  useEffect(() => {
+    // Refresh account balances every 5 seconds
+    const refreshInterval = setInterval(refreshAccountBalances, 5000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(refreshInterval);
+  }, []);
+
   // Handle adding a new transaction
   const handleAddTransaction = async (transactionData) => {
     try {
@@ -144,6 +229,9 @@ export default function Transactions() {
         console.log('All transactions after adding new one:', allTransactions);
         setTransactions(allTransactions || []);
       }
+
+      // Refresh account balances
+      await refreshAccountBalances();
 
       setIsAddModalOpen(false);
       setError(null);
@@ -171,6 +259,9 @@ export default function Transactions() {
         console.log('All transactions after update:', allTransactions);
         setTransactions(allTransactions || []);
       }
+
+      // Refresh account balances
+      await refreshAccountBalances();
 
       setError(null);
     } catch (err) {
@@ -204,12 +295,92 @@ export default function Transactions() {
         setTransactions(allTransactions || []);
       }
 
+      // Refresh account balances
+      await refreshAccountBalances();
+
       setIsDeleteModalOpen(false);
       setTransactionToDelete(null);
       setError(null);
     } catch (err) {
       console.error(`Error deleting transaction ${transactionToDelete}:`, err);
       alert('Failed to delete transaction. Error: ' + (err.message || 'Unknown error'));
+    }
+  };
+
+  // Handle updating transaction status
+  const handleUpdateStatus = async (id, status) => {
+    try {
+      const updatedTransaction = await updateTransactionStatus(id, status);
+      console.log(`Updated transaction ${id} status to ${status}:`, updatedTransaction);
+
+      // Refresh transactions list after updating a transaction status
+      if (selectedAccountId) {
+        // If an account is selected, fetch transactions for that account
+        const updatedTransactions = await getTransactionsByAccount(selectedAccountId);
+        console.log('Updated transactions for account after status update:', updatedTransactions);
+        setTransactions(updatedTransactions || []);
+      } else {
+        // Otherwise fetch all transactions
+        const allTransactions = await getTransactions();
+        console.log('All transactions after status update:', allTransactions);
+        setTransactions(allTransactions || []);
+      }
+
+      // Refresh account balances
+      await refreshAccountBalances();
+
+      setError(null);
+    } catch (err) {
+      console.error(`Error updating transaction ${id} status:`, err);
+      showError('Failed to update transaction status: ' + (err.message || 'Unknown error'));
+    }
+  };
+
+  // Handle CSV upload
+  const handleCSVUpload = async (fileContent, columnMapping, accountId) => {
+    try {
+      setLoading(true);
+
+      // Debug logging
+      console.log('CSV Upload - File content length:', fileContent.length);
+      console.log('CSV Upload - Column mapping:', columnMapping);
+      console.log('CSV Upload - Account ID:', accountId);
+
+      // Call the API to upload CSV transactions
+      const result = await uploadCSVTransactions(fileContent, columnMapping, accountId);
+
+      // Debug logging
+      console.log('CSV Upload - API response:', result);
+
+      // Show success message
+      const successCount = result.success || 0;
+      showSuccess(`Successfully imported ${successCount} transactions`);
+
+      // If there were errors, show them
+      if (result.errors && result.errors.length > 0) {
+        console.warn('CSV Upload - Errors:', result.errors);
+        showError(`${result.errors.length} rows had errors. Check console for details.`);
+      }
+
+      // Refresh transactions list
+      if (selectedAccountId) {
+        const updatedTransactions = await getTransactionsByAccount(selectedAccountId);
+        setTransactions(updatedTransactions || []);
+      } else {
+        const allTransactions = await getTransactions();
+        setTransactions(allTransactions || []);
+      }
+
+      // Refresh account balances
+      await refreshAccountBalances();
+
+      return result;
+    } catch (err) {
+      console.error('Error uploading CSV transactions:', err);
+      showError('Failed to upload CSV: ' + (err.message || 'Unknown error'));
+      throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -221,44 +392,41 @@ export default function Transactions() {
       {error && <p className={styles.errorText}>{error}</p>}
 
       {/* Bank Feed Account Cards */}
-      {bankFeedAccounts.length > 0 ? (
-        <div>
-          <h2>Bank Feed Accounts</h2>
-          <div className={styles.accountCardsContainer}>
-            {bankFeedAccounts.map(account => (
-              <AccountCard
-                key={account.id}
-                account={account}
-                isSelected={selectedAccountId === account.id}
-                onClick={handleAccountSelect}
-              />
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className={styles.widget}>
-          <h2>No Bank Feed Accounts</h2>
-          <p>You don't have any accounts set up for bank feed. Go to the Accounts page to add accounts to your bank feed.</p>
-        </div>
-      )}
+      <BankFeedAccountsList
+        accounts={bankFeedAccounts}
+        selectedAccountId={selectedAccountId}
+        onAccountSelect={handleAccountSelect}
+      />
 
-      {/* Add Transaction Button */}
-      <button
-        className={styles.addButton}
-        onClick={() => setIsAddModalOpen(true)}
-      >
-        + Add Transaction
-      </button>
+      {/* Action Buttons */}
+      <TransactionActionButtons
+        onAddClick={() => setIsAddModalOpen(true)}
+        onImportClick={() => setIsCSVUploadModalOpen(true)}
+        selectedAccountId={selectedAccountId}
+      />
 
-      {/* Transactions Table */}
+      {/* Status Filter */}
+      <TransactionFilters
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+      />
+
+      {/* Transactions List */}
       {loading ? (
         <p>Loading transactions...</p>
       ) : (
-        <TransactionTable
+        <TransactionList
           transactions={transactions}
           accounts={allAccounts}
+          selectedAccountId={selectedAccountId}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSort={handleSort}
           onUpdate={handleUpdateTransaction}
           onDelete={handleDeleteClick}
+          onUpdateStatus={handleUpdateStatus}
+          statusFilter={statusFilter}
+          pageSize={pageSize}
         />
       )}
 
@@ -270,37 +438,26 @@ export default function Transactions() {
       >
         <TransactionForm
           accounts={allAccounts}
+          selectedAccountId={selectedAccountId}
           onSubmit={handleAddTransaction}
           onCancel={() => setIsAddModalOpen(false)}
         />
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      <Modal
+      <DeleteTransactionModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        title="Confirm Deletion"
-      >
-        <div className={styles.confirmDialog}>
-          <p>Are you sure you want to delete this transaction?</p>
-          <p>This action cannot be undone.</p>
+        onConfirm={handleDeleteTransaction}
+      />
 
-          <div className={styles.confirmActions}>
-            <button
-              className={styles.deleteButton}
-              onClick={handleDeleteTransaction}
-            >
-              Delete
-            </button>
-            <button
-              className={styles.cancelButton}
-              onClick={() => setIsDeleteModalOpen(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </Modal>
+      {/* CSV Upload Modal */}
+      <CSVUploadModal
+        isOpen={isCSVUploadModalOpen}
+        onClose={() => setIsCSVUploadModalOpen(false)}
+        onUpload={handleCSVUpload}
+        selectedAccountId={selectedAccountId}
+      />
     </Layout>
   );
 }

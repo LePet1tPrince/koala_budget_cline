@@ -1,0 +1,75 @@
+.statusToggleContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 0.5rem;
+  background-color: #f7fafc;
+  border-radius: 24px;
+  padding: 0.25rem;
+  width: fit-content;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.statusButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: transparent;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #4a5568;
+}
+
+.statusButton:hover {
+  background-color: #edf2f7;
+}
+
+.statusButton.active {
+  background-color: #4299e1;
+  color: white;
+}
+
+.statusButton.review.active {
+  background-color: #f56565;
+}
+
+.statusButton.categorized.active {
+  background-color: #f6ad55;
+}
+
+.statusButton.reconciled.active {
+  background-color: #48bb78;
+}
+
+/* Status transition buttons */
+.statusTransitionButton {
+  padding: 0.35rem 0.75rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.reviewToCategorizingButton {
+  background-color: #f6ad55;
+  color: white;
+}
+
+.reviewToCategorizingButton:hover {
+  background-color: #ed8936;
+}
+
+.categorizedToReconciledButton {
+  background-color: #48bb78;
+  color: white;
+}
+
+.categorizedToReconciledButton:hover {
+  background-color: #38a169;
+}

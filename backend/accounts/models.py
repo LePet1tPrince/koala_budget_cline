@@ -63,6 +63,48 @@ class Account(models.Model):
     def __str__(self):
         return f"{self.num} - {self.name} ({self.type})"
 
+    def calculate_balance(self):
+        """
+        Calculate the account balance based on all transactions.
+        """
+        from django.db.models import Sum
+        from decimal import Decimal
+
+        # Get sum of all transactions where this account is debited (money coming in)
+        debit_sum = self.debit.aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0.00')
+
+        # Get sum of all transactions where this account is credited (money going out)
+        credit_sum = self.credit.aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0.00')
+
+        # Calculate balance based on account type
+        if self.type in ['Asset', 'Expense', 'Goal']:
+            # For asset, expense, and goal accounts:
+            # Debits increase the balance, credits decrease it
+            return debit_sum - credit_sum
+        elif self.type in ['Liability', 'Income', 'Equity']:
+            # For liability, income, and equity accounts:
+            # Credits increase the balance, debits decrease it
+            return credit_sum - debit_sum
+
+        return Decimal('0.00')
+
+    def update_balance(self):
+        """
+        Update the account balance and save it.
+        """
+        self.balance = self.calculate_balance()
+        # Use update to avoid triggering signals
+        type(self).objects.filter(pk=self.pk).update(balance=self.balance)
+
+class TransactionStatus(models.TextChoices):
+    REVIEW = 'review', 'Review'
+    CATEGORIZED = 'categorized', 'Categorized'
+    RECONCILED = 'reconciled', 'Reconciled'
+
 #Transaction model
 class Transaction(models.Model):
     date = models.DateField(auto_now_add=False)
@@ -79,7 +121,12 @@ class Transaction(models.Model):
         on_delete=models.RESTRICT,
         related_name="credit",)
     notes = models.CharField(max_length=500, null=True, blank=True)
-    is_reconciled = models.BooleanField(default=False)
+    is_reconciled = models.BooleanField(default=False)  # Keeping for backward compatibility
+    status = models.CharField(
+        max_length=20,
+        choices=TransactionStatus.choices,
+        default=TransactionStatus.REVIEW
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transactions')
 
     def __str__(self):

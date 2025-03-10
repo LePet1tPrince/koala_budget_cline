@@ -13,10 +13,22 @@
 .editButton {
   background-color: #4299e1;
   color: white;
+  border-radius: 20px; /* Pill shape */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
 }
 
 .editButton:hover {
   background-color: #3182ce;
+}
+
+.buttonIcon {
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .saveButton {
@@ -31,6 +43,10 @@
 .deleteButton {
   background-color: #f56565;
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
 }
 
 .deleteButton:hover {

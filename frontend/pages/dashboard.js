@@ -1,5 +1,8 @@
-import Layout from '../components/Layout';
-import styles from '../styles/Dashboard.module.css';
+import Layout from '../components/layout/Layout';
+import { LayoutStyles } from '../styles/modules';
+
+// Use LayoutStyles instead of styles
+const styles = LayoutStyles;
 
 export default function Dashboard() {
   return (

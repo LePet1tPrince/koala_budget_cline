@@ -1,10 +1,10 @@
-import { getCurrentUser, logout } from '../services/authService';
+import { getCurrentUser, logout } from '../../services/authService';
 import { useEffect, useState } from 'react';
 
 import Head from 'next/head';
 import Link from 'next/link';
 import Sidebar from './Sidebar';
-import { LayoutStyles as styles } from '../styles/modules';
+import { LayoutStyles as styles } from '../../styles/modules';
 import { useRouter } from 'next/router';
 
 export default function Layout({ children, title, activePage }) {

@@ -82,3 +82,10 @@
 .cancelButton:hover {
   background-color: #f7fafc;
 }
+
+.categoryHint {
+  font-size: 0.7rem;
+  color: #718096;
+  margin-top: 0.25rem;
+  font-style: italic;
+}

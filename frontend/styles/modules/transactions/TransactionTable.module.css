@@ -50,6 +50,38 @@
   gap: 0.5rem;
 }
 
+/* Status transition buttons */
+.statusTransitionButton {
+  padding: 0.35rem 0.75rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.reviewToCategorizingButton {
+  background-color: #f6ad55;
+  color: white;
+}
+
+.reviewToCategorizingButton:hover {
+  background-color: #ed8936;
+}
+
+.categorizedToReconciledButton {
+  background-color: #48bb78;
+  color: white;
+}
+
+.categorizedToReconciledButton:hover {
+  background-color: #38a169;
+}
+
 .editInput {
   width: 100%;
   padding: 0.5rem;
@@ -65,4 +97,54 @@
   text-align: center;
   color: #a0aec0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reconcileCheckbox {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #4a5568;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.accountSelects {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.accountSelectContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.accountSelectContainer label {
+  font-size: 0.75rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+/* Sortable Header Styles */
+.sortableHeader {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.sortableHeader:hover {
+  background-color: #edf2f7;
+}
+
+.categoryHint {
+  font-size: 0.7rem;
+  color: #718096;
+  margin-top: 0.25rem;
+  font-style: italic;
 }

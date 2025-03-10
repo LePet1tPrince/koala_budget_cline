@@ -1,8 +1,11 @@
+import { LayoutStyles, ProfileStyles } from '../styles/modules';
 import { useEffect, useState } from 'react';
 
-import Layout from '../components/Layout';
+import Layout from '../components/layout/Layout';
 import { getCurrentUser } from '../services/authService';
-import styles from '../styles/Dashboard.module.css';
+
+// Use LayoutStyles instead of styles
+const styles = LayoutStyles;
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -27,7 +30,7 @@ export default function Profile() {
         <div className={styles.widget}>
           <h2>User Information</h2>
           {user && (
-            <div className={styles.profileInfo}>
+            <div className={ProfileStyles.profileInfo}>
               <p><strong>Email:</strong> {user.email}</p>
               <p><strong>First Name:</strong> {user.first_name}</p>
               <p><strong>Last Name:</strong> {user.last_name}</p>

@@ -53,7 +53,7 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ('id', 'date', 'amount', 'debit', 'credit', 'debit_account', 'credit_account',
-                 'notes', 'is_reconciled', 'updated', 'user')
+                 'notes', 'is_reconciled', 'status', 'updated', 'user')
         read_only_fields = ('id', 'updated', 'user')
 
     def create(self, validated_data):

@@ -86,3 +86,29 @@ export const deleteTransaction = async (id) => {
     throw error;
   }
 };
+
+// Update transaction status
+export const updateTransactionStatus = async (id, status) => {
+  try {
+    const response = await apiClient.patch(`/transactions/${id}/update_status/`, { status });
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating transaction status: ${error}`);
+    throw error;
+  }
+};
+
+// Upload CSV file for transaction import
+export const uploadCSVTransactions = async (fileContent, columnMapping, selectedAccountId) => {
+  try {
+    const response = await apiClient.post('/transactions/upload_csv/', {
+      file_content: fileContent,
+      column_mapping: columnMapping,
+      selected_account_id: selectedAccountId
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error uploading CSV transactions:', error);
+    throw error;
+  }
+};
