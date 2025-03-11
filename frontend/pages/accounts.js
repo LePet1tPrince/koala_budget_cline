@@ -26,12 +26,27 @@ export default function Accounts() {
   const [accountTypes, setAccountTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Modal states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentAccount, setCurrentAccount] = useState(null);
+
+  // Filter accounts based on search query
+  const filteredAccounts = accounts.filter(account => {
+    if (!searchQuery.trim()) return true;
+
+    const query = searchQuery.toLowerCase();
+    return (
+      (account.num && String(account.num).toLowerCase().includes(query)) ||
+      (account.name && String(account.name).toLowerCase().includes(query)) ||
+      (account.type && String(account.type).toLowerCase().includes(query)) ||
+      (account.sub_type && typeof account.sub_type === 'object' &&
+        account.sub_type.sub_type && String(account.sub_type.sub_type).toLowerCase().includes(query))
+    );
+  });
 
   // Function to refresh accounts data
   const refreshAccounts = async () => {
@@ -144,6 +159,24 @@ export default function Accounts() {
       {/* Error Message */}
       {error && <p className={styles.errorText}>{error}</p>}
 
+      {/* Search Input */}
+      <div className={styles.searchContainer}>
+        <label htmlFor="accountSearch" className={styles.searchLabel}>Search Accounts:</label>
+        <input
+          id="accountSearch"
+          type="text"
+          className={styles.searchInput}
+          placeholder="Search by name, number, or type..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {searchQuery && (
+          <span className={styles.resultsInfo}>
+            Found {filteredAccounts.length} of {accounts.length} accounts
+          </span>
+        )}
+      </div>
+
       {/* Accounts Table */}
       {loading ? (
         <p>Loading accounts...</p>
@@ -151,6 +184,11 @@ export default function Accounts() {
         <div className={styles.widget}>
           <h2>No Accounts Found</h2>
           <p>You haven't added any accounts yet. Click the "Add Account" button to get started.</p>
+        </div>
+      ) : filteredAccounts.length === 0 ? (
+        <div className={styles.widget}>
+          <h2>No Matching Accounts</h2>
+          <p>No accounts match your search query. Try a different search term.</p>
         </div>
       ) : (
         <table className={styles.accountsTable}>
@@ -166,7 +204,7 @@ export default function Accounts() {
             </tr>
           </thead>
           <tbody>
-            {accounts.map(account => (
+            {filteredAccounts.map(account => (
               <tr key={account.id}>
                 <td>{account.num}</td>
                 <td>{account.name}</td>
