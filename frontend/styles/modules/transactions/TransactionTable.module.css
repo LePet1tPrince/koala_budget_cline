@@ -31,6 +31,13 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Placeholder for bulk actions container to prevent layout shift */
+.bulkActionsPlaceholder {
+  height: 52px; /* Match the height of the bulk actions container including padding */
+  margin-bottom: 10px; /* Match the margin of the bulk actions container */
+  visibility: hidden; /* Hide the content but preserve the space */
+}
+
 .selectedCount {
   margin-right: auto;
   font-weight: 600;

@@ -493,7 +493,13 @@ const TransactionTable = ({
           {bulkEditError}
         </div>
       )}
-      {/* Bulk Actions Bar */}
+
+      {/* Placeholder for bulk actions - only shown when no transactions are selected */}
+      {selectedTransactions.length === 0 && (
+        <div className={styles.bulkActionsPlaceholder}></div>
+      )}
+
+      {/* Bulk Actions Bar - only shown when transactions are selected */}
       {selectedTransactions.length > 0 && (
         <div className={styles.bulkActionsContainer}>
           <span className={styles.selectedCount}>
