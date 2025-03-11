@@ -3,7 +3,9 @@ import {
   ButtonStyles,
   FormStyles,
   LayoutStyles,
-  ModalStyles
+  ModalStyles,
+  StatusToggleStyles,
+  ToggleStyles
 } from '../styles/modules';
 import { createAccount, deleteAccount, getAccounts, getSubAccountTypes, updateAccount } from '../services/accountService';
 import { useEffect, useState } from 'react';
@@ -27,6 +29,9 @@ export default function Accounts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortField, setSortField] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [typeFilter, setTypeFilter] = useState('all');
 
   // Modal states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -34,8 +39,15 @@ export default function Accounts() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentAccount, setCurrentAccount] = useState(null);
 
-  // Filter accounts based on search query
+  // Get unique account types for the filter
+  const uniqueAccountTypes = ['all', ...new Set(accounts.filter(account => account.type).map(account => account.type))];
+
+  // Filter accounts based on search query and type filter
   const filteredAccounts = accounts.filter(account => {
+    // Filter by type first
+    if (typeFilter !== 'all' && account.type !== typeFilter) return false;
+
+    // Then filter by search query
     if (!searchQuery.trim()) return true;
 
     const query = searchQuery.toLowerCase();
@@ -47,6 +59,42 @@ export default function Accounts() {
         account.sub_type.sub_type && String(account.sub_type.sub_type).toLowerCase().includes(query))
     );
   });
+
+  // Sort accounts based on sort field and direction
+  const sortedAccounts = [...filteredAccounts].sort((a, b) => {
+    if (!sortField) return 0;
+
+    // Get values to compare
+    let aValue = a[sortField];
+    let bValue = b[sortField];
+
+    // Handle special cases
+    if (sortField === 'sub_type') {
+      aValue = a.sub_type && typeof a.sub_type === 'object' ? a.sub_type.sub_type : '';
+      bValue = b.sub_type && typeof b.sub_type === 'object' ? b.sub_type.sub_type : '';
+    } else if (sortField === 'balance') {
+      aValue = parseFloat(a.balance) || 0;
+      bValue = parseFloat(b.balance) || 0;
+    }
+
+    // Convert to strings for comparison if they're not numbers
+    if (sortField !== 'balance') {
+      aValue = aValue ? String(aValue).toLowerCase() : '';
+      bValue = bValue ? String(bValue).toLowerCase() : '';
+    }
+
+    // Compare based on direction
+    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  // Handle sort when a header is clicked
+  const handleSort = (field) => {
+    const newDirection = sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
+    setSortField(field);
+    setSortDirection(newDirection);
+  };
 
   // Function to refresh accounts data
   const refreshAccounts = async () => {
@@ -159,22 +207,40 @@ export default function Accounts() {
       {/* Error Message */}
       {error && <p className={styles.errorText}>{error}</p>}
 
-      {/* Search Input */}
-      <div className={styles.searchContainer}>
-        <label htmlFor="accountSearch" className={styles.searchLabel}>Search Accounts:</label>
-        <input
-          id="accountSearch"
-          type="text"
-          className={styles.searchInput}
-          placeholder="Search by name, number, or type..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        {searchQuery && (
-          <span className={styles.resultsInfo}>
-            Found {filteredAccounts.length} of {accounts.length} accounts
-          </span>
-        )}
+      {/* Search and Filter Controls */}
+      <div className={styles.controlsContainer}>
+        <div className={styles.searchContainer}>
+          <label htmlFor="accountSearch" className={styles.searchLabel}>Search Accounts:</label>
+          <input
+            id="accountSearch"
+            type="text"
+            className={styles.searchInput}
+            placeholder="Search by name, number, or type..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <span className={styles.resultsInfo}>
+              Found {filteredAccounts.length} of {accounts.length} accounts
+            </span>
+          )}
+        </div>
+
+        {/* Account Type Filter */}
+        <div className={styles.filterContainer}>
+          <label className={styles.filterLabel}>Filter by Type:</label>
+          <div className={StatusToggleStyles.statusToggleContainer}>
+            {uniqueAccountTypes.map(type => (
+              <button
+                key={type}
+                className={`${StatusToggleStyles.statusButton} ${typeFilter === type ? StatusToggleStyles.active : ''}`}
+                onClick={() => setTypeFilter(type)}
+              >
+                {type === 'all' ? 'All' : type}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Accounts Table */}
@@ -185,7 +251,7 @@ export default function Accounts() {
           <h2>No Accounts Found</h2>
           <p>You haven't added any accounts yet. Click the "Add Account" button to get started.</p>
         </div>
-      ) : filteredAccounts.length === 0 ? (
+      ) : sortedAccounts.length === 0 ? (
         <div className={styles.widget}>
           <h2>No Matching Accounts</h2>
           <p>No accounts match your search query. Try a different search term.</p>
@@ -194,17 +260,59 @@ export default function Accounts() {
         <table className={styles.accountsTable}>
           <thead>
             <tr>
-              <th>Account Number</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Sub Type</th>
-              <th>Balance</th>
-              <th>Bank Feed</th>
+              <th onClick={() => handleSort('num')} className={styles.sortableHeader}>
+                Account Number
+                {sortField === 'num' && (
+                  <span className={styles.sortIcon}>
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort('name')} className={styles.sortableHeader}>
+                Name
+                {sortField === 'name' && (
+                  <span className={styles.sortIcon}>
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort('type')} className={styles.sortableHeader}>
+                Type
+                {sortField === 'type' && (
+                  <span className={styles.sortIcon}>
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort('sub_type')} className={styles.sortableHeader}>
+                Sub Type
+                {sortField === 'sub_type' && (
+                  <span className={styles.sortIcon}>
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort('balance')} className={styles.sortableHeader}>
+                Balance
+                {sortField === 'balance' && (
+                  <span className={styles.sortIcon}>
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
+              <th onClick={() => handleSort('inBankFeed')} className={styles.sortableHeader}>
+                Bank Feed
+                {sortField === 'inBankFeed' && (
+                  <span className={styles.sortIcon}>
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredAccounts.map(account => (
+            {sortedAccounts.map(account => (
               <tr key={account.id}>
                 <td>{account.num}</td>
                 <td>{account.name}</td>
@@ -229,7 +337,16 @@ export default function Accounts() {
 
                   return '0.00';
                 })()}</td>
-                <td>{account.inBankFeed ? 'Yes' : 'No'}</td>
+                <td>
+                  <label className={ToggleStyles.toggleSwitch}>
+                    <input
+                      type="checkbox"
+                      checked={account.inBankFeed}
+                      readOnly
+                    />
+                    <span className={ToggleStyles.toggleSlider}></span>
+                  </label>
+                </td>
                 <td className={styles.accountActions}>
                   <button
                     className={styles.editButton}
