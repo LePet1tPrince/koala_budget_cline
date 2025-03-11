@@ -7,6 +7,7 @@ Koala Budget is a comprehensive personal finance management application that hel
 - **User Authentication**: Secure email-based authentication system
 - **Financial Account Management**: Create and manage different types of financial accounts
 - **Transaction Tracking**: Record financial transactions with double-entry accounting
+- **Bank Integration**: Connect to your bank accounts via Plaid to automatically import transactions
 - **Budget Planning**: Create and manage budgets for different spending categories
 - **Financial Visualization**: View your financial progress with charts and reports
 - **Responsive Design**: Works on desktop and mobile devices
@@ -20,11 +21,13 @@ Koala Budget is a comprehensive personal finance management application that hel
 - Celery (for background tasks)
 - Redis (for caching and message broker)
 - JWT Authentication
+- Plaid API (for bank account integration)
 
 ### Frontend
 - Next.js
 - React
 - Axios (for API requests)
+- React Plaid Link (for bank account integration)
 
 ### Infrastructure
 - Docker & Docker Compose
@@ -59,7 +62,11 @@ Koala Budget follows a microservices architecture with containerized services:
 2. Create a `.env` file in the root directory with the following variables:
    ```
    DJANGO_SECRET_KEY=your_secret_key_here
+   PLAID_CLIENT_ID=your_plaid_client_id
+   PLAID_SECRET=your_plaid_secret
    ```
+
+   You can obtain Plaid API credentials by signing up at [https://plaid.com/](https://plaid.com/)
 
 3. Build and start the containers:
    ```bash
@@ -88,6 +95,13 @@ Koala Budget follows a microservices architecture with containerized services:
 2. Click "Add Transaction" to record income or expenses
 3. Select the appropriate accounts for the transaction
 
+### Connecting to Bank Accounts
+1. Navigate to the Transactions section
+2. Select a bank feed account from the list
+3. Click "Connect to Bank" to link your bank account
+4. Follow the prompts to authenticate with your bank
+5. Your transactions will be automatically imported and updated daily
+
 ## Development
 
 ### Running in Development Mode
@@ -113,6 +127,10 @@ Key endpoints:
 - `/api/users/` - User management
 - `/api/accounts/` - Account management
 - `/api/transactions/` - Transaction management
+- `/api/plaid/create_link_token/` - Create a Plaid Link token
+- `/api/plaid/exchange_public_token/` - Exchange a Plaid public token for an access token
+- `/api/plaid/sync_transactions/` - Sync transactions from Plaid
+- `/api/plaid/items/` - Manage Plaid connections
 
 ## Contributing
 

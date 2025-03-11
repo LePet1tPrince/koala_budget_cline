@@ -19,6 +19,7 @@ import DeleteTransactionModal from '../components/transactions/DeleteTransaction
 import Layout from '../components/layout/Layout';
 import { LayoutStyles } from '../styles/modules';
 import Modal from '../components/common/Modal';
+import PlaidLinkModal from '../components/transactions/PlaidLinkModal';
 import TransactionActionButtons from '../components/transactions/TransactionActionButtons';
 import TransactionFilters from '../components/transactions/TransactionFilters';
 import TransactionForm from '../components/transactions/TransactionForm';
@@ -92,6 +93,7 @@ export default function Transactions() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCSVUploadModalOpen, setIsCSVUploadModalOpen] = useState(false);
+  const [isPlaidLinkModalOpen, setIsPlaidLinkModalOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
 
   // Notification context
@@ -402,6 +404,7 @@ export default function Transactions() {
       <TransactionActionButtons
         onAddClick={() => setIsAddModalOpen(true)}
         onImportClick={() => setIsCSVUploadModalOpen(true)}
+        onPlaidConnect={() => setIsPlaidLinkModalOpen(true)}
         selectedAccountId={selectedAccountId}
       />
 
@@ -484,6 +487,23 @@ export default function Transactions() {
         onClose={() => setIsCSVUploadModalOpen(false)}
         onUpload={handleCSVUpload}
         selectedAccountId={selectedAccountId}
+      />
+
+      {/* Plaid Link Modal */}
+      <PlaidLinkModal
+        isOpen={isPlaidLinkModalOpen}
+        onClose={() => setIsPlaidLinkModalOpen(false)}
+        accountId={selectedAccountId}
+        onSuccess={async (plaidItem) => {
+          // Refresh transactions list after connecting to Plaid
+          if (selectedAccountId) {
+            const updatedTransactions = await getTransactionsByAccount(selectedAccountId);
+            setTransactions(updatedTransactions || []);
+          }
+
+          // Refresh account balances
+          await refreshAccountBalances();
+        }}
       />
     </Layout>
   );

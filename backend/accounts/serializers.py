@@ -40,11 +40,16 @@ class AccountSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    is_plaid_linked = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Account
-        fields = ('id', 'name', 'num', 'type', 'sub_type', 'sub_type_id', 'inBankFeed', 'balance', 'reconciled_balance', 'user')
-        read_only_fields = ('id', 'user')
+        fields = ('id', 'name', 'num', 'type', 'sub_type', 'sub_type_id', 'inBankFeed', 'balance', 'reconciled_balance', 'user', 'is_plaid_linked')
+        read_only_fields = ('id', 'user', 'is_plaid_linked')
+
+    def get_is_plaid_linked(self, obj):
+        # Check if there's an active PlaidItem for this account
+        return obj.plaid_connection.filter(status='active').exists()
 
 class TransactionSerializer(serializers.ModelSerializer):
     debit_account = AccountSerializer(source='debit', read_only=True)

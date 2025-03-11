@@ -86,3 +86,15 @@
   background-color: #ebf4ff;
   border-left: 4px solid #4299e1;
 }
+
+/* Plaid link indicator */
+.plaidLinkedIndicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #4299e1;
+}
+
+.linkIcon {
+  display: inline-block;
+}

@@ -13,6 +13,9 @@ services:
       - DATABASE_URL=postgres://koala_user:koala_password@db:5432/koala_budget
       - DEBUG=True
       - SECRET_KEY=${DJANGO_SECRET_KEY}
+      - PLAID_CLIENT_ID=${PLAID_CLIENT_ID}
+      - PLAID_SECRET=${PLAID_SECRET}
+      - PLAID_ENV=sandbox
     command: >
       sh -c "python manage.py makemigrations accounts &&
              python manage.py migrate --run-syncdb &&
@@ -65,6 +68,9 @@ services:
     environment:
       - DATABASE_URL=postgres://koala_user:koala_password@db:5432/koala_budget
       - REDIS_URL=redis://redis:6379/0
+      - PLAID_CLIENT_ID=${PLAID_CLIENT_ID}
+      - PLAID_SECRET=${PLAID_SECRET}
+      - PLAID_ENV=sandbox
 
   celery-beat:
     build: ./backend
@@ -77,6 +83,9 @@ services:
     environment:
       - DATABASE_URL=postgres://koala_user:koala_password@db:5432/koala_budget
       - REDIS_URL=redis://redis:6379/0
+      - PLAID_CLIENT_ID=${PLAID_CLIENT_ID}
+      - PLAID_SECRET=${PLAID_SECRET}
+      - PLAID_ENV=sandbox
 
 volumes:
   postgres_data:

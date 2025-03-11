@@ -1,7 +1,9 @@
 .editButton,
 .deleteButton,
 .saveButton,
-.addButton {
+.addButton,
+.importButton,
+.plaidButton {
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -65,4 +67,44 @@
 
 .addButton:hover {
   background-color: #38a169;
+}
+
+.importButton {
+  background-color: #805ad5;
+  color: white;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  margin-left: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.importButton:hover {
+  background-color: #6b46c1;
+}
+
+.importButton:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.plaidButton {
+  background-color: #0077b6;
+  color: white;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  margin-left: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plaidButton:hover {
+  background-color: #023e8a;
+}
+
+.plaidButton:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
 }

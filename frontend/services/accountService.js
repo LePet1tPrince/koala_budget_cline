@@ -95,3 +95,31 @@ export const getBankFeedAccounts = async () => {
     throw error;
   }
 };
+
+// Get all accounts (used by Plaid account mapping)
+export const getAllAccounts = async () => {
+  try {
+    const response = await apiClient.get('/accounts/');
+
+    // Validate the response
+    if (!response.data || !Array.isArray(response.data)) {
+      console.error('Invalid response format from accounts API:', response.data);
+      throw new Error('Invalid response format from accounts API');
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all accounts:', error);
+    // Add more context to the error
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('No response received:', error.request);
+    }
+    throw error;
+  }
+};
