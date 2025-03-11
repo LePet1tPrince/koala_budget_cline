@@ -1,6 +1,8 @@
 import { ButtonStyles, FormStyles, TransactionTableStyles as styles } from '../../styles/modules';
+import { useEffect, useState } from 'react';
 
-import { useState } from 'react';
+import BulkEditModal from './BulkEditModal';
+import { bulkUpdateTransactions } from '../../services/transactionService';
 
 const TransactionTable = ({
   transactions,
@@ -11,7 +13,8 @@ const TransactionTable = ({
   onSort,
   onUpdate,
   onDelete,
-  onUpdateStatus
+  onUpdateStatus,
+  onRefresh
 }) => {
   // Debug: Log transactions to see their structure
   console.log('Transactions in table:', transactions);
@@ -24,6 +27,143 @@ const TransactionTable = ({
     notes: '',
     is_reconciled: false
   });
+
+  // State for selected transactions
+  const [selectedTransactions, setSelectedTransactions] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
+  const [bulkEditError, setBulkEditError] = useState(null);
+
+  // Instead of resetting selections when transactions change,
+  // we'll maintain selections for IDs that still exist
+  useEffect(() => {
+    if (selectedTransactions.length > 0) {
+      const existingIds = transactions.map(t => t.id);
+      const stillSelectedIds = selectedTransactions.filter(id =>
+        existingIds.includes(id)
+      );
+
+      setSelectedTransactions(stillSelectedIds);
+      setSelectAll(stillSelectedIds.length === transactions.length && transactions.length > 0);
+    }
+  }, [transactions]);
+
+  // Selection handlers
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedTransactions(transactions.map(t => t.id));
+      setSelectAll(true);
+    } else {
+      setSelectedTransactions([]);
+      setSelectAll(false);
+    }
+  };
+
+  const handleSelectTransaction = (e, id) => {
+    // Stop propagation to prevent row click from triggering
+    e.stopPropagation();
+
+    if (selectedTransactions.includes(id)) {
+      setSelectedTransactions(selectedTransactions.filter(tId => tId !== id));
+      setSelectAll(false);
+    } else {
+      setSelectedTransactions([...selectedTransactions, id]);
+      if (selectedTransactions.length + 1 === transactions.length) {
+        setSelectAll(true);
+      }
+    }
+  };
+
+  // Bulk action handlers
+  const handleBulkDelete = () => {
+    if (confirm(`Are you sure you want to delete ${selectedTransactions.length} transactions?`)) {
+      Promise.all(selectedTransactions.map(id => onDelete(id)))
+        .then(() => {
+          setSelectedTransactions([]);
+          setSelectAll(false);
+        })
+        .catch(error => {
+          console.error('Error deleting transactions:', error);
+          alert('Failed to delete some transactions. Please try again.');
+        });
+    }
+  };
+
+  const handleBulkEdit = () => {
+    setIsBulkEditModalOpen(true);
+    setBulkEditError(null);
+  };
+
+  const handleBulkEditSubmit = async (transactionIds, updateData) => {
+    try {
+      // Validate that we have transaction IDs
+      if (!transactionIds || transactionIds.length === 0) {
+        setBulkEditError('No transactions selected for update');
+        return;
+      }
+
+      // Validate that we have data to update
+      if (!updateData || Object.keys(updateData).length === 0) {
+        setBulkEditError('No fields selected for update');
+        return;
+      }
+
+      console.log('Bulk edit submit - transactionIds:', transactionIds);
+      console.log('Bulk edit submit - updateData:', updateData);
+      console.log('Bulk edit submit - selectedAccountId:', selectedAccountId);
+
+      // Pass the selectedAccountId to the bulkUpdateTransactions function
+      const result = await bulkUpdateTransactions(transactionIds, updateData, selectedAccountId);
+      console.log('Bulk update result:', result);
+
+      // Refresh transactions after bulk update using the dedicated refresh function
+      // This avoids the issue of trying to update a transaction with an empty object
+      if (onRefresh) {
+        await onRefresh();
+      }
+
+      // Only clear selections if the update was successful and the user wants to clear them
+      // For now, we'll keep the selections to allow for multiple operations
+      setIsBulkEditModalOpen(false);
+
+      // Show success message
+      setBulkEditError(null);
+    } catch (error) {
+      console.error('Error in bulk edit:', error);
+
+      // Extract detailed error information
+      let errorMessage = 'Failed to update transactions';
+
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        console.error('Error details:', errorData);
+
+        if (errorData.detail) {
+          errorMessage += `: ${errorData.detail}`;
+        }
+
+        if (errorData.missing_ids) {
+          errorMessage += `. Missing transaction IDs: ${errorData.missing_ids.join(', ')}`;
+        }
+      } else if (error.message) {
+        errorMessage += `: ${error.message}`;
+      }
+
+      setBulkEditError(errorMessage);
+    }
+  };
+
+  const handleBulkStatusUpdate = (status) => {
+    Promise.all(selectedTransactions.map(id => onUpdateStatus(id, status)))
+      .then(() => {
+        // Keep selections after status update to allow for multiple operations
+        // The user can manually deselect if needed
+      })
+      .catch(error => {
+        console.error('Error updating transaction status:', error);
+        alert('Failed to update status for some transactions. Please try again.');
+      });
+  };
 
   // Start editing a transaction
   const handleEditClick = (transaction) => {
@@ -196,11 +336,28 @@ const TransactionTable = ({
     return amount.toFixed(2);
   };
 
+  // Row click handler
+  const handleRowClick = (transaction) => {
+    // Only open edit mode if we're not already editing and the row isn't in the selected transactions
+    if (editingId !== transaction.id) {
+      handleEditClick(transaction);
+    }
+  };
+
   // Render table row based on whether it's being edited
   const renderRow = (transaction) => {
     if (editingId === transaction.id) {
       return (
         <tr key={transaction.id} className={styles.editingRow}>
+          <td className={styles.checkboxColumn}>
+            <input
+              type="checkbox"
+              checked={selectedTransactions.includes(transaction.id)}
+              onChange={(e) => handleSelectTransaction(e, transaction.id)}
+              className={styles.checkbox}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </td>
           <td>
             <input
               type="date"
@@ -286,7 +443,19 @@ const TransactionTable = ({
     }
 
     return (
-      <tr key={transaction.id}>
+      <tr
+        key={transaction.id}
+        className={styles.clickableRow}
+        onClick={() => handleRowClick(transaction)}
+      >
+        <td className={styles.checkboxColumn} onClick={(e) => e.stopPropagation()}>
+          <input
+            type="checkbox"
+            checked={selectedTransactions.includes(transaction.id)}
+            onChange={(e) => handleSelectTransaction(e, transaction.id)}
+            className={styles.checkbox}
+          />
+        </td>
         <td>{formatDate(transaction.date)}</td>
         <td className={styles.amountCell}>
           ${getAdjustedAmount(transaction)}
@@ -294,41 +463,13 @@ const TransactionTable = ({
         <td>{getCategoryName(transaction)}</td>
         <td>{transaction.notes}</td>
         <td>
-          {transaction.status === 'review' ? (
-            <button
-              type="button"
-              onClick={() => onUpdateStatus(transaction.id, 'categorized')}
-              className={`${styles.statusTransitionButton} ${styles.reviewToCategorizingButton}`}
-            >
-              Mark as Categorized
-            </button>
-          ) : transaction.status === 'categorized' ? (
-            <button
-              type="button"
-              onClick={() => onUpdateStatus(transaction.id, 'reconciled')}
-              className={`${styles.statusTransitionButton} ${styles.categorizedToReconciledButton}`}
-            >
-              Mark as Reconciled
-            </button>
-          ) : null}
-        </td>
-        <td className={styles.actionButtons}>
-          <button
-            type="button"
-            onClick={() => handleEditClick(transaction)}
-            className={styles.editButton}
-          >
-            <span className={styles.buttonIcon}>✏️</span>
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={() => onDelete(transaction.id)}
-            className={styles.deleteButton}
-          >
-            <span className={styles.buttonIcon}>❌</span>
-            Delete
-          </button>
+          {transaction.status === 'review' || transaction.status === 'categorized' ? (
+            <span className={styles.statusText}>
+              {transaction.status === 'review' ? 'Review' : 'Categorized'}
+            </span>
+          ) : (
+            <span className={styles.statusText}>Reconciled</span>
+          )}
         </td>
       </tr>
     );
@@ -336,6 +477,55 @@ const TransactionTable = ({
 
   return (
     <div className={styles.tableContainer}>
+      {/* Bulk Edit Modal */}
+      <BulkEditModal
+        isOpen={isBulkEditModalOpen}
+        onClose={() => setIsBulkEditModalOpen(false)}
+        onSubmit={handleBulkEditSubmit}
+        transactionIds={selectedTransactions}
+        accounts={accounts}
+        selectedAccountId={selectedAccountId}
+      />
+
+      {/* Error message for bulk edit */}
+      {bulkEditError && (
+        <div className={styles.errorMessage}>
+          {bulkEditError}
+        </div>
+      )}
+      {/* Bulk Actions Bar */}
+      {selectedTransactions.length > 0 && (
+        <div className={styles.bulkActionsContainer}>
+          <span className={styles.selectedCount}>
+            {selectedTransactions.length} transaction{selectedTransactions.length !== 1 ? 's' : ''} selected
+          </span>
+          <button
+            className={`${styles.bulkActionButton} ${styles.editButton}`}
+            onClick={handleBulkEdit}
+          >
+            Edit Transactions
+          </button>
+          <button
+            className={`${styles.bulkActionButton} ${styles.deleteButton}`}
+            onClick={handleBulkDelete}
+          >
+            Delete Transactions
+          </button>
+          <button
+            className={`${styles.bulkActionButton} ${styles.categorizeButton}`}
+            onClick={() => handleBulkStatusUpdate('categorized')}
+          >
+            Mark as Categorized
+          </button>
+          <button
+            className={`${styles.bulkActionButton} ${styles.reconcileButton}`}
+            onClick={() => handleBulkStatusUpdate('reconciled')}
+          >
+            Mark as Reconciled
+          </button>
+        </div>
+      )}
+
       {transactions.length === 0 ? (
         <div className={styles.noTransactions}>
           <p>No transactions found for this account.</p>
@@ -344,6 +534,14 @@ const TransactionTable = ({
         <table className={styles.transactionsTable}>
           <thead>
             <tr>
+              <th className={styles.checkboxColumn}>
+                <input
+                  type="checkbox"
+                  checked={selectAll}
+                  onChange={handleSelectAll}
+                  className={`${styles.checkbox} ${styles.selectAllCheckbox}`}
+                />
+              </th>
               <th
                 onClick={() => onSort('date')}
                 className={styles.sortableHeader}
@@ -374,7 +572,6 @@ const TransactionTable = ({
               >
                 Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>

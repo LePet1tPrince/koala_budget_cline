@@ -98,6 +98,51 @@ export const updateTransactionStatus = async (id, status) => {
   }
 };
 
+// Bulk update transactions
+export const bulkUpdateTransactions = async (ids, updateData, selectedAccountId) => {
+  try {
+    // Validate inputs
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      throw new Error('Transaction IDs must be a non-empty array');
+    }
+
+    if (!updateData || Object.keys(updateData).length === 0) {
+      throw new Error('Update data is required');
+    }
+
+    // Ensure all IDs are numbers
+    const numericIds = ids.map(id => Number(id));
+
+    // Add the selected account ID as a query parameter
+    const url = selectedAccountId
+      ? `/transactions/bulk_update/?account=${selectedAccountId}`
+      : '/transactions/bulk_update/';
+
+    // Format the category ID as a number if present
+    const formattedUpdateData = { ...updateData };
+    if (formattedUpdateData.category) {
+      formattedUpdateData.category = Number(formattedUpdateData.category);
+    }
+
+    // Also include the selectedAccountId in the request body as a fallback
+    const response = await apiClient.post(url, {
+      ids: numericIds,
+      selectedAccountId: selectedAccountId ? Number(selectedAccountId) : undefined,
+      ...formattedUpdateData
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error bulk updating transactions:', error);
+    // Add more context to the error
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    }
+    throw error;
+  }
+};
+
 // Upload CSV file for transaction import
 export const uploadCSVTransactions = async (fileContent, columnMapping, selectedAccountId) => {
   try {

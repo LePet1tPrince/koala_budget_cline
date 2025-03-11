@@ -427,6 +427,33 @@ export default function Transactions() {
           onUpdateStatus={handleUpdateStatus}
           statusFilter={statusFilter}
           pageSize={pageSize}
+          onRefresh={async () => {
+            // Dedicated refresh function that doesn't rely on updating a transaction
+            try {
+              setLoading(true);
+              if (selectedAccountId) {
+                // If an account is selected, fetch transactions for that account
+                const updatedTransactions = await getTransactionsByAccount(selectedAccountId);
+                console.log('Refreshed transactions for account:', updatedTransactions);
+                setTransactions(updatedTransactions || []);
+              } else {
+                // Otherwise fetch all transactions
+                const allTransactions = await getTransactions();
+                console.log('Refreshed all transactions:', allTransactions);
+                setTransactions(allTransactions || []);
+              }
+
+              // Also refresh account balances
+              await refreshAccountBalances();
+
+              setError(null);
+            } catch (err) {
+              console.error('Error refreshing transactions:', err);
+              setError('Failed to refresh transactions. Error: ' + (err.message || 'Unknown error'));
+            } finally {
+              setLoading(false);
+            }
+          }}
         />
       )}
 

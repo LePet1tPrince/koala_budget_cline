@@ -168,6 +168,162 @@ class TransactionViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=False, methods=['post'])
+    def bulk_update(self, request):
+        """
+        Update multiple transactions at once.
+
+        Expected request data:
+        - ids: List of transaction IDs to update
+        - category: (optional) Category ID to set for all transactions
+        - notes: (optional) Notes to set for all transactions
+        - is_reconciled: (optional) Boolean to set reconciled status
+        """
+        # Debug logging
+        print(f"Bulk update request data: {request.data}")
+        print(f"Bulk update query params: {request.query_params}")
+
+        try:
+            # Get transaction IDs and update data
+            transaction_ids = request.data.get('ids', [])
+
+            if not transaction_ids:
+                return Response(
+                    {"detail": "No transaction IDs provided"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validate that transaction_ids is a list
+            if not isinstance(transaction_ids, list):
+                return Response(
+                    {"detail": "Transaction IDs must be provided as a list"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validate that all transactions exist and belong to the user
+            transactions = Transaction.objects.filter(
+                id__in=transaction_ids,
+                user=request.user
+            )
+
+            if len(transactions) != len(transaction_ids):
+                # Find which transaction IDs don't exist
+                found_ids = [str(t.id) for t in transactions]
+                missing_ids = [str(tid) for tid in transaction_ids if str(tid) not in found_ids]
+                return Response(
+                    {
+                        "detail": "Some transactions were not found",
+                        "missing_ids": missing_ids
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Process updates
+            updated_count = 0
+            updated_fields = []
+
+            # Handle category updates if provided
+            if 'category' in request.data:
+                category_id = request.data.get('category')
+                if not category_id:
+                    return Response(
+                        {"detail": "Category ID cannot be empty if category field is included"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+                # Validate that the category account exists
+                try:
+                    category_account = Account.objects.get(id=category_id, user=request.user)
+                    updated_fields.append('category')
+                except Account.DoesNotExist:
+                    return Response(
+                        {"detail": f"Category account with ID {category_id} not found"},
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+
+                # Get the selected account ID from query params or request data
+                selected_account_id = None
+
+                # First try to get from query params
+                account_param = request.query_params.get('account')
+                if account_param:
+                    try:
+                        selected_account_id = int(account_param)
+                        print(f"Selected account ID from query params: {selected_account_id}")
+                    except (ValueError, TypeError) as e:
+                        print(f"Error parsing account param from query params: {e}")
+
+                # If not found in query params, try to get from request data
+                if not selected_account_id and 'selectedAccountId' in request.data:
+                    try:
+                        selected_account_id = int(request.data.get('selectedAccountId'))
+                        print(f"Selected account ID from request data: {selected_account_id}")
+                    except (ValueError, TypeError) as e:
+                        print(f"Error parsing account param from request data: {e}")
+
+                if not selected_account_id:
+                    return Response(
+                        {"detail": "Selected account ID is required for category updates"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+                # Update each transaction's category
+                for transaction in transactions:
+                    if selected_account_id:
+                        # Debug logging
+                        print(f"Transaction {transaction.id}: debit_id={transaction.debit_id}, credit_id={transaction.credit_id}")
+
+                        # Update the appropriate field based on which account is the selected one
+                        if transaction.debit_id == selected_account_id:
+                            print(f"Updating credit_id to {category_id} (selected account is debit)")
+                            transaction.credit_id = category_id
+                        else:
+                            print(f"Updating debit_id to {category_id} (selected account is credit)")
+                            transaction.debit_id = category_id
+
+                        transaction.save()
+                        updated_count += 1
+                    else:
+                        print(f"Skipping transaction {transaction.id} - no selected account ID")
+
+            # Handle notes updates if provided
+            if 'notes' in request.data:
+                notes = request.data.get('notes')
+                # Notes can be empty, so we don't need to validate
+                updated_fields.append('notes')
+                for transaction in transactions:
+                    transaction.notes = notes
+                    transaction.save()
+                    updated_count += 1
+
+            # Handle is_reconciled updates if provided
+            if 'is_reconciled' in request.data:
+                is_reconciled = request.data.get('is_reconciled')
+                updated_fields.append('is_reconciled')
+                for transaction in transactions:
+                    transaction.is_reconciled = is_reconciled
+                    transaction.save()
+                    updated_count += 1
+
+            if not updated_fields:
+                return Response(
+                    {"detail": "No fields to update were provided"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            return Response({
+                "detail": f"Successfully updated {updated_count} transactions",
+                "updated_fields": updated_fields,
+                "transaction_count": len(transactions)
+            })
+
+        except Exception as e:
+            print(f"Error in bulk update: {str(e)}")
+            return Response(
+                {"detail": f"Error processing bulk update: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=False, methods=['post'])
     def upload_csv(self, request):
         """
         Upload and process a CSV file of transactions.

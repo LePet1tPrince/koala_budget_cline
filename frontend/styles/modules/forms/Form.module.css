@@ -41,6 +41,18 @@
   border-radius: 4px;
 }
 
+.formError {
+  color: #f56565;
+  font-size: 0.875rem;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: #fff5f5;
+  border: 1px solid #f56565;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 500;
+}
+
 .checkboxLabel {
   display: flex;
   align-items: center;

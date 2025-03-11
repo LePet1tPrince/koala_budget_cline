@@ -12,7 +12,8 @@ const TransactionList = ({
   onDelete,
   onUpdateStatus,
   statusFilter,
-  pageSize = 10
+  pageSize = 10,
+  onRefresh // New prop for refreshing transactions
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -84,6 +85,7 @@ const TransactionList = ({
         onUpdate={onUpdate}
         onDelete={onDelete}
         onUpdateStatus={onUpdateStatus}
+        onRefresh={onRefresh} // Pass the refresh function to TransactionTable
       />
 
       {totalPages > 1 && (
