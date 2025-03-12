@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('accounts.urls')),
-    path('api/plaid/', include('plaid.urls')),
+    path('api/plaid/', include('plaid_integration.urls')),
 ]
 
 if settings.DEBUG:

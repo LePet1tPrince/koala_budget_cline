@@ -17,17 +17,17 @@ app.autodiscover_tasks()
 # Configure Celery Beat schedule
 app.conf.beat_schedule = {
     'sync-plaid-transactions-daily': {
-        'task': 'plaid.tasks.sync_all_plaid_accounts',
+        'task': 'plaid_integration.tasks.sync_all_plaid_accounts',
         'schedule': crontab(hour=1, minute=0),  # Run at 1:00 AM every day
         'args': (),
     },
     'check-plaid-errors-daily': {
-        'task': 'plaid.tasks.check_plaid_errors',
+        'task': 'plaid_integration.tasks.check_plaid_errors',
         'schedule': crontab(hour=2, minute=0),  # Run at 2:00 AM every day
         'args': (),
     },
     'retry-plaid-errors-daily': {
-        'task': 'plaid.tasks.retry_plaid_errors',
+        'task': 'plaid_integration.tasks.retry_plaid_errors',
         'schedule': crontab(hour=3, minute=0),  # Run at 3:00 AM every day
         'args': (),
     },

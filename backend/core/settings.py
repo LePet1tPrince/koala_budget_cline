@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     # Local apps
     'accounts',
-    'plaid',
+    'plaid_integration',
 ]
 
 MIDDLEWARE = [
