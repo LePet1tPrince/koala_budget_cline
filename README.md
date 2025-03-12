@@ -93,6 +93,8 @@ Koala Budget follows a microservices architecture with containerized services:
 ### Running in Development Mode
 ```bash
 docker-compose up
+
+docker-compose run --rm backend sh -c "python manage.py makemigrations"
 ```
 
 ### Running Tests

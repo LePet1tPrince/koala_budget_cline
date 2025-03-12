@@ -9,6 +9,9 @@ export { default as AccountTableStyles } from './accounts/AccountTable.module.cs
 // Transactions
 export { default as TransactionTableStyles } from './transactions/TransactionTable.module.css';
 
+// Budget
+export { default as BudgetTableStyles } from './budget/BudgetTable.module.css';
+
 // Forms
 export { default as FormStyles } from './forms/Form.module.css';
 

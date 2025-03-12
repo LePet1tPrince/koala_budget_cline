@@ -35,6 +35,15 @@ export default function Sidebar({ activePage }) {
           </li>
           <li className={styles.sidebarMenuItem}>
             <Link
+              href="/budgeting"
+              className={`${styles.sidebarMenuLink} ${activePage === 'budgeting' ? styles.active : ''}`}
+            >
+              <span className={styles.sidebarMenuIcon}>📊</span>
+              Budgeting
+            </Link>
+          </li>
+          <li className={styles.sidebarMenuItem}>
+            <Link
               href="/profile"
               className={`${styles.sidebarMenuLink} ${activePage === 'profile' ? styles.active : ''}`}
             >
