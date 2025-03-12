@@ -1,0 +1,188 @@
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+.dateRangeDisplay {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.dateRangeDisplay:hover {
+  border-color: #80bdff;
+}
+
+.clearButton {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.clearButton:hover {
+  text-decoration: underline;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 550px;
+  background-color: #212529;
+  border-radius: 4px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  color: #fff;
+}
+
+.dropdownHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #343a40;
+}
+
+.dateRangeText {
+  font-weight: bold;
+}
+
+.dropdownContent {
+  display: flex;
+  padding: 15px;
+}
+
+.presetRanges {
+  width: 200px;
+  border-right: 1px solid #343a40;
+  padding-right: 15px;
+}
+
+.rangeLabel {
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #adb5bd;
+}
+
+.rangeButton {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 8px 10px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.rangeButton:hover {
+  background-color: #343a40;
+}
+
+.activeRange {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.activeRange:hover {
+  background-color: #0b5ed7;
+}
+
+.dateInputs {
+  flex-grow: 1;
+  padding-left: 15px;
+}
+
+.dateInputGroup {
+  margin-bottom: 15px;
+}
+
+.dateInputGroup label {
+  display: block;
+  margin-bottom: 8px;
+  color: #adb5bd;
+}
+
+.dateInputWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.dateInput {
+  flex-grow: 1;
+  padding: 8px 12px;
+  background-color: #343a40;
+  border: 1px solid #495057;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.dateInput:focus {
+  outline: none;
+  border-color: #0d6efd;
+}
+
+.clearInputButton {
+  background: none;
+  border: none;
+  color: #0d6efd;
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.clearInputButton:hover {
+  text-decoration: underline;
+}
+
+.dropdownFooter {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px;
+  border-top: 1px solid #343a40;
+}
+
+.cancelButton,
+.applyButton {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelButton {
+  background: none;
+  border: 1px solid #6c757d;
+  color: #fff;
+  margin-right: 10px;
+}
+
+.cancelButton:hover {
+  background-color: #343a40;
+}
+
+.applyButton {
+  background-color: #dc6434;
+  border: none;
+  color: #fff;
+}
+
+.applyButton:hover {
+  background-color: #c55a2e;
+}

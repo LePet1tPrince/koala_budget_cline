@@ -12,6 +12,9 @@ export { default as TransactionTableStyles } from './transactions/TransactionTab
 // Budget
 export { default as BudgetTableStyles } from './budget/BudgetTable.module.css';
 
+// Reports
+export { default as ReportsStyles } from './reports/Reports.module.css';
+
 // Forms
 export { default as FormStyles } from './forms/Form.module.css';
 
@@ -22,3 +25,4 @@ export { default as ProfileStyles } from './common/Profile.module.css';
 export { default as ToggleStyles } from './common/Toggle.module.css';
 export { default as StatusToggleStyles } from './common/StatusToggle.module.css';
 export { default as NotificationStyles } from './common/Notification.module.css';
+export { default as DateRangePickerStyles } from './common/DateRangePicker.module.css';

@@ -1,16 +1,96 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, views
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.db import models
-from .models import SubAccountType, Account, Transaction
+from django.db.models import Q, Sum
+from .models import SubAccountType, Account, Transaction, AccountTypes
 from .serializers import (
     UserSerializer, UserCreateSerializer, SubAccountTypeSerializer,
     AccountSerializer, TransactionSerializer
 )
+from decimal import Decimal
 from .permissions import IsOwner
 
 User = get_user_model()
+
+class AccountBalanceView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        """
+        Get account balances as of a specific date.
+
+        Query parameters:
+        - as_of_date: The date to calculate balances up to (format: YYYY-MM-DD)
+        """
+        try:
+            # Get the as_of_date parameter
+            as_of_date_str = request.query_params.get('as_of_date')
+            if not as_of_date_str:
+                return Response(
+                    {"detail": "as_of_date parameter is required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Parse the date
+            try:
+                as_of_date = datetime.strptime(as_of_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                return Response(
+                    {"detail": "Invalid date format. Expected YYYY-MM-DD"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Get all accounts for the user
+            accounts = Account.objects.filter(user=request.user)
+
+            # Calculate balance for each account
+            account_balances = []
+            for account in accounts:
+                # Get all transactions for this account up to the as_of_date
+                transactions = Transaction.objects.filter(
+                    Q(debit=account) | Q(credit=account),
+                    date__lte=as_of_date,
+                    user=request.user
+                )
+
+                # Calculate the balance
+                debit_sum = transactions.filter(debit=account).aggregate(
+                    total=Sum('amount')
+                )['total'] or Decimal('0.00')
+
+                credit_sum = transactions.filter(credit=account).aggregate(
+                    total=Sum('amount')
+                )['total'] or Decimal('0.00')
+
+                # Calculate balance based on account type
+                if account.type in ['Asset', 'Expense', 'Goal']:
+                    # For asset, expense, and goal accounts:
+                    # Debits increase the balance, credits decrease it
+                    balance = debit_sum - credit_sum
+                elif account.type in ['Liability', 'Income', 'Equity']:
+                    # For liability, income, and equity accounts:
+                    # Credits increase the balance, debits decrease it
+                    balance = credit_sum - debit_sum
+                else:
+                    balance = Decimal('0.00')
+
+                account_balances.append({
+                    'account_id': account.id,
+                    'account_name': account.name,
+                    'account_type': account.type,
+                    'balance': balance
+                })
+
+            return Response(account_balances)
+
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -127,6 +207,28 @@ class TransactionViewSet(viewsets.ModelViewSet):
             except (ValueError, TypeError) as e:
                 print(f"Invalid account_id parameter: {account_id}, error: {e}")
                 # Return empty queryset if account_id is invalid
+                return Transaction.objects.none()
+
+        # Filter by date range if specified
+        start_date = self.request.query_params.get('start_date', None)
+        end_date = self.request.query_params.get('end_date', None)
+
+        if start_date:
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+                queryset = queryset.filter(date__gte=start_date)
+            except ValueError:
+                print(f"Invalid start_date parameter: {start_date}")
+                # Return empty queryset if start_date is invalid
+                return Transaction.objects.none()
+
+        if end_date:
+            try:
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+                queryset = queryset.filter(date__lte=end_date)
+            except ValueError:
+                print(f"Invalid end_date parameter: {end_date}")
+                # Return empty queryset if end_date is invalid
                 return Transaction.objects.none()
 
         return queryset.order_by('-date', '-updated')
