@@ -198,3 +198,13 @@
   margin-bottom: 20px;
   max-width: 300px;
 }
+
+.accountNameCell {
+  display: flex;
+  align-items: center;
+}
+
+.accountIcon {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+}

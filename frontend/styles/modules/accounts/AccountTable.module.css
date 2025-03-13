@@ -104,3 +104,9 @@
   font-size: 0.875rem;
   color: #718096;
 }
+
+.iconCell {
+  font-size: 1.5rem;
+  text-align: center;
+  width: 60px;
+}

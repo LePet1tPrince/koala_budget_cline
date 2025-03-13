@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import EmojiPicker from 'emoji-picker-react';
 import { FormStyles as styles } from '../../styles/modules';
 
 const AccountForm = ({
@@ -14,8 +15,11 @@ const AccountForm = ({
     type: 'Asset',
     sub_type_id: '',
     inBankFeed: false,
-    balance: '0.00'
+    balance: '0.00',
+    icon: '💰'
   });
+
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const [errors, setErrors] = useState({});
 
@@ -28,10 +32,33 @@ const AccountForm = ({
         type: account.type || 'Asset',
         sub_type_id: account.sub_type ? account.sub_type.id : '',
         inBankFeed: account.inBankFeed || false,
-        balance: account.balance ? account.balance.toString() : '0.00'
+        balance: account.balance ? account.balance.toString() : '0.00',
+        icon: account.icon || getDefaultIconForType(account.type || 'Asset')
       });
     }
   }, [account]);
+
+  // Get default icon based on account type
+  const getDefaultIconForType = (type) => {
+    switch (type) {
+      case 'Asset': return '💰';
+      case 'Liability': return '💳';
+      case 'Income': return '💵';
+      case 'Expense': return '🛒';
+      case 'Equity': return '📊';
+      case 'Goal': return '🎯';
+      default: return '💰';
+    }
+  };
+
+  // Handle emoji selection
+  const handleEmojiClick = (emojiData) => {
+    setFormData({
+      ...formData,
+      icon: emojiData.emoji
+    });
+    setShowEmojiPicker(false);
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -134,6 +161,25 @@ const AccountForm = ({
           <option value="Goal">Goal</option>
         </select>
         {errors.type && <p className={styles.errorText}>{errors.type}</p>}
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="icon">Account Icon</label>
+        <div className={styles.emojiPickerContainer}>
+          <button
+            type="button"
+            className={styles.emojiButton}
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            <span className={styles.currentEmoji}>{formData.icon}</span>
+            <span className={styles.emojiButtonText}>Change Icon</span>
+          </button>
+          {showEmojiPicker && (
+            <div className={styles.emojiPickerWrapper}>
+              <EmojiPicker onEmojiClick={handleEmojiClick} />
+            </div>
+          )}
+        </div>
       </div>
 
       <div className={styles.formGroup}>

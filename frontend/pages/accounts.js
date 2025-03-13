@@ -260,6 +260,14 @@ export default function Accounts() {
         <table className={styles.accountsTable}>
           <thead>
             <tr>
+              <th onClick={() => handleSort('icon')} className={styles.sortableHeader}>
+                Icon
+                {sortField === 'icon' && (
+                  <span className={styles.sortIcon}>
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+              </th>
               <th onClick={() => handleSort('num')} className={styles.sortableHeader}>
                 Account Number
                 {sortField === 'num' && (
@@ -314,6 +322,7 @@ export default function Accounts() {
           <tbody>
             {sortedAccounts.map(account => (
               <tr key={account.id}>
+                <td className={styles.iconCell}>{account.icon || '💰'}</td>
                 <td>{account.num}</td>
                 <td>{account.name}</td>
                 <td>{account.type}</td>

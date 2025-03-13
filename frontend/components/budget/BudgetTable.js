@@ -163,7 +163,10 @@ const BudgetTable = ({ accounts, budgets, onBudgetUpdate }) => {
 
     return (
       <tr key={account.id}>
-        <td>{account.name}</td>
+        <td className={styles.accountNameCell}>
+          <span className={styles.accountIcon}>{account.icon || '💰'}</span>
+          {account.name}
+        </td>
         <td className={styles.budgetInputCell}>
           <input
             type="number"

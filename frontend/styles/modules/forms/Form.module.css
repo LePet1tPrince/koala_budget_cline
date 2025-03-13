@@ -101,3 +101,43 @@
   margin-top: 0.25rem;
   font-style: italic;
 }
+
+/* Emoji Picker Styles */
+.emojiPickerContainer {
+  position: relative;
+  width: 100%;
+}
+
+.emojiButton {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.emojiButton:hover {
+  background-color: #f7fafc;
+}
+
+.currentEmoji {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.emojiButtonText {
+  color: #4a5568;
+}
+
+.emojiPickerWrapper {
+  position: absolute;
+  z-index: 10;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}

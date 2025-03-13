@@ -216,3 +216,13 @@
   text-align: right;
   font-family: monospace;
 }
+
+.accountNameCell {
+  display: flex;
+  align-items: center;
+}
+
+.accountIcon {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+}

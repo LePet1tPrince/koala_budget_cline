@@ -27,7 +27,10 @@ const AccountCard = ({ account, isSelected, onClick }) => {
       className={`${styles.accountCard} ${getCardColorClass()} ${isSelected ? styles.selectedCard : ''}`}
       onClick={() => onClick(account.id)}
     >
-      <h3 className={styles.accountCardName}>{account.name}</h3>
+      <h3 className={styles.accountCardName}>
+        <span className={styles.accountCardIcon}>{account.icon || '💰'}</span>
+        {account.name}
+      </h3>
       <div className={styles.accountCardNumber}>#{account.num}</div>
       <div className={styles.accountCardBalance}>
         ${(() => {

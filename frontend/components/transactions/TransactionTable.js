@@ -310,9 +310,19 @@ const TransactionTable = ({
   // Get the category name (the account that isn't the selected bank feed account)
   const getCategoryName = (transaction) => {
     if (transaction.debit === selectedAccountId) {
-      return transaction.credit_account ? transaction.credit_account.name : getAccountName(transaction.credit);
+      return transaction.credit_account ? (
+        <span className={styles.categoryWithIcon}>
+          <span className={styles.categoryIcon}>{transaction.credit_account.icon || '💰'}</span>
+          {transaction.credit_account.name}
+        </span>
+      ) : getAccountName(transaction.credit);
     } else {
-      return transaction.debit_account ? transaction.debit_account.name : getAccountName(transaction.debit);
+      return transaction.debit_account ? (
+        <span className={styles.categoryWithIcon}>
+          <span className={styles.categoryIcon}>{transaction.debit_account.icon || '💰'}</span>
+          {transaction.debit_account.name}
+        </span>
+      ) : getAccountName(transaction.debit);
     }
   };
 

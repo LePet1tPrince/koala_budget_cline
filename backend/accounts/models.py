@@ -58,6 +58,7 @@ class Account(models.Model):
     inBankFeed = models.BooleanField(default=False)
     balance = models.DecimalField(max_digits=10,decimal_places=2, null=True, blank=True)
     reconciled_balance = models.DecimalField(max_digits=10,decimal_places=2, null=True, blank=True, default=0)
+    icon = models.CharField(max_length=10, blank=True, null=True, default='💰')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='accounts')
 
     def __str__(self):

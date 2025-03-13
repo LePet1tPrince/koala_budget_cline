@@ -43,7 +43,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('id', 'name', 'num', 'type', 'sub_type', 'sub_type_id', 'inBankFeed', 'balance', 'reconciled_balance', 'user')
+        fields = ('id', 'name', 'num', 'type', 'sub_type', 'sub_type_id', 'inBankFeed', 'balance', 'reconciled_balance', 'user', 'icon')
         read_only_fields = ('id', 'user')
 
 class TransactionSerializer(serializers.ModelSerializer):

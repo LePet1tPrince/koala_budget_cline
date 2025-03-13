@@ -138,7 +138,10 @@ const BalanceReport = () => {
 
     return (
       <tr key={account.id}>
-        <td>{account.name}</td>
+        <td className={styles.accountNameCell}>
+          <span className={styles.accountIcon}>{account.icon || '💰'}</span>
+          {account.name}
+        </td>
         <td className={styles.currencyCell}>{formattedAmount}</td>
       </tr>
     );
