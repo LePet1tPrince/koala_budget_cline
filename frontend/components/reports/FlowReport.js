@@ -1,11 +1,13 @@
 import { Fragment, useEffect, useState } from 'react';
 
 import DateRangePicker from '../common/DateRangePicker';
+import FlowDashboard from './FlowDashboard';
 import { getAccounts } from '../../services/accountService';
 import { getTransactionsByDateRange } from '../../services/reportService';
 import { ReportsStyles as styles } from '../../styles/modules';
 
 const FlowReport = () => {
+  const [activeSubTab, setActiveSubTab] = useState('report');
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
 
@@ -151,13 +153,133 @@ const FlowReport = () => {
     );
   };
 
+  // Render the report content
+  const renderReportContent = () => {
+    if (loading) {
+      return <p>Loading report data...</p>;
+    }
+
+    if (error) {
+      return <p className="error">{error}</p>;
+    }
+
+    return (
+      <div className={styles.tableContainer}>
+        <table className={styles.reportTable}>
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* Income Accounts */}
+            {groupedAccounts['Income'] && groupedAccounts['Income'].length > 0 && (
+              <Fragment>
+                {/* Income Header */}
+                <tr className={styles.accountTypeRow}>
+                  <td colSpan={2}>Income Accounts</td>
+                </tr>
+
+                {/* Income Accounts */}
+                {groupedAccounts['Income'].map(account => renderAccountRow(account))}
+
+                {/* Income Total */}
+                <tr className={styles.totalRow}>
+                  <td><strong>Income Total</strong></td>
+                  <td className={styles.currencyCell}>
+                    <strong>{formatCurrency(calculateTotals('Income'))}</strong>
+                  </td>
+                </tr>
+              </Fragment>
+            )}
+
+            {/* Expense Accounts */}
+            {groupedAccounts['Expense'] && groupedAccounts['Expense'].length > 0 && (
+              <Fragment>
+                {/* Expense Header */}
+                <tr className={styles.accountTypeRow}>
+                  <td colSpan={2}>Expense Accounts</td>
+                </tr>
+
+                {/* Expense Accounts by Subtype */}
+                {Object.entries(groupExpenseAccountsBySubType()).map(([subType, accounts]) => (
+                  <Fragment key={subType}>
+                    {/* Subtype Header */}
+                    <tr className={styles.subAccountTypeRow}>
+                      <td colSpan={2}>{subType}</td>
+                    </tr>
+
+                    {/* Accounts of this subtype */}
+                    {accounts.map(account => renderAccountRow(account))}
+
+                    {/* Subtype Total */}
+                    <tr className={styles.subTotalRow}>
+                      <td><strong>{subType} Total</strong></td>
+                      <td className={styles.currencyCell}>
+                        <strong>{formatCurrency(calculateSubtotals(accounts))}</strong>
+                      </td>
+                    </tr>
+                  </Fragment>
+                ))}
+
+                {/* Expense Total */}
+                <tr className={styles.totalRow}>
+                  <td><strong>Expense Total</strong></td>
+                  <td className={styles.currencyCell}>
+                    <strong>{formatCurrency(calculateTotals('Expense'))}</strong>
+                  </td>
+                </tr>
+              </Fragment>
+            )}
+
+            {/* Net Income (Income - Expense) */}
+            {filteredAccounts.length > 0 && (
+              <tr className={styles.grandTotalRow}>
+                <td><strong>Net Income</strong></td>
+                <td className={`${styles.currencyCell} ${calculateTotals('Income') - calculateTotals('Expense') >= 0 ? styles.positive : styles.negative}`}>
+                  <strong>{formatCurrency(calculateTotals('Income') - calculateTotals('Expense'))}</strong>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  // Render the report view
+  const renderReportView = () => {
+    return (
+      <div>
+        <p>
+          This report shows income and expense accounts with their transaction totals for the selected period.
+          Income amounts are reported with credits as positive. Expense amounts are reported with debits as positive.
+        </p>
+        {renderReportContent()}
+      </div>
+    );
+  };
+
   return (
     <div>
       <h2>Flow Report</h2>
-      <p>
-        This report shows income and expense accounts with their transaction totals for the selected period.
-        Income amounts are reported with credits as positive. Expense amounts are reported with debits as positive.
-      </p>
+
+      {/* Sub-Tab Navigation */}
+      <div className={styles.tabContainer}>
+        <button
+          className={`${styles.tabButton} ${activeSubTab === 'report' ? styles.activeTab : ''}`}
+          onClick={() => setActiveSubTab('report')}
+        >
+          Report
+        </button>
+        <button
+          className={`${styles.tabButton} ${activeSubTab === 'dashboard' ? styles.activeTab : ''}`}
+          onClick={() => setActiveSubTab('dashboard')}
+        >
+          Dashboard
+        </button>
+      </div>
 
       {/* Date Range Picker */}
       <div className={styles.dateRangePickerContainer}>
@@ -168,92 +290,14 @@ const FlowReport = () => {
         />
       </div>
 
-      {loading ? (
-        <p>Loading report data...</p>
-      ) : error ? (
-        <p className="error">{error}</p>
+      {/* Content based on active sub-tab */}
+      {activeSubTab === 'report' ? (
+        renderReportView()
       ) : (
-        <div className={styles.tableContainer}>
-          <table className={styles.reportTable}>
-            <thead>
-              <tr>
-                <th>Account</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Income Accounts */}
-              {groupedAccounts['Income'] && groupedAccounts['Income'].length > 0 && (
-                <Fragment>
-                  {/* Income Header */}
-                  <tr className={styles.accountTypeRow}>
-                    <td colSpan={2}>Income Accounts</td>
-                  </tr>
-
-                  {/* Income Accounts */}
-                  {groupedAccounts['Income'].map(account => renderAccountRow(account))}
-
-                  {/* Income Total */}
-                  <tr className={styles.totalRow}>
-                    <td><strong>Income Total</strong></td>
-                    <td className={styles.currencyCell}>
-                      <strong>{formatCurrency(calculateTotals('Income'))}</strong>
-                    </td>
-                  </tr>
-                </Fragment>
-              )}
-
-              {/* Expense Accounts */}
-              {groupedAccounts['Expense'] && groupedAccounts['Expense'].length > 0 && (
-                <Fragment>
-                  {/* Expense Header */}
-                  <tr className={styles.accountTypeRow}>
-                    <td colSpan={2}>Expense Accounts</td>
-                  </tr>
-
-                  {/* Expense Accounts by Subtype */}
-                  {Object.entries(groupExpenseAccountsBySubType()).map(([subType, accounts]) => (
-                    <Fragment key={subType}>
-                      {/* Subtype Header */}
-                      <tr className={styles.subAccountTypeRow}>
-                        <td colSpan={2}>{subType}</td>
-                      </tr>
-
-                      {/* Accounts of this subtype */}
-                      {accounts.map(account => renderAccountRow(account))}
-
-                      {/* Subtype Total */}
-                      <tr className={styles.subTotalRow}>
-                        <td><strong>{subType} Total</strong></td>
-                        <td className={styles.currencyCell}>
-                          <strong>{formatCurrency(calculateSubtotals(accounts))}</strong>
-                        </td>
-                      </tr>
-                    </Fragment>
-                  ))}
-
-                  {/* Expense Total */}
-                  <tr className={styles.totalRow}>
-                    <td><strong>Expense Total</strong></td>
-                    <td className={styles.currencyCell}>
-                      <strong>{formatCurrency(calculateTotals('Expense'))}</strong>
-                    </td>
-                  </tr>
-                </Fragment>
-              )}
-
-              {/* Net Income (Income - Expense) */}
-              {filteredAccounts.length > 0 && (
-                <tr className={styles.grandTotalRow}>
-                  <td><strong>Net Income</strong></td>
-                  <td className={`${styles.currencyCell} ${calculateTotals('Income') - calculateTotals('Expense') >= 0 ? styles.positive : styles.negative}`}>
-                    <strong>{formatCurrency(calculateTotals('Income') - calculateTotals('Expense'))}</strong>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <FlowDashboard
+          startDate={startDate}
+          endDate={endDate}
+        />
       )}
     </div>
   );

@@ -12,9 +12,11 @@
     "axios": "^1.6.2",
     "emoji-picker-react": "^4.12.2",
     "next": "^14.0.3",
+    "plotly.js": "^3.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-dropzone": "^14.3.8"
+    "react-dropzone": "^14.3.8",
+    "react-plotly.js": "^2.6.0"
   },
   "devDependencies": {
     "eslint": "^8.54.0",

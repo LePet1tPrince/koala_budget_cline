@@ -199,6 +199,43 @@
   max-width: 300px;
 }
 
+/* Sankey Diagram Styles */
+.sankeyContainer {
+  margin-top: 20px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.dashboardSummary {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.summaryItem {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+}
+
+.summaryItem h3 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #495057;
+}
+
+.summaryItem p {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: monospace;
+}
+
 .accountNameCell {
   display: flex;
   align-items: center;
