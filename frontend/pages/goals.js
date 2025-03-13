@@ -23,7 +23,7 @@ const styles = {
   ...FormStyles
 };
 
-export default function Accounts() {
+export default function Goals() {
   const [accounts, setAccounts] = useState([]);
   const [accountTypes, setAccountTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,13 +43,10 @@ export default function Accounts() {
   const uniqueAccountTypes = ['all', ...new Set(accounts.filter(account => account.type).map(account => account.type))];
 
   // Filter accounts based on search query and type filter
-  // Only show Asset and Liability accounts on this page
+  // Only show Goal accounts on this page
   const filteredAccounts = accounts.filter(account => {
-    // Only include Asset and Liability accounts
-    if (!['Asset', 'Liability'].includes(account.type)) return false;
-
-    // Filter by type if a specific type is selected
-    if (typeFilter !== 'all' && account.type !== typeFilter) return false;
+    // Only include Goal accounts
+    if (account.type !== 'Goal') return false;
 
     // Then filter by search query
     if (!searchQuery.trim()) return true;
@@ -58,7 +55,6 @@ export default function Accounts() {
     return (
       (account.num && String(account.num).toLowerCase().includes(query)) ||
       (account.name && String(account.name).toLowerCase().includes(query)) ||
-      (account.type && String(account.type).toLowerCase().includes(query)) ||
       (account.sub_type && typeof account.sub_type === 'object' &&
         account.sub_type.sub_type && String(account.sub_type.sub_type).toLowerCase().includes(query))
     );
@@ -143,27 +139,39 @@ export default function Accounts() {
   // Handle account creation
   const handleAddAccount = async (accountData) => {
     try {
-      const newAccount = await createAccount(accountData);
+      // Ensure the account type is set to Goal
+      const goalAccountData = {
+        ...accountData,
+        type: 'Goal'
+      };
+
+      const newAccount = await createAccount(goalAccountData);
       // Refresh accounts data to ensure we have the latest data
       await refreshAccounts();
       setIsAddModalOpen(false);
     } catch (err) {
-      console.error('Error creating account:', err);
-      alert('Failed to create account. Please try again.');
+      console.error('Error creating goal:', err);
+      alert('Failed to create goal. Please try again.');
     }
   };
 
   // Handle account update
   const handleUpdateAccount = async (accountData) => {
     try {
-      const updatedAccount = await updateAccount(currentAccount.id, accountData);
+      // Ensure the account type is set to Goal
+      const goalAccountData = {
+        ...accountData,
+        type: 'Goal'
+      };
+
+      const updatedAccount = await updateAccount(currentAccount.id, goalAccountData);
       // Refresh accounts data to ensure we have the latest data
       await refreshAccounts();
       setIsEditModalOpen(false);
       setCurrentAccount(null);
     } catch (err) {
-      console.error('Error updating account:', err);
-      alert('Failed to update account. Please try again.');
+      console.error('Error updating goal:', err);
+      alert('Failed to update goal. Please try again.');
     }
   };
 
@@ -176,8 +184,8 @@ export default function Accounts() {
       setIsDeleteModalOpen(false);
       setCurrentAccount(null);
     } catch (err) {
-      console.error('Error deleting account:', err);
-      alert('Failed to delete account. Please try again.');
+      console.error('Error deleting goal:', err);
+      alert('Failed to delete goal. Please try again.');
     }
   };
 
@@ -194,68 +202,52 @@ export default function Accounts() {
   };
 
   return (
-    <Layout title="Accounts" activePage="accounts">
-      <h1 className={styles.title}>Your Accounts</h1>
+    <Layout title="Goals" activePage="goals">
+      <h1 className={styles.title}>Your Goals</h1>
 
-      {/* Add Account Button */}
+      {/* Add Goal Button */}
       <button
         className={styles.addButton}
         onClick={() => setIsAddModalOpen(true)}
       >
-        + Add Account
+        + Add Goal
       </button>
 
       {/* Error Message */}
       {error && <p className={styles.errorText}>{error}</p>}
 
-      {/* Search and Filter Controls */}
+      {/* Search Controls */}
       <div className={styles.controlsContainer}>
         <div className={styles.searchContainer}>
-          <label htmlFor="accountSearch" className={styles.searchLabel}>Search Accounts:</label>
+          <label htmlFor="accountSearch" className={styles.searchLabel}>Search Goals:</label>
           <input
             id="accountSearch"
             type="text"
             className={styles.searchInput}
-            placeholder="Search by name, number, or type..."
+            placeholder="Search by name or number..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
             <span className={styles.resultsInfo}>
-              Found {filteredAccounts.length} of {accounts.length} accounts
+              Found {filteredAccounts.length} of {filteredAccounts.length} goals
             </span>
           )}
         </div>
-
-        {/* Account Type Filter */}
-        <div className={styles.filterContainer}>
-          <label className={styles.filterLabel}>Filter by Type:</label>
-          <div className={StatusToggleStyles.statusToggleContainer}>
-            {uniqueAccountTypes.map(type => (
-              <button
-                key={type}
-                className={`${StatusToggleStyles.statusButton} ${typeFilter === type ? StatusToggleStyles.active : ''}`}
-                onClick={() => setTypeFilter(type)}
-              >
-                {type === 'all' ? 'All' : type}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
-      {/* Accounts Table */}
+      {/* Goals Table */}
       {loading ? (
-        <p>Loading accounts...</p>
+        <p>Loading goals...</p>
       ) : accounts.length === 0 ? (
         <div className={styles.widget}>
-          <h2>No Accounts Found</h2>
-          <p>You haven't added any accounts yet. Click the "Add Account" button to get started.</p>
+          <h2>No Goals Found</h2>
+          <p>You haven't added any goals yet. Click the "Add Goal" button to get started.</p>
         </div>
       ) : sortedAccounts.length === 0 ? (
         <div className={styles.widget}>
-          <h2>No Matching Accounts</h2>
-          <p>No accounts match your search query. Try a different search term.</p>
+          <h2>No Matching Goals</h2>
+          <p>No goals match your search query. Try a different search term.</p>
         </div>
       ) : (
         <table className={styles.accountsTable}>
@@ -270,7 +262,7 @@ export default function Accounts() {
                 )}
               </th>
               <th onClick={() => handleSort('num')} className={styles.sortableHeader}>
-                Account Number
+                Goal Number
                 {sortField === 'num' && (
                   <span className={styles.sortIcon}>
                     {sortDirection === 'asc' ? ' ↑' : ' ↓'}
@@ -280,14 +272,6 @@ export default function Accounts() {
               <th onClick={() => handleSort('name')} className={styles.sortableHeader}>
                 Name
                 {sortField === 'name' && (
-                  <span className={styles.sortIcon}>
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-              </th>
-              <th onClick={() => handleSort('type')} className={styles.sortableHeader}>
-                Type
-                {sortField === 'type' && (
                   <span className={styles.sortIcon}>
                     {sortDirection === 'asc' ? ' ↑' : ' ↓'}
                   </span>
@@ -309,24 +293,15 @@ export default function Accounts() {
                   </span>
                 )}
               </th>
-              <th onClick={() => handleSort('inBankFeed')} className={styles.sortableHeader}>
-                Bank Feed
-                {sortField === 'inBankFeed' && (
-                  <span className={styles.sortIcon}>
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {sortedAccounts.map(account => (
               <tr key={account.id}>
-                <td className={styles.iconCell}>{account.icon || '💰'}</td>
+                <td className={styles.iconCell}>{account.icon || '🎯'}</td>
                 <td>{account.num}</td>
                 <td>{account.name}</td>
-                <td>{account.type}</td>
                 <td>{account.sub_type && typeof account.sub_type === 'object' ? account.sub_type.sub_type : '-'}</td>
                 <td>${(() => {
                   // Handle different types of balance values
@@ -347,16 +322,6 @@ export default function Accounts() {
 
                   return '0.00';
                 })()}</td>
-                <td>
-                  <label className={ToggleStyles.toggleSwitch}>
-                    <input
-                      type="checkbox"
-                      checked={account.inBankFeed}
-                      readOnly
-                    />
-                    <span className={ToggleStyles.toggleSlider}></span>
-                  </label>
-                </td>
                 <td className={styles.accountActions}>
                   <button
                     className={styles.editButton}
@@ -377,11 +342,11 @@ export default function Accounts() {
         </table>
       )}
 
-      {/* Add Account Modal */}
+      {/* Add Goal Modal */}
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add New Account"
+        title="Add New Goal"
       >
         <AccountForm
           accountTypes={accountTypes}
@@ -390,11 +355,11 @@ export default function Accounts() {
         />
       </Modal>
 
-      {/* Edit Account Modal */}
+      {/* Edit Goal Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title="Edit Account"
+        title="Edit Goal"
       >
         <AccountForm
           account={currentAccount}
@@ -411,7 +376,7 @@ export default function Accounts() {
         title="Confirm Deletion"
       >
         <div className={styles.confirmDialog}>
-          <p>Are you sure you want to delete the account "{currentAccount?.name}"?</p>
+          <p>Are you sure you want to delete the goal "{currentAccount?.name}"?</p>
           <p>This action cannot be undone.</p>
 
           <div className={styles.confirmActions}>

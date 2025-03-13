@@ -62,10 +62,20 @@ const AccountForm = ({
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
+
+    // Create updated form data
+    const updatedFormData = {
       ...formData,
       [name]: type === 'checkbox' ? checked : value
-    });
+    };
+
+    // If changing account type to something other than Asset or Liability,
+    // ensure inBankFeed is set to false
+    if (name === 'type' && value !== 'Asset' && value !== 'Liability') {
+      updatedFormData.inBankFeed = false;
+    }
+
+    setFormData(updatedFormData);
   };
 
   const validateForm = () => {
@@ -213,17 +223,20 @@ const AccountForm = ({
         {errors.balance && <p className={styles.errorText}>{errors.balance}</p>}
       </div>
 
-      <div className={styles.formGroup}>
-        <label className={styles.checkboxLabel}>
-          <input
-            type="checkbox"
-            name="inBankFeed"
-            checked={formData.inBankFeed}
-            onChange={handleChange}
-          />
-          Include in Bank Feed
-        </label>
-      </div>
+      {/* Only show bank feed toggle for Asset and Liability accounts */}
+      {(formData.type === 'Asset' || formData.type === 'Liability') && (
+        <div className={styles.formGroup}>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              name="inBankFeed"
+              checked={formData.inBankFeed}
+              onChange={handleChange}
+            />
+            Include in Bank Feed
+          </label>
+        </div>
+      )}
 
       <div className={styles.formActions}>
         <button type="submit" className={styles.submitButton}>

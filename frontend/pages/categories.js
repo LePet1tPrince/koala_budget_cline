@@ -23,7 +23,7 @@ const styles = {
   ...FormStyles
 };
 
-export default function Accounts() {
+export default function Categories() {
   const [accounts, setAccounts] = useState([]);
   const [accountTypes, setAccountTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,10 +43,10 @@ export default function Accounts() {
   const uniqueAccountTypes = ['all', ...new Set(accounts.filter(account => account.type).map(account => account.type))];
 
   // Filter accounts based on search query and type filter
-  // Only show Asset and Liability accounts on this page
+  // Only show Income and Expense accounts on this page
   const filteredAccounts = accounts.filter(account => {
-    // Only include Asset and Liability accounts
-    if (!['Asset', 'Liability'].includes(account.type)) return false;
+    // Only include Income and Expense accounts
+    if (!['Income', 'Expense'].includes(account.type)) return false;
 
     // Filter by type if a specific type is selected
     if (typeFilter !== 'all' && account.type !== typeFilter) return false;
@@ -194,15 +194,15 @@ export default function Accounts() {
   };
 
   return (
-    <Layout title="Accounts" activePage="accounts">
-      <h1 className={styles.title}>Your Accounts</h1>
+    <Layout title="Categories" activePage="categories">
+      <h1 className={styles.title}>Your Categories</h1>
 
       {/* Add Account Button */}
       <button
         className={styles.addButton}
         onClick={() => setIsAddModalOpen(true)}
       >
-        + Add Account
+        + Add Category
       </button>
 
       {/* Error Message */}
@@ -211,7 +211,7 @@ export default function Accounts() {
       {/* Search and Filter Controls */}
       <div className={styles.controlsContainer}>
         <div className={styles.searchContainer}>
-          <label htmlFor="accountSearch" className={styles.searchLabel}>Search Accounts:</label>
+          <label htmlFor="accountSearch" className={styles.searchLabel}>Search Categories:</label>
           <input
             id="accountSearch"
             type="text"
@@ -222,7 +222,7 @@ export default function Accounts() {
           />
           {searchQuery && (
             <span className={styles.resultsInfo}>
-              Found {filteredAccounts.length} of {accounts.length} accounts
+              Found {filteredAccounts.length} of {accounts.length} categories
             </span>
           )}
         </div>
@@ -244,18 +244,18 @@ export default function Accounts() {
         </div>
       </div>
 
-      {/* Accounts Table */}
+      {/* Categories Table */}
       {loading ? (
-        <p>Loading accounts...</p>
+        <p>Loading categories...</p>
       ) : accounts.length === 0 ? (
         <div className={styles.widget}>
-          <h2>No Accounts Found</h2>
-          <p>You haven't added any accounts yet. Click the "Add Account" button to get started.</p>
+          <h2>No Categories Found</h2>
+          <p>You haven't added any categories yet. Click the "Add Category" button to get started.</p>
         </div>
       ) : sortedAccounts.length === 0 ? (
         <div className={styles.widget}>
-          <h2>No Matching Accounts</h2>
-          <p>No accounts match your search query. Try a different search term.</p>
+          <h2>No Matching Categories</h2>
+          <p>No categories match your search query. Try a different search term.</p>
         </div>
       ) : (
         <table className={styles.accountsTable}>
@@ -270,7 +270,7 @@ export default function Accounts() {
                 )}
               </th>
               <th onClick={() => handleSort('num')} className={styles.sortableHeader}>
-                Account Number
+                Category Number
                 {sortField === 'num' && (
                   <span className={styles.sortIcon}>
                     {sortDirection === 'asc' ? ' ↑' : ' ↓'}
@@ -309,14 +309,6 @@ export default function Accounts() {
                   </span>
                 )}
               </th>
-              <th onClick={() => handleSort('inBankFeed')} className={styles.sortableHeader}>
-                Bank Feed
-                {sortField === 'inBankFeed' && (
-                  <span className={styles.sortIcon}>
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-              </th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -347,16 +339,6 @@ export default function Accounts() {
 
                   return '0.00';
                 })()}</td>
-                <td>
-                  <label className={ToggleStyles.toggleSwitch}>
-                    <input
-                      type="checkbox"
-                      checked={account.inBankFeed}
-                      readOnly
-                    />
-                    <span className={ToggleStyles.toggleSlider}></span>
-                  </label>
-                </td>
                 <td className={styles.accountActions}>
                   <button
                     className={styles.editButton}
@@ -377,11 +359,11 @@ export default function Accounts() {
         </table>
       )}
 
-      {/* Add Account Modal */}
+      {/* Add Category Modal */}
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add New Account"
+        title="Add New Category"
       >
         <AccountForm
           accountTypes={accountTypes}
@@ -390,11 +372,11 @@ export default function Accounts() {
         />
       </Modal>
 
-      {/* Edit Account Modal */}
+      {/* Edit Category Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title="Edit Account"
+        title="Edit Category"
       >
         <AccountForm
           account={currentAccount}
@@ -411,7 +393,7 @@ export default function Accounts() {
         title="Confirm Deletion"
       >
         <div className={styles.confirmDialog}>
-          <p>Are you sure you want to delete the account "{currentAccount?.name}"?</p>
+          <p>Are you sure you want to delete the category "{currentAccount?.name}"?</p>
           <p>This action cannot be undone.</p>
 
           <div className={styles.confirmActions}>

@@ -45,6 +45,50 @@
   font-size: 1.25rem;
 }
 
+/* Accordion styles */
+.accordionButton {
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.accordionButton:hover {
+  background-color: #4a5568;
+}
+
+.accordionIcon {
+  margin-left: auto;
+}
+
+/* Submenu styles */
+.submenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.submenuItem {
+  margin: 0;
+}
+
+.submenuLink {
+  padding-left: 3rem;
+  font-size: 0.95rem;
+  background-color: #1e2533;
+}
+
+.submenuLink:hover {
+  background-color: #3a4556;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
