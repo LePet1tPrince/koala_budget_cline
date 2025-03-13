@@ -23,14 +23,14 @@ const AccountForm = ({
 
   const [errors, setErrors] = useState({});
 
-  // If editing an existing account, populate the form
+  // If editing an existing account or creating with pre-selected values, populate the form
   useEffect(() => {
     if (account) {
       setFormData({
         name: account.name || '',
         num: account.num || '',
         type: account.type || 'Asset',
-        sub_type_id: account.sub_type ? account.sub_type.id : '',
+        sub_type_id: account.sub_type ? account.sub_type.id : account.sub_type_id || '',
         inBankFeed: account.inBankFeed || false,
         balance: account.balance ? account.balance.toString() : '0.00',
         icon: account.icon || getDefaultIconForType(account.type || 'Asset')

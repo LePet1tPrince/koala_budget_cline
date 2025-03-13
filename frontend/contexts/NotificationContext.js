@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useState } from 'react';
 
+import Notification from '../components/common/Notification';
 import { NotificationStyles as styles } from '../styles/modules';
 
 // Create the context

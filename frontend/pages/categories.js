@@ -1,155 +1,223 @@
+import React, { useEffect, useState } from 'react';
 import {
-  AccountTableStyles,
-  ButtonStyles,
-  FormStyles,
-  LayoutStyles,
-  ModalStyles,
-  StatusToggleStyles,
-  ToggleStyles
-} from '../styles/modules';
-import { createAccount, deleteAccount, getAccounts, getSubAccountTypes, updateAccount } from '../services/accountService';
-import { useEffect, useState } from 'react';
+  checkSubtypeHasAccounts,
+  createAccount,
+  createSubAccountType,
+  deleteAccount,
+  deleteSubAccountType,
+  getAccounts,
+  getSubAccountTypes,
+  updateAccount,
+  updateSubAccountType
+} from '../services/accountService';
 
 import AccountForm from '../components/accounts/AccountForm';
+import CategoryGroup from '../components/categories/CategoryGroup';
 import Layout from '../components/layout/Layout';
 import Modal from '../components/common/Modal';
-
-// Combine styles from different modules
-const styles = {
-  ...LayoutStyles,
-  ...ButtonStyles,
-  ...ModalStyles,
-  ...AccountTableStyles,
-  ...FormStyles
-};
+import SubtypeForm from '../components/categories/SubtypeForm';
+import styles from '../styles/modules/categories/CategoryGroup.module.css';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function Categories() {
+  const { showWarning, showError } = useNotification();
+
+  // State for data
   const [accounts, setAccounts] = useState([]);
-  const [accountTypes, setAccountTypes] = useState([]);
+  const [subtypes, setSubtypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortField, setSortField] = useState(null);
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [typeFilter, setTypeFilter] = useState('all');
 
-  // Modal states
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  // State for organizing data
+  const [incomeSubtypes, setIncomeSubtypes] = useState([]);
+  const [expenseSubtypes, setExpenseSubtypes] = useState([]);
+
+  // State for subtype forms
+  const [showIncomeForm, setShowIncomeForm] = useState(false);
+  const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const [editingSubtype, setEditingSubtype] = useState(null);
+
+  // State for account modals
+  const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false);
+  const [isEditAccountModalOpen, setIsEditAccountModalOpen] = useState(false);
+  const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] = useState(false);
   const [currentAccount, setCurrentAccount] = useState(null);
+  const [selectedAccountType, setSelectedAccountType] = useState('Income');
 
-  // Get unique account types for the filter
-  const uniqueAccountTypes = ['all', ...new Set(accounts.filter(account => account.type).map(account => account.type))];
+  // State for subtype deletion confirmation
+  const [isDeletingSubtype, setIsDeletingSubtype] = useState(false);
+  const [subtypeToDelete, setSubtypeToDelete] = useState(null);
 
-  // Filter accounts based on search query and type filter
-  // Only show Income and Expense accounts on this page
-  const filteredAccounts = accounts.filter(account => {
-    // Only include Income and Expense accounts
-    if (!['Income', 'Expense'].includes(account.type)) return false;
-
-    // Filter by type if a specific type is selected
-    if (typeFilter !== 'all' && account.type !== typeFilter) return false;
-
-    // Then filter by search query
-    if (!searchQuery.trim()) return true;
-
-    const query = searchQuery.toLowerCase();
-    return (
-      (account.num && String(account.num).toLowerCase().includes(query)) ||
-      (account.name && String(account.name).toLowerCase().includes(query)) ||
-      (account.type && String(account.type).toLowerCase().includes(query)) ||
-      (account.sub_type && typeof account.sub_type === 'object' &&
-        account.sub_type.sub_type && String(account.sub_type.sub_type).toLowerCase().includes(query))
-    );
-  });
-
-  // Sort accounts based on sort field and direction
-  const sortedAccounts = [...filteredAccounts].sort((a, b) => {
-    if (!sortField) return 0;
-
-    // Get values to compare
-    let aValue = a[sortField];
-    let bValue = b[sortField];
-
-    // Handle special cases
-    if (sortField === 'sub_type') {
-      aValue = a.sub_type && typeof a.sub_type === 'object' ? a.sub_type.sub_type : '';
-      bValue = b.sub_type && typeof b.sub_type === 'object' ? b.sub_type.sub_type : '';
-    } else if (sortField === 'balance') {
-      aValue = parseFloat(a.balance) || 0;
-      bValue = parseFloat(b.balance) || 0;
-    }
-
-    // Convert to strings for comparison if they're not numbers
-    if (sortField !== 'balance') {
-      aValue = aValue ? String(aValue).toLowerCase() : '';
-      bValue = bValue ? String(bValue).toLowerCase() : '';
-    }
-
-    // Compare based on direction
-    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  // Handle sort when a header is clicked
-  const handleSort = (field) => {
-    const newDirection = sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
-    setSortField(field);
-    setSortDirection(newDirection);
-  };
-
-  // Function to refresh accounts data
-  const refreshAccounts = async () => {
+  // Function to refresh data
+  const refreshData = async () => {
     try {
       setLoading(true);
-      const accountsData = await getAccounts();
+      const [accountsData, subtypesData] = await Promise.all([
+        getAccounts(),
+        getSubAccountTypes()
+      ]);
+
       setAccounts(accountsData);
+      setSubtypes(subtypesData);
+
+      // Organize subtypes by account type
+      organizeData(accountsData, subtypesData);
+
       setError(null);
     } catch (err) {
-      console.error('Error refreshing accounts:', err);
-      setError('Failed to refresh accounts. Please try again later.');
+      console.error('Error refreshing data:', err);
+      setError('Failed to refresh data. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch accounts and account types on component mount
+  // Organize data into income and expense categories
+  const organizeData = (accountsData, subtypesData) => {
+    // Filter subtypes by account type
+    const incomeTypes = subtypesData.filter(st => st.account_type === 'Income');
+    const expenseTypes = subtypesData.filter(st => st.account_type === 'Expense');
+
+    // Add accounts to each subtype
+    const incomeWithAccounts = incomeTypes.map(subtype => ({
+      ...subtype,
+      accounts: accountsData.filter(account =>
+        account.sub_type && account.sub_type.id === subtype.id
+      )
+    }));
+
+    const expenseWithAccounts = expenseTypes.map(subtype => ({
+      ...subtype,
+      accounts: accountsData.filter(account =>
+        account.sub_type && account.sub_type.id === subtype.id
+      )
+    }));
+
+    setIncomeSubtypes(incomeWithAccounts);
+    setExpenseSubtypes(expenseWithAccounts);
+  };
+
+  // Fetch data on component mount
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [accountsData, typesData] = await Promise.all([
-          getAccounts(),
-          getSubAccountTypes()
-        ]);
-        setAccounts(accountsData);
-        setAccountTypes(typesData);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load accounts. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-
-    // No automatic refresh interval - we'll refresh only when accounts are modified
+    refreshData();
   }, []);
+
+  // Handle moving accounts between subtypes
+  const moveAccount = (fromSubtypeId, fromIndex, toSubtypeId, toIndex) => {
+    // This function is kept for future implementation
+    console.log('Move account functionality is currently disabled');
+  };
+
+  // Handle subtype creation
+  const handleCreateSubtype = async (subtypeData) => {
+    try {
+      const newSubtype = await createSubAccountType(subtypeData);
+      await refreshData();
+
+      // Close the form
+      if (subtypeData.account_type === 'Income') {
+        setShowIncomeForm(false);
+      } else {
+        setShowExpenseForm(false);
+      }
+    } catch (err) {
+      console.error('Error creating subtype:', err);
+      showError('Failed to create category. Please try again.');
+    }
+  };
+
+  // Handle subtype update
+  const handleUpdateSubtype = async (subtypeData) => {
+    try {
+      const updatedSubtype = await updateSubAccountType(editingSubtype.id, subtypeData);
+      await refreshData();
+
+      // Reset editing state
+      setEditingSubtype(null);
+    } catch (err) {
+      console.error('Error updating subtype:', err);
+      showError('Failed to update category. Please try again.');
+    }
+  };
+
+  // Handle subtype deletion confirmation
+  const handleConfirmDeleteSubtype = (subtype) => {
+    console.log('Setting up deletion for subtype:', subtype);
+    setSubtypeToDelete(subtype);
+    setIsDeletingSubtype(true);
+  };
+
+  // Confirm and execute subtype deletion
+  const confirmDeleteSubtype = async () => {
+    console.log('Confirming deletion of subtype:', subtypeToDelete);
+
+    if (!subtypeToDelete) {
+      console.error('No subtype to delete');
+      return;
+    }
+
+    try {
+      console.log('Deleting subtype with ID:', subtypeToDelete.id);
+      const result = await deleteSubAccountType(subtypeToDelete.id);
+      console.log('Deletion result:', result);
+      await refreshData();
+      setIsDeletingSubtype(false);
+      setSubtypeToDelete(null);
+    } catch (err) {
+      console.error('Error deleting subtype:', err);
+      showError('Failed to delete category. Please try again.');
+    }
+  };
+
+  // Handle subtype deletion
+  const handleDeleteSubtype = async (subtypeId) => {
+    console.log('Handling delete for subtype ID:', subtypeId);
+
+    try {
+      // Find the subtype first to get its details
+      const subtype = subtypes.find(st => st.id === subtypeId);
+      if (!subtype) {
+        console.error('Subtype not found:', subtypeId);
+        return;
+      }
+
+      console.log('Found subtype:', subtype);
+
+      // Check if the subtype has accounts
+      const hasAccounts = subtype.accounts && subtype.accounts.length > 0;
+      console.log(`Local check: Subtype ${subtypeId} has accounts: ${hasAccounts}`);
+
+      // Double-check with the API
+      const apiHasAccounts = await checkSubtypeHasAccounts(subtypeId);
+      console.log(`API check: Subtype ${subtypeId} has accounts: ${apiHasAccounts}`);
+
+      if (hasAccounts || apiHasAccounts) {
+        showWarning('Cannot delete a category that contains accounts. Please move or delete the accounts first.');
+        return;
+      }
+
+      // Proceed with deletion confirmation
+      handleConfirmDeleteSubtype(subtype);
+    } catch (err) {
+      console.error('Error checking subtype accounts:', err);
+      showError('Failed to check category accounts. Please try again.');
+    }
+  };
+
+  // Handle editing a subtype
+  const handleEditSubtype = (subtype) => {
+    setEditingSubtype(subtype);
+  };
 
   // Handle account creation
   const handleAddAccount = async (accountData) => {
     try {
       const newAccount = await createAccount(accountData);
-      // Refresh accounts data to ensure we have the latest data
-      await refreshAccounts();
-      setIsAddModalOpen(false);
+      await refreshData();
+      setIsAddAccountModalOpen(false);
     } catch (err) {
       console.error('Error creating account:', err);
-      alert('Failed to create account. Please try again.');
+      showError('Failed to create account. Please try again.');
     }
   };
 
@@ -157,13 +225,12 @@ export default function Categories() {
   const handleUpdateAccount = async (accountData) => {
     try {
       const updatedAccount = await updateAccount(currentAccount.id, accountData);
-      // Refresh accounts data to ensure we have the latest data
-      await refreshAccounts();
-      setIsEditModalOpen(false);
+      await refreshData();
+      setIsEditAccountModalOpen(false);
       setCurrentAccount(null);
     } catch (err) {
       console.error('Error updating account:', err);
-      alert('Failed to update account. Please try again.');
+      showError('Failed to update account. Please try again.');
     }
   };
 
@@ -171,247 +238,235 @@ export default function Categories() {
   const handleDeleteAccount = async () => {
     try {
       await deleteAccount(currentAccount.id);
-      // Refresh accounts data to ensure we have the latest data
-      await refreshAccounts();
-      setIsDeleteModalOpen(false);
+      await refreshData();
+      setIsDeleteAccountModalOpen(false);
       setCurrentAccount(null);
     } catch (err) {
       console.error('Error deleting account:', err);
-      alert('Failed to delete account. Please try again.');
+      showError('Failed to delete account. Please try again.');
     }
   };
 
-  // Open edit modal with selected account
-  const openEditModal = (account) => {
-    setCurrentAccount(account);
-    setIsEditModalOpen(true);
+  // Open account modals
+  const openAddAccountModal = (accountType, subtypeId = null) => {
+    setSelectedAccountType(accountType);
+
+    // If a subtypeId is provided, pre-select that subtype
+    if (subtypeId) {
+      const selectedSubtype = subtypes.find(st => st.id === subtypeId);
+      if (selectedSubtype) {
+        setCurrentAccount({ sub_type_id: subtypeId, type: accountType });
+      }
+    } else {
+      setCurrentAccount({ type: accountType });
+    }
+
+    setIsAddAccountModalOpen(true);
   };
 
-  // Open delete confirmation modal
-  const openDeleteModal = (account) => {
+  const openEditAccountModal = (account) => {
     setCurrentAccount(account);
-    setIsDeleteModalOpen(true);
+    setIsEditAccountModalOpen(true);
   };
+
+  const openDeleteAccountModal = (account) => {
+    setCurrentAccount(account);
+    setIsDeleteAccountModalOpen(true);
+  };
+
+  // Make openAddAccountModal available globally for the CategoryGroup component
+  useEffect(() => {
+    window.openAddAccountModal = openAddAccountModal;
+
+    // Clean up when component unmounts
+    return () => {
+      delete window.openAddAccountModal;
+    };
+  }, [subtypes]); // Re-create when subtypes change
 
   return (
     <Layout title="Categories" activePage="categories">
-      <h1 className={styles.title}>Your Categories</h1>
+      <div className={styles.container}>
+        <h1 className={styles.title}>Categories</h1>
 
-      {/* Add Account Button */}
-      <button
-        className={styles.addButton}
-        onClick={() => setIsAddModalOpen(true)}
-      >
-        + Add Category
-      </button>
+        {error && <p className={styles.errorText}>{error}</p>}
 
-      {/* Error Message */}
-      {error && <p className={styles.errorText}>{error}</p>}
+        {loading ? (
+          <p>Loading categories...</p>
+        ) : (
+          <>
+            {/* Income Section */}
+            <div className={styles.sectionContainer}>
+              <h2 className={styles.sectionTitle}>Income</h2>
 
-      {/* Search and Filter Controls */}
-      <div className={styles.controlsContainer}>
-        <div className={styles.searchContainer}>
-          <label htmlFor="accountSearch" className={styles.searchLabel}>Search Categories:</label>
-          <input
-            id="accountSearch"
-            type="text"
-            className={styles.searchInput}
-            placeholder="Search by name, number, or type..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+              {incomeSubtypes.length === 0 ? (
+                <p>No income categories found. Create one below.</p>
+              ) : (
+                incomeSubtypes.map((subtype) => (
+                  <CategoryGroup
+                    key={subtype.id}
+                    subtype={subtype}
+                    accounts={subtype.accounts}
+                    onEdit={handleEditSubtype}
+                    onDelete={handleDeleteSubtype}
+                    onMoveAccount={moveAccount}
+                    onEditAccount={openEditAccountModal}
+                  />
+                ))
+              )}
+
+              {/* Create Income Category Form */}
+              {showIncomeForm ? (
+                <SubtypeForm
+                  accountType="Income"
+                  existingSubtypes={subtypes}
+                  onSubmit={handleCreateSubtype}
+                  onCancel={() => setShowIncomeForm(false)}
+                />
+              ) : (
+                <button
+                  className={styles.createCategoryButton}
+                  onClick={() => setShowIncomeForm(true)}
+                >
+                  + Create Income Category
+                </button>
+              )}
+            </div>
+
+            {/* Expense Section */}
+            <div className={styles.sectionContainer}>
+              <h2 className={styles.sectionTitle}>Expenses</h2>
+
+              {expenseSubtypes.length === 0 ? (
+                <p>No expense categories found. Create one below.</p>
+              ) : (
+                expenseSubtypes.map((subtype) => (
+                  <CategoryGroup
+                    key={subtype.id}
+                    subtype={subtype}
+                    accounts={subtype.accounts}
+                    onEdit={handleEditSubtype}
+                    onDelete={handleDeleteSubtype}
+                    onMoveAccount={moveAccount}
+                    onEditAccount={openEditAccountModal}
+                  />
+                ))
+              )}
+
+              {/* Create Expense Category Form */}
+              {showExpenseForm ? (
+                <SubtypeForm
+                  accountType="Expense"
+                  existingSubtypes={subtypes}
+                  onSubmit={handleCreateSubtype}
+                  onCancel={() => setShowExpenseForm(false)}
+                />
+              ) : (
+                <button
+                  className={styles.createCategoryButton}
+                  onClick={() => setShowExpenseForm(true)}
+                >
+                  + Create Expense Category
+                </button>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Edit Subtype Form */}
+        {editingSubtype && (
+          <div className={styles.editFormOverlay}>
+            <div className={styles.editFormContainer}>
+              <SubtypeForm
+                accountType={editingSubtype.account_type}
+                existingSubtypes={subtypes}
+                subtype={editingSubtype}
+                onSubmit={handleUpdateSubtype}
+                onCancel={() => setEditingSubtype(null)}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Account Modals */}
+        <Modal
+          isOpen={isAddAccountModalOpen}
+          onClose={() => setIsAddAccountModalOpen(false)}
+          title={`Add New ${selectedAccountType} Account`}
+        >
+          <AccountForm
+            accountTypes={subtypes.filter(st => st.account_type === selectedAccountType)}
+            onSubmit={handleAddAccount}
+            onCancel={() => setIsAddAccountModalOpen(false)}
           />
-          {searchQuery && (
-            <span className={styles.resultsInfo}>
-              Found {filteredAccounts.length} of {accounts.length} categories
-            </span>
-          )}
-        </div>
+        </Modal>
 
-        {/* Account Type Filter */}
-        <div className={styles.filterContainer}>
-          <label className={styles.filterLabel}>Filter by Type:</label>
-          <div className={StatusToggleStyles.statusToggleContainer}>
-            {uniqueAccountTypes.map(type => (
+        <Modal
+          isOpen={isEditAccountModalOpen}
+          onClose={() => setIsEditAccountModalOpen(false)}
+          title="Edit Account"
+        >
+          <AccountForm
+            account={currentAccount}
+            accountTypes={subtypes}
+            onSubmit={handleUpdateAccount}
+            onCancel={() => setIsEditAccountModalOpen(false)}
+          />
+        </Modal>
+
+        <Modal
+          isOpen={isDeleteAccountModalOpen}
+          onClose={() => setIsDeleteAccountModalOpen(false)}
+          title="Confirm Deletion"
+        >
+          <div className={styles.confirmDialog}>
+            <p>Are you sure you want to delete the account "{currentAccount?.name}"?</p>
+            <p>This action cannot be undone.</p>
+
+            <div className={styles.formActions}>
               <button
-                key={type}
-                className={`${StatusToggleStyles.statusButton} ${typeFilter === type ? StatusToggleStyles.active : ''}`}
-                onClick={() => setTypeFilter(type)}
+                className={styles.cancelButton}
+                onClick={() => setIsDeleteAccountModalOpen(false)}
               >
-                {type === 'all' ? 'All' : type}
+                Cancel
               </button>
-            ))}
+              <button
+                className={styles.submitButton}
+                onClick={handleDeleteAccount}
+              >
+                Delete
+              </button>
+            </div>
           </div>
-        </div>
+        </Modal>
+
+        {/* Subtype Delete Confirmation Modal */}
+        <Modal
+          isOpen={isDeletingSubtype}
+          onClose={() => setIsDeletingSubtype(false)}
+          title="Confirm Category Deletion"
+        >
+          <div className={styles.confirmDialog}>
+            <p>Are you sure you want to delete the category "{subtypeToDelete?.sub_type}"?</p>
+            <p>This action cannot be undone.</p>
+
+            <div className={styles.formActions}>
+              <button
+                className={styles.cancelButton}
+                onClick={() => setIsDeletingSubtype(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.submitButton}
+                onClick={confirmDeleteSubtype}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </Modal>
       </div>
-
-      {/* Categories Table */}
-      {loading ? (
-        <p>Loading categories...</p>
-      ) : accounts.length === 0 ? (
-        <div className={styles.widget}>
-          <h2>No Categories Found</h2>
-          <p>You haven't added any categories yet. Click the "Add Category" button to get started.</p>
-        </div>
-      ) : sortedAccounts.length === 0 ? (
-        <div className={styles.widget}>
-          <h2>No Matching Categories</h2>
-          <p>No categories match your search query. Try a different search term.</p>
-        </div>
-      ) : (
-        <table className={styles.accountsTable}>
-          <thead>
-            <tr>
-              <th onClick={() => handleSort('icon')} className={styles.sortableHeader}>
-                Icon
-                {sortField === 'icon' && (
-                  <span className={styles.sortIcon}>
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-              </th>
-              <th onClick={() => handleSort('num')} className={styles.sortableHeader}>
-                Category Number
-                {sortField === 'num' && (
-                  <span className={styles.sortIcon}>
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-              </th>
-              <th onClick={() => handleSort('name')} className={styles.sortableHeader}>
-                Name
-                {sortField === 'name' && (
-                  <span className={styles.sortIcon}>
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-              </th>
-              <th onClick={() => handleSort('type')} className={styles.sortableHeader}>
-                Type
-                {sortField === 'type' && (
-                  <span className={styles.sortIcon}>
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-              </th>
-              <th onClick={() => handleSort('sub_type')} className={styles.sortableHeader}>
-                Sub Type
-                {sortField === 'sub_type' && (
-                  <span className={styles.sortIcon}>
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-              </th>
-              <th onClick={() => handleSort('balance')} className={styles.sortableHeader}>
-                Balance
-                {sortField === 'balance' && (
-                  <span className={styles.sortIcon}>
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-              </th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedAccounts.map(account => (
-              <tr key={account.id}>
-                <td className={styles.iconCell}>{account.icon || '💰'}</td>
-                <td>{account.num}</td>
-                <td>{account.name}</td>
-                <td>{account.type}</td>
-                <td>{account.sub_type && typeof account.sub_type === 'object' ? account.sub_type.sub_type : '-'}</td>
-                <td>${(() => {
-                  // Handle different types of balance values
-                  if (account.balance === null || account.balance === undefined) {
-                    return '0.00';
-                  }
-
-                  // If it's a number, format it
-                  if (typeof account.balance === 'number') {
-                    return account.balance.toFixed(2);
-                  }
-
-                  // If it's a string, try to parse it as a number
-                  const parsedBalance = parseFloat(account.balance);
-                  if (!isNaN(parsedBalance)) {
-                    return parsedBalance.toFixed(2);
-                  }
-
-                  return '0.00';
-                })()}</td>
-                <td className={styles.accountActions}>
-                  <button
-                    className={styles.editButton}
-                    onClick={() => openEditModal(account)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => openDeleteModal(account)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
-      {/* Add Category Modal */}
-      <Modal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        title="Add New Category"
-      >
-        <AccountForm
-          accountTypes={accountTypes}
-          onSubmit={handleAddAccount}
-          onCancel={() => setIsAddModalOpen(false)}
-        />
-      </Modal>
-
-      {/* Edit Category Modal */}
-      <Modal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        title="Edit Category"
-      >
-        <AccountForm
-          account={currentAccount}
-          accountTypes={accountTypes}
-          onSubmit={handleUpdateAccount}
-          onCancel={() => setIsEditModalOpen(false)}
-        />
-      </Modal>
-
-      {/* Delete Confirmation Modal */}
-      <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        title="Confirm Deletion"
-      >
-        <div className={styles.confirmDialog}>
-          <p>Are you sure you want to delete the category "{currentAccount?.name}"?</p>
-          <p>This action cannot be undone.</p>
-
-          <div className={styles.confirmActions}>
-            <button
-              className={styles.deleteButton}
-              onClick={handleDeleteAccount}
-            >
-              Delete
-            </button>
-            <button
-              className={styles.cancelButton}
-              onClick={() => setIsDeleteModalOpen(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </Modal>
     </Layout>
   );
 }

@@ -6,6 +6,9 @@ export { default as SidebarStyles } from './layout/Sidebar.module.css';
 export { default as AccountCardStyles } from './accounts/AccountCard.module.css';
 export { default as AccountTableStyles } from './accounts/AccountTable.module.css';
 
+// Categories
+export { default as CategoryGroupStyles } from './categories/CategoryGroup.module.css';
+
 // Transactions
 export { default as TransactionTableStyles } from './transactions/TransactionTable.module.css';
 

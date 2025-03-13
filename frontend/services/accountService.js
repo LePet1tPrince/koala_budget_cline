@@ -41,6 +41,54 @@ export const getSubAccountTypes = async () => {
   }
 };
 
+// Create a new subtype
+export const createSubAccountType = async (subtypeData) => {
+  try {
+    const response = await apiClient.post('/subaccounttypes/', subtypeData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating subtype:', error);
+    throw error;
+  }
+};
+
+// Update an existing subtype
+export const updateSubAccountType = async (id, subtypeData) => {
+  try {
+    const response = await apiClient.put(`/subaccounttypes/${id}/`, subtypeData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating subtype ${id}:`, error);
+    throw error;
+  }
+};
+
+// Delete a subtype
+export const deleteSubAccountType = async (id) => {
+  try {
+    await apiClient.delete(`/subaccounttypes/${id}/`);
+    return true;
+  } catch (error) {
+    console.error(`Error deleting subtype ${id}:`, error);
+    throw error;
+  }
+};
+
+// Check if a subtype has accounts
+export const checkSubtypeHasAccounts = async (id) => {
+  try {
+    console.log(`Checking if subtype ${id} has accounts via API...`);
+    const response = await apiClient.get(`/accounts/?sub_type_id=${id}`);
+    console.log(`API response for subtype ${id}:`, response.data);
+    const hasAccounts = response.data.length > 0;
+    console.log(`Subtype ${id} has accounts: ${hasAccounts}`);
+    return hasAccounts;
+  } catch (error) {
+    console.error(`Error checking if subtype ${id} has accounts:`, error);
+    throw error;
+  }
+};
+
 // Create a new account
 export const createAccount = async (accountData) => {
   try {
