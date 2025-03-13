@@ -392,7 +392,6 @@ const TransactionTable = ({
           </td>
           <td className={styles.accountSelects}>
             <div className={styles.accountSelectContainer}>
-              <label>Category:</label>
               <select
                 name="category"
                 value={editFormData.category}
@@ -400,30 +399,27 @@ const TransactionTable = ({
                 className={styles.editInput}
               >
                 <option value="">Select Category</option>
-                {accounts
-                  .filter(account => account.id !== selectedAccountId)
-                  .map(account => (
-                    <option key={`category-${account.id}`} value={account.id}>
-                      {account.name}
-                    </option>
-                  ))}
+                {/* Group accounts by type */}
+                {(() => {
+                  // Get all account types
+                  const accountTypes = [...new Set(accounts
+                    .filter(account => account.id !== selectedAccountId)
+                    .map(account => account.type))];
+
+                  // Return grouped options
+                  return accountTypes.map(type => (
+                    <optgroup key={`type-${type}`} label={type}>
+                      {accounts
+                        .filter(account => account.type === type && account.id !== selectedAccountId)
+                        .map(account => (
+                          <option key={`category-${account.id}`} value={account.id}>
+                            {account.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ));
+                })()}
               </select>
-              <div className={styles.categoryHint}>
-                {parseFloat(editFormData.amount) >= 0
-                  ? 'Money going to selected account'
-                  : 'Money coming from selected account'}
-              </div>
-            </div>
-            <div className={styles.reconcileCheckbox}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  name="is_reconciled"
-                  checked={editFormData.is_reconciled}
-                  onChange={handleEditFormChange}
-                />
-                Reconciled
-              </label>
             </div>
           </td>
           <td>

@@ -105,7 +105,7 @@
 .statusText {
   font-size: 0.875rem;
   font-weight: 500;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', sans-serif;
 }
 
 /* Error message */
@@ -122,7 +122,7 @@
   text-align: center;
   max-width: 100%;
   overflow-wrap: break-word;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', sans-serif;
 }
 
 .transactionsTable {
@@ -164,14 +164,55 @@
   background-color: rgba(80, 166, 211, 0.1) !important; /* Light Blue with opacity */
 }
 
+.editingRow td {
+  vertical-align: middle;
+  padding: 0.75rem 1rem;
+  height: 60px; /* Fixed height for all cells in editing row */
+}
+
 .amountCell {
   font-weight: 600;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
 }
 
 .actionButtons {
   display: flex;
   gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+/* Save and Cancel buttons in edit mode */
+.saveButton,
+.cancelButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  min-width: 80px;
+  text-align: center;
+}
+
+.saveButton {
+  background-color: #289A82; /* Primary Green */
+  color: white;
+}
+
+.saveButton:hover {
+  background-color: #1E7A68; /* Slightly darker green */
+}
+
+.cancelButton {
+  background-color: #8A8C8E; /* Light Gray */
+  color: white;
+}
+
+.cancelButton:hover {
+  background-color: #404040; /* Dark Gray */
 }
 
 /* Status transition buttons */
@@ -211,11 +252,44 @@
 
 .editInput {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border-radius: 4px;
   border: 1px solid #8A8C8E; /* Light Gray */
   font-size: 0.875rem;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', sans-serif;
+  height: 40px; /* Fixed height for all inputs */
+  box-sizing: border-box;
+}
+
+/* Improved select dropdown styling */
+select.editInput {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8C8E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+select.editInput:focus {
+  border-color: #2E83B7; /* Primary Blue */
+  box-shadow: 0 0 0 2px rgba(46, 131, 183, 0.2); /* Primary Blue with opacity */
+  outline: none;
+}
+
+/* Style for number inputs */
+input[type="number"].editInput {
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
+  text-align: right;
+  padding-right: 1rem;
+  font-size: 1rem;
+}
+
+/* Style for date inputs */
+input[type="date"].editInput {
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
+  font-size: 1rem;
 }
 
 .noTransactions {
@@ -225,41 +299,28 @@
   text-align: center;
   color: #8A8C8E; /* Light Gray */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-family: Georgia, serif;
-}
-
-.reconcileCheckbox {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: #404040; /* Dark Gray */
-  font-family: Georgia, serif;
-}
-
-.checkboxLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', sans-serif;
 }
 
 .accountSelects {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  justify-content: center;
+  height: 100%;
 }
 
 .accountSelectContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
 }
 
 .accountSelectContainer label {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: #404040; /* Dark Gray */
   font-weight: 500;
   font-family: Arial, sans-serif;
+  margin-bottom: 0.25rem;
 }
 
 /* Sortable Header Styles */
@@ -279,7 +340,7 @@
   color: #8A8C8E; /* Light Gray */
   margin-top: 0.25rem;
   font-style: italic;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', sans-serif;
 }
 
 .categoryWithIcon {
@@ -290,4 +351,43 @@
 .categoryIcon {
   font-size: 1.2rem;
   margin-right: 0.5rem;
+}
+
+/* Pagination Controls */
+.paginationControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.paginationButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #2E83B7; /* Primary Blue */
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.paginationButton:hover {
+  background-color: #50A6D3; /* Light Blue */
+}
+
+.paginationButton:disabled {
+  background-color: rgba(138, 140, 142, 0.5); /* Light Gray with opacity */
+  cursor: not-allowed;
+}
+
+.paginationInfo {
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
+  font-size: 0.875rem;
+  color: #404040; /* Dark Gray */
 }

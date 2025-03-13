@@ -1,4 +1,5 @@
 import TransactionTable from './TransactionTable';
+import { TransactionTableStyles as styles } from '../../styles/modules';
 import { useState } from 'react';
 
 const TransactionList = ({
@@ -89,23 +90,23 @@ const TransactionList = ({
       />
 
       {totalPages > 1 && (
-        <div className="paginationControls">
+        <div className={styles.paginationControls}>
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="paginationButton"
+            className={styles.paginationButton}
           >
             Previous
           </button>
 
-          <span className="paginationInfo">
+          <span className={styles.paginationInfo}>
             Page {currentPage} of {totalPages}
           </span>
 
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="paginationButton"
+            className={styles.paginationButton}
           >
             Next
           </button>

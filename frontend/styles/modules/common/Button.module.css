@@ -2,7 +2,8 @@
 .deleteButton,
 .saveButton,
 .addButton,
-.cancelButton {
+.cancelButton,
+.importButton {
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -77,4 +78,29 @@
 
 .cancelButton:hover {
   background-color: #404040; /* Dark Gray */
+}
+
+.importButton {
+  background-color: #2E83B7; /* Primary Blue */
+  color: white;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.importButton:hover {
+  background-color: #50A6D3; /* Light Blue */
+}
+
+.importButton:disabled {
+  background-color: rgba(138, 140, 142, 0.5); /* Light Gray with opacity */
+  cursor: not-allowed;
+}
+
+.actionButtons {
+  display: flex;
+  margin-bottom: 1.5rem;
 }

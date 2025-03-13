@@ -1,11 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;500;600;700&display=swap');
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color: #404040;
+}
+
+/* Apply Roboto Flex to all numbers */
+.number,
+[data-type="number"],
+input[type="number"],
+time,
+[data-type="currency"],
+[data-type="date"],
+input[type="date"],
+.currency,
+.date,
+.amount,
+td[data-numeric="true"],
+td.numeric,
+td:has(> .amount),
+td:has(> .currency),
+td:has(> .number) {
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
+}
+
+/* Apply monospace to all numeric table cells */
+table td:nth-child(n+1):not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(5)) {
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
+  text-align: right;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -48,7 +75,7 @@ button {
 }
 
 table {
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', sans-serif;
 }
 
 th {

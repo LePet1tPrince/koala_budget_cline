@@ -49,7 +49,7 @@
   border-radius: 4px;
   font-size: 14px;
   text-align: right;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
   background-color: rgba(138, 140, 142, 0.05); /* Light Gray with opacity */
   transition: border-color 0.2s, background-color 0.2s;
 }
@@ -111,13 +111,13 @@
 .positive {
   color: #289A82; /* Primary Green */
   font-weight: bold;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
 }
 
 .negative {
   color: #D25425; /* Primary Orange */
   font-weight: bold;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
 }
 
 .monthSelectorContainer {
@@ -150,7 +150,7 @@
   border-radius: 4px;
   font-size: 14px;
   flex-grow: 1;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
 }
 
 .monthSelector input:focus {
@@ -233,7 +233,7 @@
 
 .currencyCell {
   text-align: right;
-  font-family: Georgia, serif;
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
 }
 
 .accountNameCell {
