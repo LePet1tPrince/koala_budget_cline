@@ -22,7 +22,7 @@
   width: 100%;
   padding: 2.5rem;
   background-color: white;
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -31,7 +31,9 @@
   line-height: 1.15;
   font-size: 2rem;
   text-align: center;
-  color: #2f80ed;
+  color: #2E83B7; /* Primary Blue */
+  font-family: Arial, sans-serif;
+  font-weight: 600;
 }
 
 .form {
@@ -49,81 +51,100 @@
   margin-bottom: 0.5rem;
   font-size: 1rem;
   font-weight: 500;
+  color: #404040; /* Dark Gray */
+  font-family: Arial, sans-serif;
 }
 
 .input {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: 1px solid #8A8C8E; /* Light Gray */
+  border-radius: 4px;
   background-color: #f9f9f9;
-  transition: border-color 0.3s;
+  transition: all 0.3s;
+  font-family: Georgia, serif;
 }
 
 .input:focus {
   outline: none;
-  border-color: #2f80ed;
+  border-color: #50A6D3; /* Light Blue */
+  box-shadow: 0 0 0 2px rgba(80, 166, 211, 0.2); /* Light Blue with opacity */
 }
 
 .button {
   padding: 0.75rem 1.5rem;
-  background-color: #2f80ed;
+  background-color: #289A82; /* Primary Green */
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s;
   margin-top: 1rem;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .button:hover:not(:disabled) {
-  background-color: #1c6fd9;
+  background-color: #1E7A68; /* Slightly darker green */
 }
 
 .button:disabled {
-  background-color: #a0c1e7;
+  background-color: rgba(40, 154, 130, 0.5); /* Primary Green with opacity */
   cursor: not-allowed;
 }
 
 .error {
-  color: #e53e3e;
+  color: #D25425; /* Primary Orange */
   margin-bottom: 1rem;
   padding: 0.5rem;
-  background-color: #fed7d7;
-  border-radius: 5px;
+  background-color: rgba(210, 84, 37, 0.1); /* Primary Orange with opacity */
+  border-radius: 4px;
   text-align: center;
+  font-family: Georgia, serif;
 }
 
 .success {
-  color: #2f855a;
+  color: #289A82; /* Primary Green */
   margin-bottom: 1rem;
   padding: 0.5rem;
-  background-color: #c6f6d5;
-  border-radius: 5px;
+  background-color: rgba(40, 154, 130, 0.1); /* Primary Green with opacity */
+  border-radius: 4px;
   text-align: center;
+  font-family: Georgia, serif;
 }
 
 .register {
   margin-top: 1.5rem;
   text-align: center;
+  font-family: Georgia, serif;
+  color: #404040; /* Dark Gray */
 }
 
 .link {
-  color: #2f80ed;
+  color: #2E83B7; /* Primary Blue */
   cursor: pointer;
   text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: #50A6D3; /* Light Blue */
 }
 
 .backLink {
   display: block;
   margin-top: 1.5rem;
   text-align: center;
-  color: #718096;
+  color: #8A8C8E; /* Light Gray */
   cursor: pointer;
+  font-family: Georgia, serif;
+  transition: color 0.2s;
 }
 
 .backLink:hover {
+  color: #404040; /* Dark Gray */
   text-decoration: underline;
 }

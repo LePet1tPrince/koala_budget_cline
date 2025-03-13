@@ -15,7 +15,8 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #4a5568;
+  color: #404040; /* Dark Gray */
+  font-family: Arial, sans-serif;
 }
 
 .input,
@@ -23,34 +24,44 @@
   width: 100%;
   padding: 0.5rem;
   border-radius: 4px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #8A8C8E; /* Light Gray */
   font-size: 1rem;
+  font-family: Georgia, serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #50A6D3; /* Light Blue */
+  box-shadow: 0 0 0 2px rgba(80, 166, 211, 0.2); /* Light Blue with opacity */
 }
 
 .inputError {
-  border-color: #f56565;
+  border-color: #D25425; /* Primary Orange */
 }
 
 .errorText {
-  color: #f56565;
+  color: #D25425; /* Primary Orange */
   font-size: 0.875rem;
   margin: 0.5rem 0;
   padding: 0.75rem;
-  background-color: #fff5f5;
-  border-left: 4px solid #f56565;
+  background-color: rgba(210, 84, 37, 0.1); /* Primary Orange with opacity */
+  border-left: 4px solid #D25425; /* Primary Orange */
   border-radius: 4px;
+  font-family: Georgia, serif;
 }
 
 .formError {
-  color: #f56565;
+  color: #D25425; /* Primary Orange */
   font-size: 0.875rem;
   margin: 1rem 0;
   padding: 0.75rem;
-  background-color: #fff5f5;
-  border: 1px solid #f56565;
+  background-color: rgba(210, 84, 37, 0.1); /* Primary Orange with opacity */
+  border: 1px solid #D25425; /* Primary Orange */
   border-radius: 4px;
   text-align: center;
   font-weight: 500;
+  font-family: Georgia, serif;
 }
 
 .checkboxLabel {
@@ -58,6 +69,7 @@
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
+  font-family: Georgia, serif;
 }
 
 .formActions {
@@ -73,33 +85,37 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
 }
 
 .submitButton {
-  background-color: #4299e1;
+  background-color: #289A82; /* Primary Green */
   color: white;
   border: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .submitButton:hover {
-  background-color: #3182ce;
+  background-color: #1E7A68; /* Slightly darker green */
 }
 
 .cancelButton {
   background-color: transparent;
-  color: #4a5568;
-  border: 1px solid #e2e8f0;
+  color: #404040; /* Dark Gray */
+  border: 1px solid #8A8C8E; /* Light Gray */
 }
 
 .cancelButton:hover {
-  background-color: #f7fafc;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
 }
 
 .categoryHint {
   font-size: 0.7rem;
-  color: #718096;
+  color: #8A8C8E; /* Light Gray */
   margin-top: 0.25rem;
   font-style: italic;
+  font-family: Georgia, serif;
 }
 
 /* Emoji Picker Styles */
@@ -112,16 +128,17 @@
   display: flex;
   align-items: center;
   padding: 0.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #8A8C8E; /* Light Gray */
   border-radius: 4px;
   background-color: white;
   cursor: pointer;
   width: 100%;
   transition: all 0.2s;
+  font-family: Georgia, serif;
 }
 
 .emojiButton:hover {
-  background-color: #f7fafc;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
 }
 
 .currentEmoji {
@@ -130,7 +147,7 @@
 }
 
 .emojiButtonText {
-  color: #4a5568;
+  color: #404040; /* Dark Gray */
 }
 
 .emojiPickerWrapper {

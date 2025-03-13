@@ -24,7 +24,7 @@
 }
 
 .selectedCard {
-  box-shadow: 0 0 0 2px #2f80ed, 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 0 2px #2E83B7, 0 4px 8px rgba(0, 0, 0, 0.15); /* Primary Blue */
 }
 
 .accountCardName {
@@ -36,6 +36,8 @@
   text-overflow: ellipsis;
   display: flex;
   align-items: center;
+  font-family: Arial, sans-serif;
+  color: #404040; /* Dark Gray */
 }
 
 .accountCardIcon {
@@ -45,14 +47,17 @@
 
 .accountCardNumber {
   font-size: 0.8rem;
-  color: #718096;
+  color: #8A8C8E; /* Light Gray */
   margin-bottom: 0.75rem;
+  font-family: Georgia, serif;
 }
 
 .accountCardBalance {
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
+  font-family: Georgia, serif;
+  color: #404040; /* Dark Gray */
 }
 
 .accountCardType {
@@ -61,35 +66,36 @@
   border-radius: 4px;
   display: inline-block;
   background-color: rgba(0, 0, 0, 0.05);
+  font-family: Arial, sans-serif;
 }
 
 /* Account card colors based on type */
 .assetCard {
-  background-color: #ebf8ff;
-  border-left: 4px solid #3182ce;
+  background-color: rgba(80, 166, 211, 0.1); /* Light Blue with opacity */
+  border-left: 4px solid #2E83B7; /* Primary Blue */
 }
 
 .liabilityCard {
-  background-color: #fff5f5;
-  border-left: 4px solid #e53e3e;
+  background-color: rgba(231, 115, 56, 0.1); /* Light Orange with opacity */
+  border-left: 4px solid #D25425; /* Primary Orange */
 }
 
 .incomeCard {
-  background-color: #f0fff4;
-  border-left: 4px solid #38a169;
+  background-color: rgba(40, 154, 130, 0.1); /* Primary Green with opacity */
+  border-left: 4px solid #00251B; /* Dark Green */
 }
 
 .expenseCard {
-  background-color: #fffaf0;
-  border-left: 4px solid #dd6b20;
+  background-color: rgba(210, 84, 37, 0.1); /* Primary Orange with opacity */
+  border-left: 4px solid #00251B; /* Dark Green */
 }
 
 .equityCard {
-  background-color: #f7fafc;
-  border-left: 4px solid #4a5568;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
+  border-left: 4px solid #404040; /* Dark Gray */
 }
 
 .goalCard {
-  background-color: #ebf4ff;
-  border-left: 4px solid #4299e1;
+  background-color: rgba(46, 131, 183, 0.1); /* Primary Blue with opacity */
+  border-left: 4px solid #50A6D3; /* Light Blue */
 }

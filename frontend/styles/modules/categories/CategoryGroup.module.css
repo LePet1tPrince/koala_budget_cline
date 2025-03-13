@@ -3,7 +3,7 @@
   border-radius: 8px;
   background-color: transparent;
   overflow: hidden;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #8A8C8E; /* Light Gray */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -11,9 +11,9 @@
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
-  background-color: #f5f5f5;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
   cursor: pointer;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #8A8C8E; /* Light Gray */
 }
 
 .categoryTitle {
@@ -21,16 +21,17 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: #404040; /* Dark Gray */
   display: flex;
   align-items: center;
   cursor: pointer;
+  font-family: Arial, sans-serif;
 }
 
 .expandIcon {
   margin-left: 0.5rem;
   font-size: 0.8rem;
-  color: #888;
+  color: #8A8C8E; /* Light Gray */
 }
 
 .categoryActions {
@@ -45,17 +46,19 @@
   font-size: 0.8rem;
   cursor: pointer;
   background-color: transparent;
-  color: #888;
+  color: #8A8C8E; /* Light Gray */
+  font-family: Arial, sans-serif;
+  transition: all 0.2s;
 }
 
 .editButton:hover {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: rgba(46, 131, 183, 0.1); /* Primary Blue with opacity */
+  color: #2E83B7; /* Primary Blue */
 }
 
 .deleteButton:hover {
-  background-color: #ffebee;
-  color: #d32f2f;
+  background-color: rgba(210, 84, 37, 0.1); /* Primary Orange with opacity */
+  color: #D25425; /* Primary Orange */
 }
 
 .categoryItems {
@@ -70,14 +73,14 @@
   margin: 0.25rem 0.5rem;
   border-radius: 4px;
   background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #8A8C8E; /* Light Gray */
   cursor: pointer;
   position: relative;
   transition: background-color 0.2s ease;
 }
 
 .categoryItem:hover {
-  background-color: #f5f5f5;
+  background-color: rgba(138, 140, 142, 0.05); /* Light Gray with opacity */
 }
 
 .itemIcon {
@@ -88,14 +91,16 @@
 .itemName {
   flex: 1;
   font-size: 0.95rem;
-  color: #333;
+  color: #404040; /* Dark Gray */
+  font-family: Georgia, serif;
 }
 
 .emptyMessage {
   padding: 0.75rem 1.5rem;
-  color: #888;
+  color: #8A8C8E; /* Light Gray */
   font-style: italic;
   font-size: 0.9rem;
+  font-family: Georgia, serif;
 }
 
 /* Create Category Form */
@@ -104,7 +109,7 @@
   background-color: #ffffff;
   border-radius: 8px;
   margin-top: 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #8A8C8E; /* Light Gray */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -112,8 +117,9 @@
   margin-top: 0;
   margin-bottom: 1rem;
   font-size: 1rem;
-  color: #333;
+  color: #404040; /* Dark Gray */
   font-weight: 600;
+  font-family: Arial, sans-serif;
 }
 
 .formGroup {
@@ -124,23 +130,26 @@
   display: block;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
-  color: #555;
+  color: #404040; /* Dark Gray */
+  font-family: Arial, sans-serif;
 }
 
 .formInput {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #ccc;
+  border: 1px solid #8A8C8E; /* Light Gray */
   border-radius: 4px;
   background-color: #fff;
-  color: #333;
+  color: #404040; /* Dark Gray */
   font-size: 0.9rem;
+  font-family: Georgia, serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .formInput:focus {
   outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  border-color: #50A6D3; /* Light Blue */
+  box-shadow: 0 0 0 2px rgba(80, 166, 211, 0.2); /* Light Blue with opacity */
 }
 
 .formActions {
@@ -155,25 +164,27 @@
   border-radius: 4px;
   font-size: 0.9rem;
   cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .submitButton {
-  background-color: #4a90e2;
+  background-color: #289A82; /* Primary Green */
   color: white;
 }
 
 .submitButton:hover {
-  background-color: #3a80d2;
+  background-color: #1E7A68; /* Slightly darker green */
 }
 
 .cancelButton {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
+  background-color: #8A8C8E; /* Light Gray */
+  color: white;
 }
 
 .cancelButton:hover {
-  background-color: #e0e0e0;
+  background-color: #404040; /* Dark Gray */
 }
 
 .createCategoryButton {
@@ -181,33 +192,37 @@
   width: 100%;
   padding: 0.75rem;
   margin-top: 1rem;
-  border: 1px dashed #ccc;
+  border: 1px dashed #8A8C8E; /* Light Gray */
   border-radius: 8px;
   background-color: transparent;
-  color: #666;
+  color: #404040; /* Dark Gray */
   font-size: 0.9rem;
   text-align: center;
   cursor: pointer;
+  font-family: Arial, sans-serif;
+  transition: all 0.2s;
 }
 
 .createCategoryButton:hover {
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: rgba(40, 154, 130, 0.1); /* Primary Green with opacity */
+  color: #289A82; /* Primary Green */
 }
 
 .errorText {
-  color: #e74c3c;
+  color: #D25425; /* Primary Orange */
   font-size: 0.8rem;
   margin-top: 0.25rem;
+  font-family: Georgia, serif;
 }
 
 /* Section styles */
 .sectionTitle {
   font-size: 1.5rem;
-  color: #333;
+  color: #404040; /* Dark Gray */
   margin-top: 2rem;
   margin-bottom: 1rem;
   font-weight: 600;
+  font-family: Arial, sans-serif;
 }
 
 .sectionContainer {
@@ -245,7 +260,8 @@
 /* Confirm Dialog */
 .confirmDialog {
   padding: 1rem;
-  color: #333;
+  color: #404040; /* Dark Gray */
+  font-family: Georgia, serif;
 }
 
 .confirmDialog p {
@@ -255,9 +271,10 @@
 /* Title */
 .title {
   font-size: 2rem;
-  color: #333;
+  color: #404040; /* Dark Gray */
   margin-bottom: 1.5rem;
   font-weight: 700;
+  font-family: Arial, sans-serif;
 }
 
 /* Add Account Button */
@@ -266,16 +283,18 @@
   width: calc(100% - 1rem);
   margin: 0.5rem;
   padding: 0.5rem;
-  background-color: #f5f5f5;
-  border: 1px dashed #ccc;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
+  border: 1px dashed #8A8C8E; /* Light Gray */
   border-radius: 4px;
-  color: #666;
+  color: #404040; /* Dark Gray */
   font-size: 0.9rem;
   text-align: center;
   cursor: pointer;
+  font-family: Arial, sans-serif;
+  transition: all 0.2s;
 }
 
 .addAccountButton:hover {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: rgba(40, 154, 130, 0.1); /* Primary Green with opacity */
+  color: #289A82; /* Primary Green */
 }

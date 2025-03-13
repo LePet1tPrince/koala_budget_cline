@@ -26,7 +26,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: #8A8C8E; /* Light Gray */
   transition: .4s;
   border-radius: 24px;
 }
@@ -44,11 +44,11 @@
 }
 
 .toggleSwitch input:checked + .toggleSlider {
-  background-color: #4299e1;
+  background-color: #289A82; /* Primary Green */
 }
 
 .toggleSwitch input:focus + .toggleSlider {
-  box-shadow: 0 0 1px #4299e1;
+  box-shadow: 0 0 1px #289A82; /* Primary Green */
 }
 
 .toggleSwitch input:checked + .toggleSlider:before {
@@ -57,7 +57,8 @@
 
 .toggleLabel {
   font-size: 0.9rem;
-  color: #4a5568;
+  color: #404040; /* Dark Gray */
+  font-family: Georgia, serif;
 }
 
 /* Pagination Controls */
@@ -71,24 +72,29 @@
 
 .paginationButton {
   padding: 0.5rem 1rem;
-  background-color: #4299e1;
+  background-color: #2E83B7; /* Primary Blue */
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .paginationButton:hover:not(:disabled) {
-  background-color: #3182ce;
+  background-color: #50A6D3; /* Light Blue */
 }
 
 .paginationButton:disabled {
-  background-color: #cbd5e0;
+  background-color: #8A8C8E; /* Light Gray */
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .paginationInfo {
   font-size: 0.9rem;
-  color: #4a5568;
+  color: #404040; /* Dark Gray */
+  font-family: Georgia, serif;
 }

@@ -27,13 +27,16 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
+  padding-bottom: 1rem;
 }
 
 .modalTitle {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #2d3748;
+  color: #404040; /* Dark Gray */
   margin: 0;
+  font-family: Arial, sans-serif;
 }
 
 .closeButton {
@@ -41,23 +44,27 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #a0aec0;
+  color: #8A8C8E; /* Light Gray */
+  transition: color 0.2s;
 }
 
 .closeButton:hover {
-  color: #4a5568;
+  color: #404040; /* Dark Gray */
 }
 
 .confirmDialog {
   text-align: center;
+  font-family: Georgia, serif;
 }
 
 .confirmDialog p {
   margin-bottom: 1.5rem;
+  color: #404040; /* Dark Gray */
 }
 
 .confirmActions {
   display: flex;
   justify-content: center;
   gap: 1rem;
+  margin-top: 1.5rem;
 }

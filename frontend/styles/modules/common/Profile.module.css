@@ -1,11 +1,13 @@
 .profileInfo {
   margin-top: 1rem;
+  font-family: Georgia, serif;
+  color: #404040; /* Dark Gray */
 }
 
 .profileInfo p {
   margin-bottom: 0.75rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #edf2f7;
+  border-bottom: 1px solid rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
 }
 
 .profileInfo p:last-child {

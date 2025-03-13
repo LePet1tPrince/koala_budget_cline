@@ -10,27 +10,32 @@
   margin-bottom: 20px;
   background-color: #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .budgetTable th,
 .budgetTable td {
   padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
 }
 
 .budgetTable th {
-  background-color: #f8f9fa;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
   font-weight: bold;
-  color: #495057;
+  color: #404040; /* Dark Gray */
   position: sticky;
   top: 0;
   z-index: 10;
+  font-family: Arial, sans-serif;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .budgetTable tr:hover {
-  background-color: #f5f5f5;
+  background-color: rgba(138, 140, 142, 0.05); /* Light Gray with opacity */
 }
 
 .budgetTable tr:last-child td {
@@ -40,12 +45,12 @@
 .editInput {
   width: 120px;
   padding: 6px 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #8A8C8E; /* Light Gray */
   border-radius: 4px;
   font-size: 14px;
   text-align: right;
-  font-family: monospace;
-  background-color: #f8f9fa;
+  font-family: Georgia, serif;
+  background-color: rgba(138, 140, 142, 0.05); /* Light Gray with opacity */
   transition: border-color 0.2s, background-color 0.2s;
 }
 
@@ -56,9 +61,9 @@
 
 .editInput:focus {
   outline: none;
-  border-color: #80bdff;
+  border-color: #50A6D3; /* Light Blue */
   background-color: #fff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(80, 166, 211, 0.25); /* Light Blue with opacity */
 }
 
 .saveButton,
@@ -71,43 +76,48 @@
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.2s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .saveButton {
-  background-color: #28a745;
+  background-color: #289A82; /* Primary Green */
   color: white;
 }
 
 .saveButton:hover {
-  background-color: #218838;
+  background-color: #1E7A68; /* Slightly darker green */
 }
 
 .cancelButton {
-  background-color: #6c757d;
+  background-color: #8A8C8E; /* Light Gray */
   color: white;
 }
 
 .cancelButton:hover {
-  background-color: #5a6268;
+  background-color: #404040; /* Dark Gray */
 }
 
 .editButton {
-  background-color: #007bff;
+  background-color: #2E83B7; /* Primary Blue */
   color: white;
 }
 
 .editButton:hover {
-  background-color: #0069d9;
+  background-color: #50A6D3; /* Light Blue */
 }
 
 .positive {
-  color: #28a745;
+  color: #289A82; /* Primary Green */
   font-weight: bold;
+  font-family: Georgia, serif;
 }
 
 .negative {
-  color: #dc3545;
+  color: #D25425; /* Primary Orange */
   font-weight: bold;
+  font-family: Georgia, serif;
 }
 
 .monthSelectorContainer {
@@ -121,8 +131,8 @@
   align-items: center;
   width: 300px;
   padding: 10px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
+  border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -130,20 +140,23 @@
   margin-right: 10px;
   font-weight: bold;
   white-space: nowrap;
+  font-family: Arial, sans-serif;
+  color: #404040; /* Dark Gray */
 }
 
 .monthSelector input {
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #8A8C8E; /* Light Gray */
   border-radius: 4px;
   font-size: 14px;
   flex-grow: 1;
+  font-family: Georgia, serif;
 }
 
 .monthSelector input:focus {
   outline: none;
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #50A6D3; /* Light Blue */
+  box-shadow: 0 0 0 0.2rem rgba(80, 166, 211, 0.25); /* Light Blue with opacity */
 }
 
 .monthNavButton {
@@ -151,7 +164,7 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #6c757d;
+  color: #8A8C8E; /* Light Gray */
   padding: 0 10px;
   transition: color 0.2s;
   display: flex;
@@ -160,66 +173,73 @@
 }
 
 .monthNavButton:hover {
-  color: #007bff;
+  color: #2E83B7; /* Primary Blue */
 }
 
 .monthNavButton:focus {
   outline: none;
-  color: #0056b3;
+  color: #50A6D3; /* Light Blue */
 }
 
 .accountTypeHeader {
-  background-color: #e9ecef;
+  background-color: rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
   font-weight: bold;
-  color: #495057;
+  color: #404040; /* Dark Gray */
+  font-family: Arial, sans-serif;
 }
 
 .accountTypeRow td {
   padding-top: 15px;
   padding-bottom: 15px;
-  background-color: #e9ecef;
+  background-color: rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
   font-weight: bold;
-  color: #495057;
+  color: #404040; /* Dark Gray */
+  font-family: Arial, sans-serif;
 }
 
 .subAccountTypeRow td {
   padding-top: 10px;
   padding-bottom: 10px;
-  background-color: #f8f9fa;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
   font-weight: bold;
-  color: #6c757d;
+  color: #8A8C8E; /* Light Gray */
   font-style: italic;
   padding-left: 25px;
+  font-family: Arial, sans-serif;
 }
 
 .totalRow td {
   font-weight: bold;
-  border-top: 2px solid #dee2e6;
-  background-color: #f8f9fa;
+  border-top: 2px solid #8A8C8E; /* Light Gray */
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
+  font-family: Arial, sans-serif;
 }
 
 .subTotalRow td {
   font-weight: bold;
-  border-top: 1px solid #dee2e6;
+  border-top: 1px solid #8A8C8E; /* Light Gray */
   font-style: italic;
   padding-left: 25px;
+  font-family: Arial, sans-serif;
 }
 
 .grandTotalRow td {
   font-weight: bold;
-  border-top: 3px double #dee2e6;
-  background-color: #e9ecef;
+  border-top: 3px double #8A8C8E; /* Light Gray */
+  background-color: rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
   font-size: 1.1em;
+  font-family: Arial, sans-serif;
 }
 
 .currencyCell {
   text-align: right;
-  font-family: monospace;
+  font-family: Georgia, serif;
 }
 
 .accountNameCell {
   display: flex;
   align-items: center;
+  font-family: Georgia, serif;
 }
 
 .accountIcon {

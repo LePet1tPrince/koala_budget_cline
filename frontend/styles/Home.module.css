@@ -23,10 +23,12 @@
   line-height: 1.15;
   font-size: 4rem;
   text-align: center;
+  font-family: Arial, sans-serif;
+  color: #404040; /* Dark Gray */
 }
 
 .highlight {
-  color: #2f80ed;
+  color: #2E83B7; /* Primary Blue */
 }
 
 .description {
@@ -34,6 +36,8 @@
   font-size: 1.5rem;
   text-align: center;
   margin: 1.5rem 0;
+  font-family: Georgia, serif;
+  color: #404040; /* Dark Gray */
 }
 
 .grid {
@@ -52,23 +56,32 @@
   text-align: left;
   color: inherit;
   text-decoration: none;
-  border: 1px solid #eaeaea;
-  border-radius: 10px;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  border: 1px solid rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
+  border-radius: 8px;
+  transition: all 0.2s ease;
   width: 300px;
   background-color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
 .card h2 {
   margin: 0 0 1rem 0;
   font-size: 1.5rem;
+  font-family: Arial, sans-serif;
+  color: #2E83B7; /* Primary Blue */
 }
 
 .card p {
   margin: 0;
   font-size: 1.25rem;
   line-height: 1.5;
+  font-family: Georgia, serif;
+  color: #404040; /* Dark Gray */
 }
 
 .buttonContainer {
@@ -79,41 +92,48 @@
 
 .button {
   padding: 12px 30px;
-  background-color: #2f80ed;
+  background-color: #289A82; /* Primary Green */
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   font-size: 1.1rem;
   cursor: pointer;
   transition: background-color 0.3s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .button:hover {
-  background-color: #1c6fd9;
+  background-color: #1E7A68; /* Slightly darker green */
 }
 
 .buttonOutline {
   padding: 12px 30px;
   background-color: transparent;
-  color: #2f80ed;
-  border: 1px solid #2f80ed;
-  border-radius: 5px;
+  color: #2E83B7; /* Primary Blue */
+  border: 1px solid #2E83B7; /* Primary Blue */
+  border-radius: 8px;
   font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.3s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
 }
 
 .buttonOutline:hover {
-  background-color: rgba(47, 128, 237, 0.1);
+  background-color: rgba(46, 131, 183, 0.1); /* Primary Blue with opacity */
 }
 
 .footer {
   width: 100%;
   height: 100px;
-  border-top: 1px solid #eaeaea;
+  border-top: 1px solid rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
   display: flex;
   justify-content: center;
   align-items: center;
+  color: #8A8C8E; /* Light Gray */
+  font-family: Georgia, serif;
 }
 
 @media (max-width: 600px) {

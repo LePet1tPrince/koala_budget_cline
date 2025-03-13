@@ -1,4 +1,4 @@
-dok.tableContainer {
+.tableContainer {
   margin-top: 1.5rem;
   overflow-x: auto;
 }
@@ -25,7 +25,7 @@ dok.tableContainer {
   align-items: center;
   gap: 10px;
   padding: 10px;
-  background-color: #f7fafc;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
   border-radius: 8px;
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -41,6 +41,7 @@ dok.tableContainer {
 .selectedCount {
   margin-right: auto;
   font-weight: 600;
+  font-family: Arial, sans-serif;
 }
 
 .bulkActionButton {
@@ -50,42 +51,45 @@ dok.tableContainer {
   cursor: pointer;
   transition: all 0.2s;
   border: none;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .bulkActionButton.editButton {
-  background-color: #4299e1;
+  background-color: #2E83B7; /* Primary Blue */
   color: white;
 }
 
 .bulkActionButton.editButton:hover {
-  background-color: #3182ce;
+  background-color: #50A6D3; /* Light Blue */
 }
 
 .bulkActionButton.deleteButton {
-  background-color: #f56565;
+  background-color: #D25425; /* Primary Orange */
   color: white;
 }
 
 .bulkActionButton.deleteButton:hover {
-  background-color: #e53e3e;
+  background-color: #E77338; /* Light Orange */
 }
 
 .bulkActionButton.categorizeButton {
-  background-color: #f6ad55;
+  background-color: #E77338; /* Light Orange */
   color: white;
 }
 
 .bulkActionButton.categorizeButton:hover {
-  background-color: #ed8936;
+  background-color: #D25425; /* Primary Orange */
 }
 
 .bulkActionButton.reconcileButton {
-  background-color: #48bb78;
+  background-color: #289A82; /* Primary Green */
   color: white;
 }
 
 .bulkActionButton.reconcileButton:hover {
-  background-color: #38a169;
+  background-color: #1E7A68; /* Slightly darker green */
 }
 
 /* Clickable row */
@@ -94,29 +98,31 @@ dok.tableContainer {
 }
 
 .clickableRow:hover {
-  background-color: #edf2f7;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
 }
 
 /* Status text */
 .statusText {
   font-size: 0.875rem;
   font-weight: 500;
+  font-family: Georgia, serif;
 }
 
 /* Error message */
 .errorMessage {
-  background-color: #fff5f5;
-  color: #f56565;
+  background-color: rgba(210, 84, 37, 0.1); /* Primary Orange with opacity */
+  color: #D25425; /* Primary Orange */
   padding: 0.75rem 1rem;
   border-radius: 4px;
   margin-bottom: 1rem;
   font-size: 0.875rem;
   font-weight: 500;
-  border: 1px solid #f56565;
+  border: 1px solid #D25425; /* Primary Orange */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   text-align: center;
   max-width: 100%;
   overflow-wrap: break-word;
+  font-family: Georgia, serif;
 }
 
 .transactionsTable {
@@ -133,16 +139,17 @@ dok.tableContainer {
 .transactionsTable td {
   padding: 0.75rem 1rem;
   text-align: left;
-  border-bottom: 1px solid #edf2f7;
+  border-bottom: 1px solid rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
 }
 
 .transactionsTable th {
-  background-color: #f7fafc;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
   font-weight: 600;
-  color: #4a5568;
+  color: #404040; /* Dark Gray */
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
+  font-family: Arial, sans-serif;
 }
 
 .transactionsTable tr:last-child td {
@@ -150,15 +157,16 @@ dok.tableContainer {
 }
 
 .transactionsTable tr:hover {
-  background-color: #f7fafc;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
 }
 
 .editingRow {
-  background-color: #ebf8ff !important;
+  background-color: rgba(80, 166, 211, 0.1) !important; /* Light Blue with opacity */
 }
 
 .amountCell {
   font-weight: 600;
+  font-family: Georgia, serif;
 }
 
 .actionButtons {
@@ -178,32 +186,36 @@ dok.tableContainer {
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .reviewToCategorizingButton {
-  background-color: #f6ad55;
+  background-color: #E77338; /* Light Orange */
   color: white;
 }
 
 .reviewToCategorizingButton:hover {
-  background-color: #ed8936;
+  background-color: #D25425; /* Primary Orange */
 }
 
 .categorizedToReconciledButton {
-  background-color: #48bb78;
+  background-color: #289A82; /* Primary Green */
   color: white;
 }
 
 .categorizedToReconciledButton:hover {
-  background-color: #38a169;
+  background-color: #1E7A68; /* Slightly darker green */
 }
 
 .editInput {
   width: 100%;
   padding: 0.5rem;
   border-radius: 4px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #8A8C8E; /* Light Gray */
   font-size: 0.875rem;
+  font-family: Georgia, serif;
 }
 
 .noTransactions {
@@ -211,14 +223,16 @@ dok.tableContainer {
   border-radius: 8px;
   padding: 2rem;
   text-align: center;
-  color: #a0aec0;
+  color: #8A8C8E; /* Light Gray */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: Georgia, serif;
 }
 
 .reconcileCheckbox {
   margin-top: 0.5rem;
   font-size: 0.875rem;
-  color: #4a5568;
+  color: #404040; /* Dark Gray */
+  font-family: Georgia, serif;
 }
 
 .checkboxLabel {
@@ -226,6 +240,7 @@ dok.tableContainer {
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
+  font-family: Georgia, serif;
 }
 
 .accountSelects {
@@ -242,8 +257,9 @@ dok.tableContainer {
 
 .accountSelectContainer label {
   font-size: 0.75rem;
-  color: #4a5568;
+  color: #404040; /* Dark Gray */
   font-weight: 500;
+  font-family: Arial, sans-serif;
 }
 
 /* Sortable Header Styles */
@@ -255,14 +271,15 @@ dok.tableContainer {
 }
 
 .sortableHeader:hover {
-  background-color: #edf2f7;
+  background-color: rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
 }
 
 .categoryHint {
   font-size: 0.7rem;
-  color: #718096;
+  color: #8A8C8E; /* Light Gray */
   margin-top: 0.25rem;
   font-style: italic;
+  font-family: Georgia, serif;
 }
 
 .categoryWithIcon {

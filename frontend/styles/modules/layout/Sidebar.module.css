@@ -1,9 +1,10 @@
 .sidebar {
   width: 250px;
-  background-color: #2d3748;
+  background-color: #00251B; /* Dark Green */
   color: white;
   padding: 1.5rem 0;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
 }
 
 .sidebarNav {
@@ -24,20 +25,23 @@
   display: flex;
   align-items: center;
   padding: 0.75rem 1.5rem;
-  color: #cbd5e0;
+  color: #FFFFFF;
   text-decoration: none;
   transition: all 0.2s;
+  opacity: 0.85;
 }
 
 .sidebarMenuLink:hover {
-  background-color: #4a5568;
+  background-color: rgba(40, 154, 130, 0.2); /* Primary Green with opacity */
   color: white;
+  opacity: 1;
 }
 
 .sidebarMenuLink.active {
-  background-color: #2f80ed;
+  background-color: #289A82; /* Primary Green */
   color: white;
-  border-left: 4px solid #90cdf4;
+  border-left: 4px solid #50A6D3; /* Light Blue */
+  opacity: 1;
 }
 
 .sidebarMenuIcon {
@@ -57,11 +61,11 @@
   align-items: center;
   color: inherit;
   font-size: inherit;
-  font-family: inherit;
+  font-family: Arial, sans-serif;
 }
 
 .accordionButton:hover {
-  background-color: #4a5568;
+  background-color: rgba(40, 154, 130, 0.2); /* Primary Green with opacity */
 }
 
 .accordionIcon {
@@ -82,11 +86,11 @@
 .submenuLink {
   padding-left: 3rem;
   font-size: 0.95rem;
-  background-color: #1e2533;
+  background-color: rgba(0, 0, 0, 0.2); /* Black with opacity */
 }
 
 .submenuLink:hover {
-  background-color: #3a4556;
+  background-color: rgba(40, 154, 130, 0.3); /* Primary Green with opacity */
 }
 
 @media (max-width: 768px) {

@@ -9,29 +9,31 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 15px;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
+  border: 1px solid #8A8C8E; /* Light Gray */
+  border-radius: 8px;
   cursor: pointer;
   transition: border-color 0.2s;
+  font-family: Georgia, serif;
 }
 
 .dateRangeDisplay:hover {
-  border-color: #80bdff;
+  border-color: #50A6D3; /* Light Blue */
 }
 
 .clearButton {
   background: none;
   border: none;
-  color: #007bff;
+  color: #2E83B7; /* Primary Blue */
   cursor: pointer;
   font-size: 14px;
   padding: 0;
   margin-left: 10px;
+  font-family: Arial, sans-serif;
 }
 
 .clearButton:hover {
-  text-decoration: underline;
+  color: #50A6D3; /* Light Blue */
 }
 
 .dropdown {
@@ -39,11 +41,12 @@
   top: calc(100% + 5px);
   left: 0;
   width: 550px;
-  background-color: #212529;
-  border-radius: 4px;
+  background-color: #00251B; /* Dark Green */
+  border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   color: #fff;
+  font-family: Georgia, serif;
 }
 
 .dropdownHeader {
@@ -51,11 +54,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid #343a40;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .dateRangeText {
   font-weight: bold;
+  font-family: Arial, sans-serif;
 }
 
 .dropdownContent {
@@ -65,14 +69,15 @@
 
 .presetRanges {
   width: 200px;
-  border-right: 1px solid #343a40;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   padding-right: 15px;
 }
 
 .rangeLabel {
   font-weight: bold;
   margin-bottom: 15px;
-  color: #adb5bd;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: Arial, sans-serif;
 }
 
 .rangeButton {
@@ -87,19 +92,20 @@
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
+  font-family: Georgia, serif;
 }
 
 .rangeButton:hover {
-  background-color: #343a40;
+  background-color: rgba(40, 154, 130, 0.3); /* Primary Green with opacity */
 }
 
 .activeRange {
-  background-color: #0d6efd;
+  background-color: #289A82; /* Primary Green */
   color: #fff;
 }
 
 .activeRange:hover {
-  background-color: #0b5ed7;
+  background-color: #1E7A68; /* Slightly darker green */
 }
 
 .dateInputs {
@@ -114,7 +120,8 @@
 .dateInputGroup label {
   display: block;
   margin-bottom: 8px;
-  color: #adb5bd;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: Arial, sans-serif;
 }
 
 .dateInputWrapper {
@@ -125,36 +132,38 @@
 .dateInput {
   flex-grow: 1;
   padding: 8px 12px;
-  background-color: #343a40;
-  border: 1px solid #495057;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   color: #fff;
   font-size: 14px;
+  font-family: Georgia, serif;
 }
 
 .dateInput:focus {
   outline: none;
-  border-color: #0d6efd;
+  border-color: #50A6D3; /* Light Blue */
 }
 
 .clearInputButton {
   background: none;
   border: none;
-  color: #0d6efd;
+  color: #50A6D3; /* Light Blue */
   cursor: pointer;
   margin-left: 10px;
   font-size: 14px;
+  font-family: Arial, sans-serif;
 }
 
 .clearInputButton:hover {
-  text-decoration: underline;
+  color: #2E83B7; /* Primary Blue */
 }
 
 .dropdownFooter {
   display: flex;
   justify-content: flex-end;
   padding: 15px;
-  border-top: 1px solid #343a40;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .cancelButton,
@@ -164,25 +173,27 @@
   font-size: 14px;
   cursor: pointer;
   transition: background-color 0.2s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
 }
 
 .cancelButton {
   background: none;
-  border: 1px solid #6c757d;
+  border: 1px solid #8A8C8E; /* Light Gray */
   color: #fff;
   margin-right: 10px;
 }
 
 .cancelButton:hover {
-  background-color: #343a40;
+  background-color: rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
 }
 
 .applyButton {
-  background-color: #dc6434;
+  background-color: #D25425; /* Primary Orange */
   border: none;
   color: #fff;
 }
 
 .applyButton:hover {
-  background-color: #c55a2e;
+  background-color: #E77338; /* Light Orange */
 }
