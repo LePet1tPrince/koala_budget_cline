@@ -40,6 +40,19 @@ const FlowDashboard = ({ startDate, endDate }) => {
     fetchData();
   }, [startDate, endDate]);
 
+  // Format date for display (e.g., "Jan 1, 2024")
+  const formatDisplayDate = (dateString) => {
+    if (!dateString) return '';
+    // Parse the date string and ensure it's interpreted in local timezone
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed in JS Date
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
   // Process data for Sankey diagram whenever accounts or transactions change
   useEffect(() => {
     if (accounts.length > 0 && transactions.length > 0) {
@@ -251,7 +264,7 @@ const FlowDashboard = ({ startDate, endDate }) => {
               }
             ]}
             layout={{
-              title: `Cash Flow: ${startDate} - ${endDate}`,
+              title: `Cash Flow: ${formatDisplayDate(startDate)} - ${formatDisplayDate(endDate)}`,
               font: {
                 size: 12,
                 color: '#333'

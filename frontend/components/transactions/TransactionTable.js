@@ -292,7 +292,10 @@ const TransactionTable = ({
 
   // Format date for display
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
+    if (!dateString) return '';
+    // Parse the date string and ensure it's interpreted in local timezone
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed in JS Date
     const options = {
       month: 'short',  // "mmm"
       day: 'numeric',  // "dd"

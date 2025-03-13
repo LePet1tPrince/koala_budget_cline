@@ -18,7 +18,9 @@ const DateRangePicker = ({
   // Format date for display (e.g., "Jan 1, 2024")
   const formatDisplayDate = (dateString) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
+    // Parse the date string and ensure it's interpreted in local timezone
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed in JS Date
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -29,8 +31,15 @@ const DateRangePicker = ({
   // Format date for input value (YYYY-MM-DD)
   const formatInputDate = (dateString) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    // Parse the date string and ensure it's interpreted in local timezone
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed in JS Date
+
+    // Format as YYYY-MM-DD
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0'); // month is 0-indexed
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   };
 
   // Get display text for the date range
@@ -150,7 +159,8 @@ const DateRangePicker = ({
   const handleThisMonth = () => {
     const now = new Date();
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
-    const end = new Date();
+    // const end = new Date();
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
     setTempStartDate(start.toISOString().split('T')[0]);
     setTempEndDate(end.toISOString().split('T')[0]);
@@ -172,7 +182,8 @@ const DateRangePicker = ({
   const handleThisYear = () => {
     const now = new Date();
     const start = new Date(now.getFullYear(), 0, 1);
-    const end = new Date();
+    // const end = new Date();
+    const end = new Date(now.getFullYear(), 11, 31);
 
     setTempStartDate(start.toISOString().split('T')[0]);
     setTempEndDate(end.toISOString().split('T')[0]);
