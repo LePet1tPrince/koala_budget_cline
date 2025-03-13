@@ -53,6 +53,27 @@ const AccountCard = ({ account, isSelected, onClick }) => {
           return '0.00';
         })()}
       </div>
+      <div className={styles.accountCardReconciledBalance}>
+        ${(() => {
+          // Handle different types of reconciled balance values
+          if (account.reconciled_balance === null || account.reconciled_balance === undefined) {
+            return '0.00';
+          }
+
+          // If it's a number, format it
+          if (typeof account.reconciled_balance === 'number') {
+            return account.reconciled_balance.toFixed(2);
+          }
+
+          // If it's a string, try to parse it as a number
+          const parsedBalance = parseFloat(account.reconciled_balance);
+          if (!isNaN(parsedBalance)) {
+            return parsedBalance.toFixed(2);
+          }
+
+          return '0.00';
+        })()} reconciled
+      </div>
       {account.sub_type && (
         <div className={styles.accountCardType}>
           {account.sub_type.sub_type}

@@ -55,9 +55,17 @@
 .accountCardBalance {
   font-size: 1.25rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
   color: #404040; /* Dark Gray */
+}
+
+.accountCardReconciledBalance {
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  font-family: 'Roboto Flex', 'SF Mono', 'Consolas', monospace;
+  color: #8A8C8E; /* Light Gray */
 }
 
 .accountCardType {

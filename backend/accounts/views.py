@@ -266,6 +266,13 @@ class TransactionViewSet(viewsets.ModelViewSet):
         transaction.is_reconciled = (status_value == TransactionStatus.RECONCILED)
         transaction.save()
 
+        # Update account balances for both debit and credit accounts
+        # This ensures the reconciled_balance is updated
+        if transaction.debit:
+            transaction.debit.update_balance()
+        if transaction.credit:
+            transaction.credit.update_balance()
+
         serializer = self.get_serializer(transaction)
         return Response(serializer.data)
 
@@ -406,11 +413,39 @@ class TransactionViewSet(viewsets.ModelViewSet):
                     transaction.save()
                     updated_count += 1
 
+            # Handle status updates if provided
+            if 'status' in request.data:
+                status_value = request.data.get('status')
+                from .models import TransactionStatus
+                if status_value not in [choice[0] for choice in TransactionStatus.choices]:
+                    return Response(
+                        {"detail": f"Invalid status value. Must be one of: {[choice[0] for choice in TransactionStatus.choices]}"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                updated_fields.append('status')
+                for transaction in transactions:
+                    transaction.status = status_value
+                    # Update is_reconciled for backward compatibility
+                    transaction.is_reconciled = (status_value == TransactionStatus.RECONCILED)
+                    transaction.save()
+                    updated_count += 1
+
             if not updated_fields:
                 return Response(
                     {"detail": "No fields to update were provided"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
+
+            # Update account balances for all affected accounts
+            affected_accounts = set()
+            for transaction in transactions:
+                if transaction.debit:
+                    affected_accounts.add(transaction.debit)
+                if transaction.credit:
+                    affected_accounts.add(transaction.credit)
+
+            for account in affected_accounts:
+                account.update_balance()
 
             return Response({
                 "detail": f"Successfully updated {updated_count} transactions",

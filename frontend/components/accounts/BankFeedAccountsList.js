@@ -11,11 +11,14 @@ const BankFeedAccountsList = ({ accounts, selectedAccountId, onAccountSelect }) 
     );
   }
 
+  // Sort accounts by account number
+  const sortedAccounts = [...accounts].sort((a, b) => a.num - b.num);
+
   return (
     <div>
       <h2>Bank Feed Accounts</h2>
       <div className={AccountCardStyles.accountCardsContainer}>
-        {accounts.map(account => (
+        {sortedAccounts.map(account => (
           <AccountCard
             key={account.id}
             account={account}

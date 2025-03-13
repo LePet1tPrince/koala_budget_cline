@@ -158,6 +158,11 @@ const TransactionTable = ({
       .then(() => {
         // Keep selections after status update to allow for multiple operations
         // The user can manually deselect if needed
+
+        // Refresh the data to update account balances
+        if (onRefresh) {
+          onRefresh();
+        }
       })
       .catch(error => {
         console.error('Error updating transaction status:', error);
@@ -471,15 +476,6 @@ const TransactionTable = ({
         </td>
         <td>{getCategoryName(transaction)}</td>
         <td>{transaction.notes}</td>
-        <td>
-          {transaction.status === 'review' || transaction.status === 'categorized' ? (
-            <span className={styles.statusText}>
-              {transaction.status === 'review' ? 'Review' : 'Categorized'}
-            </span>
-          ) : (
-            <span className={styles.statusText}>Reconciled</span>
-          )}
-        </td>
       </tr>
     );
   };
@@ -509,37 +505,66 @@ const TransactionTable = ({
       )}
 
       {/* Bulk Actions Bar - only shown when transactions are selected */}
-      {selectedTransactions.length > 0 && (
-        <div className={styles.bulkActionsContainer}>
-          <span className={styles.selectedCount}>
-            {selectedTransactions.length} transaction{selectedTransactions.length !== 1 ? 's' : ''} selected
-          </span>
-          <button
-            className={`${styles.bulkActionButton} ${styles.editButton}`}
-            onClick={handleBulkEdit}
-          >
-            Edit Transactions
-          </button>
-          <button
-            className={`${styles.bulkActionButton} ${styles.deleteButton}`}
-            onClick={handleBulkDelete}
-          >
-            Delete Transactions
-          </button>
-          <button
-            className={`${styles.bulkActionButton} ${styles.categorizeButton}`}
-            onClick={() => handleBulkStatusUpdate('categorized')}
-          >
-            Mark as Categorized
-          </button>
-          <button
-            className={`${styles.bulkActionButton} ${styles.reconcileButton}`}
-            onClick={() => handleBulkStatusUpdate('reconciled')}
-          >
-            Mark as Reconciled
-          </button>
-        </div>
-      )}
+      {selectedTransactions.length > 0 && (() => {
+        // Determine the statuses of selected transactions
+        const selectedTransactionObjects = transactions.filter(t => selectedTransactions.includes(t.id));
+        const hasReviewTransactions = selectedTransactionObjects.some(t => t.status === 'review');
+        const hasCategorizedTransactions = selectedTransactionObjects.some(t => t.status === 'categorized');
+        const hasReconciledTransactions = selectedTransactionObjects.some(t => t.status === 'reconciled');
+
+        // Determine which status buttons to show based on the rules
+        const showMarkAsReview = hasCategorizedTransactions || hasReconciledTransactions;
+        const showMarkAsCategorized = hasReviewTransactions || hasReconciledTransactions;
+        const showMarkAsReconciled = hasCategorizedTransactions; // Only categorized can be marked as reconciled
+
+        return (
+          <div className={styles.bulkActionsContainer}>
+            <span className={styles.selectedCount}>
+              {selectedTransactions.length} transaction{selectedTransactions.length !== 1 ? 's' : ''} selected
+            </span>
+            <button
+              className={`${styles.bulkActionButton} ${styles.editButton}`}
+              onClick={handleBulkEdit}
+            >
+              Edit Transactions
+            </button>
+            <button
+              className={`${styles.bulkActionButton} ${styles.deleteButton}`}
+              onClick={handleBulkDelete}
+            >
+              Delete Transactions
+            </button>
+
+            {/* Status update buttons */}
+            {showMarkAsReview && (
+              <button
+                className={`${styles.bulkActionButton} ${styles.reviewButton}`}
+                onClick={() => handleBulkStatusUpdate('review')}
+              >
+                Mark as Review
+              </button>
+            )}
+
+            {showMarkAsCategorized && (
+              <button
+                className={`${styles.bulkActionButton} ${styles.categorizeButton}`}
+                onClick={() => handleBulkStatusUpdate('categorized')}
+              >
+                Mark as Categorized
+              </button>
+            )}
+
+            {showMarkAsReconciled && (
+              <button
+                className={`${styles.bulkActionButton} ${styles.reconcileButton}`}
+                onClick={() => handleBulkStatusUpdate('reconciled')}
+              >
+                Mark as Reconciled
+              </button>
+            )}
+          </div>
+        );
+      })()}
 
       {transactions.length === 0 ? (
         <div className={styles.noTransactions}>
@@ -580,12 +605,6 @@ const TransactionTable = ({
                 className={styles.sortableHeader}
               >
                 Description {sortField === 'description' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-              <th
-                onClick={() => onSort('status')}
-                className={styles.sortableHeader}
-              >
-                Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
             </tr>
           </thead>

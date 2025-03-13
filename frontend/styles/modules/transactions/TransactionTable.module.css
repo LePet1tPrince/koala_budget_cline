@@ -92,6 +92,15 @@
   background-color: #1E7A68; /* Slightly darker green */
 }
 
+.bulkActionButton.reviewButton {
+  background-color: #8A8C8E; /* Light Gray */
+  color: white;
+}
+
+.bulkActionButton.reviewButton:hover {
+  background-color: #404040; /* Dark Gray */
+}
+
 /* Clickable row */
 .clickableRow {
   cursor: pointer;

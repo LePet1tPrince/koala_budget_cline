@@ -13,15 +13,44 @@ const TransactionList = ({
   onDelete,
   onUpdateStatus,
   statusFilter,
+  searchTerm = '',
   pageSize = 10,
   onRefresh // New prop for refreshing transactions
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Filter transactions based on status
-  const filteredTransactions = statusFilter === 'all'
-    ? transactions
-    : transactions.filter(t => t.status === statusFilter);
+  // Filter transactions based on status and search term
+  const filteredTransactions = transactions.filter(transaction => {
+    // First filter by status
+    if (statusFilter !== 'all' && transaction.status !== statusFilter) {
+      return false;
+    }
+
+    // Then filter by search term if provided
+    if (searchTerm.trim() !== '') {
+      const searchLower = searchTerm.toLowerCase();
+
+      // Search in amount
+      const amount = parseFloat(transaction.amount) || 0;
+      const amountStr = amount.toString();
+
+      // Search in category (account name)
+      const categoryName = transaction.debit === selectedAccountId
+        ? (transaction.credit_account ? transaction.credit_account.name : '')
+        : (transaction.debit_account ? transaction.debit_account.name : '');
+
+      // Search in description (notes)
+      const description = transaction.notes || '';
+
+      return (
+        amountStr.includes(searchLower) ||
+        categoryName.toLowerCase().includes(searchLower) ||
+        description.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return true;
+  });
 
   // Sort the filtered transactions
   const sortedTransactions = [...filteredTransactions].sort((a, b) => {

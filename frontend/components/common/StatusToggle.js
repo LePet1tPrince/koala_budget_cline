@@ -2,10 +2,10 @@ import { StatusToggleStyles as styles } from '../../styles/modules';
 
 const StatusToggle = ({ value, onChange }) => {
   const statuses = [
-    { id: 'all', label: 'All' },
     { id: 'review', label: 'Review' },
     { id: 'categorized', label: 'Categorized' },
-    { id: 'reconciled', label: 'Reconciled' }
+    { id: 'reconciled', label: 'Reconciled' },
+    { id: 'all', label: 'All' }
   ];
 
   return (

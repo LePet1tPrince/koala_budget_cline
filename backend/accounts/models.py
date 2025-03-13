@@ -93,13 +93,47 @@ class Account(models.Model):
 
         return Decimal('0.00')
 
+    def calculate_reconciled_balance(self):
+        """
+        Calculate the reconciled balance based only on transactions with status='reconciled'.
+        """
+        from django.db.models import Sum
+        from decimal import Decimal
+
+        # Get sum of reconciled transactions where this account is debited (money coming in)
+        reconciled_debit_sum = self.debit.filter(status='reconciled').aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0.00')
+
+        # Get sum of reconciled transactions where this account is credited (money going out)
+        reconciled_credit_sum = self.credit.filter(status='reconciled').aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0.00')
+
+        # Calculate reconciled balance based on account type
+        if self.type in ['Asset', 'Expense', 'Goal']:
+            # For asset, expense, and goal accounts:
+            # Debits increase the balance, credits decrease it
+            return reconciled_debit_sum - reconciled_credit_sum
+        elif self.type in ['Liability', 'Income', 'Equity']:
+            # For liability, income, and equity accounts:
+            # Credits increase the balance, debits decrease it
+            return reconciled_credit_sum - reconciled_debit_sum
+
+        return Decimal('0.00')
+
     def update_balance(self):
         """
-        Update the account balance and save it.
+        Update the account balance and reconciled balance and save it.
         """
         self.balance = self.calculate_balance()
+        self.reconciled_balance = self.calculate_reconciled_balance()
+
         # Use update to avoid triggering signals
-        type(self).objects.filter(pk=self.pk).update(balance=self.balance)
+        type(self).objects.filter(pk=self.pk).update(
+            balance=self.balance,
+            reconciled_balance=self.reconciled_balance
+        )
 
 class TransactionStatus(models.TextChoices):
     REVIEW = 'review', 'Review'

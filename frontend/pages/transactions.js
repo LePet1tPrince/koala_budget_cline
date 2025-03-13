@@ -59,7 +59,10 @@ export default function Transactions() {
   const [error, setError] = useState(null);
 
   // Status filter state
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'review', 'categorized', 'reconciled'
+  const [statusFilter, setStatusFilter] = useState('review'); // 'review', 'categorized', 'reconciled', 'all'
+
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -114,13 +117,25 @@ export default function Transactions() {
         console.log('Bank feed accounts:', bankFeedData);
         setBankFeedAccounts(bankFeedData);
 
-        // If there are bank feed accounts, select the first one by default
-        if (bankFeedData && bankFeedData.length > 0) {
-          setSelectedAccountId(bankFeedData[0].id);
+        // Get the saved account ID from localStorage
+        const savedAccountId = localStorage.getItem('selectedAccountId');
+        let accountToLoad = null;
 
+        // If there's a saved account ID and it exists in the bank feed accounts, use it
+        if (savedAccountId && bankFeedData.some(acc => acc.id === parseInt(savedAccountId))) {
+          accountToLoad = parseInt(savedAccountId);
+          setSelectedAccountId(accountToLoad);
+        }
+        // Otherwise, if there are bank feed accounts, select the first one by default
+        else if (bankFeedData && bankFeedData.length > 0) {
+          accountToLoad = bankFeedData[0].id;
+          setSelectedAccountId(accountToLoad);
+        }
+
+        if (accountToLoad) {
           try {
             // Fetch transactions for the selected account
-            const transactionsData = await getTransactionsByAccount(bankFeedData[0].id);
+            const transactionsData = await getTransactionsByAccount(accountToLoad);
             console.log('Transactions for account:', transactionsData);
             // Debug: Log individual transaction data to check amount field
             if (transactionsData && transactionsData.length > 0) {
@@ -170,6 +185,9 @@ export default function Transactions() {
       setLoading(true);
       setSelectedAccountId(accountId);
       setError(null);
+
+      // Save selected account ID to localStorage
+      localStorage.setItem('selectedAccountId', accountId);
 
       // Fetch transactions for the selected account
       const transactionsData = await getTransactionsByAccount(accountId);
@@ -405,10 +423,11 @@ export default function Transactions() {
         selectedAccountId={selectedAccountId}
       />
 
-      {/* Status Filter */}
+      {/* Status Filter and Search */}
       <TransactionFilters
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
+        onSearchChange={setSearchTerm}
       />
 
       {/* Transactions List */}
@@ -426,6 +445,7 @@ export default function Transactions() {
           onDelete={handleDeleteClick}
           onUpdateStatus={handleUpdateStatus}
           statusFilter={statusFilter}
+          searchTerm={searchTerm}
           pageSize={pageSize}
           onRefresh={async () => {
             // Dedicated refresh function that doesn't rely on updating a transaction
