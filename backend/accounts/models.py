@@ -96,16 +96,19 @@ class Account(models.Model):
     def calculate_reconciled_balance(self):
         """
         Calculate the reconciled balance based only on transactions with status='reconciled'.
+        The is_reconciled flag is deprecated and should not be used.
         """
         from django.db.models import Sum
         from decimal import Decimal
 
         # Get sum of reconciled transactions where this account is debited (money coming in)
+        # Only use status='reconciled', ignore is_reconciled flag
         reconciled_debit_sum = self.debit.filter(status='reconciled').aggregate(
             total=Sum('amount')
         )['total'] or Decimal('0.00')
 
         # Get sum of reconciled transactions where this account is credited (money going out)
+        # Only use status='reconciled', ignore is_reconciled flag
         reconciled_credit_sum = self.credit.filter(status='reconciled').aggregate(
             total=Sum('amount')
         )['total'] or Decimal('0.00')

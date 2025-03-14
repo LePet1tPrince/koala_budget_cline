@@ -261,9 +261,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Update status and is_reconciled for backward compatibility
+        # Update status only (is_reconciled flag is deprecated)
         transaction.status = status_value
-        transaction.is_reconciled = (status_value == TransactionStatus.RECONCILED)
         transaction.save()
 
         # Update account balances for both debit and credit accounts
@@ -425,8 +424,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                 updated_fields.append('status')
                 for transaction in transactions:
                     transaction.status = status_value
-                    # Update is_reconciled for backward compatibility
-                    transaction.is_reconciled = (status_value == TransactionStatus.RECONCILED)
+                    # No longer update is_reconciled flag (deprecated)
                     transaction.save()
                     updated_count += 1
 
