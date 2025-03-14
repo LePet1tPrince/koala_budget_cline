@@ -1,8 +1,10 @@
 import { ButtonStyles, FormStyles, TransactionTableStyles as styles } from '../../styles/modules';
 import { useEffect, useState } from 'react';
 
-import BulkEditModal from './BulkEditModal';
-import ReconcileConfirmationModal from './ReconcileConfirmationModal';
+import BulkActionsBar from './table/BulkActionsBar';
+import ModalContainer from './table/ModalContainer';
+import TransactionTableBody from './table/TransactionTableBody';
+import TransactionTableHeader from './table/TransactionTableHeader';
 import { bulkUpdateTransactions } from '../../services/transactionService';
 import { getAccountById } from '../../services/accountService';
 
@@ -352,65 +354,6 @@ const TransactionTable = ({
     setEditingId(null);
   };
 
-  // Format date for display
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    // Parse the date string and ensure it's interpreted in local timezone
-    const [year, month, day] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day); // month is 0-indexed in JS Date
-    const options = {
-      month: 'short',  // "mmm"
-      day: 'numeric',  // "dd"
-      year: 'numeric'  // "yyyy"
-    };
-    return date.toLocaleDateString('en-US', options);
-  };
-
-  // Get account name by ID
-  const getAccountName = (accountId) => {
-    const account = accounts.find(acc => acc.id === accountId);
-    return account ? account.name : 'Unknown Account';
-  };
-
-  // Get the category name (the account that isn't the selected bank feed account)
-  const getCategoryName = (transaction) => {
-    if (transaction.debit === selectedAccountId) {
-      return transaction.credit_account ? (
-        <span className={styles.categoryWithIcon}>
-          <span className={styles.categoryIcon}>{transaction.credit_account.icon || '💰'}</span>
-          {transaction.credit_account.name}
-        </span>
-      ) : getAccountName(transaction.credit);
-    } else {
-      return transaction.debit_account ? (
-        <span className={styles.categoryWithIcon}>
-          <span className={styles.categoryIcon}>{transaction.debit_account.icon || '💰'}</span>
-          {transaction.debit_account.name}
-        </span>
-      ) : getAccountName(transaction.debit);
-    }
-  };
-
-  // Get the adjusted amount based on whether the selected account is debit or credit
-  const getAdjustedAmount = (transaction) => {
-    let amount = 0;
-
-    // Parse the amount to a number
-    if (typeof transaction.amount === 'number') {
-      amount = transaction.amount;
-    } else if (typeof transaction.amount === 'string') {
-      amount = parseFloat(transaction.amount);
-      if (isNaN(amount)) amount = 0;
-    }
-
-    // Adjust sign based on whether selected account is debit or credit
-    if (transaction.credit === selectedAccountId) {
-      amount = -amount;
-    }
-
-    return amount.toFixed(2);
-  };
-
   // Row click handler
   const handleRowClick = (transaction) => {
     // Only open edit mode if we're not already editing and the row isn't in the selected transactions
@@ -419,220 +362,34 @@ const TransactionTable = ({
     }
   };
 
-  // Render table row based on whether it's being edited
-  const renderRow = (transaction) => {
-    if (editingId === transaction.id) {
-      return (
-        <tr key={transaction.id} className={styles.editingRow}>
-          <td className={styles.checkboxColumn}>
-            <input
-              type="checkbox"
-              checked={selectedTransactions.includes(transaction.id)}
-              onChange={(e) => handleSelectTransaction(e, transaction.id)}
-              className={styles.checkbox}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </td>
-          <td>
-            <input
-              type="date"
-              name="date"
-              value={editFormData.date}
-              onChange={handleEditFormChange}
-              className={styles.editInput}
-            />
-          </td>
-          <td>
-            <input
-              type="number"
-              name="amount"
-              value={editFormData.amount}
-              onChange={handleEditFormChange}
-              step="0.01"
-              className={styles.editInput}
-            />
-          </td>
-          <td className={styles.accountSelects}>
-            <div className={styles.accountSelectContainer}>
-              <select
-                name="category"
-                value={editFormData.category}
-                onChange={handleEditFormChange}
-                className={styles.editInput}
-              >
-                <option value="">Select Category</option>
-                {/* Group accounts by type */}
-                {(() => {
-                  // Get all account types
-                  const accountTypes = [...new Set(accounts
-                    .filter(account => account.id !== selectedAccountId)
-                    .map(account => account.type))];
-
-                  // Return grouped options
-                  return accountTypes.map(type => (
-                    <optgroup key={`type-${type}`} label={type}>
-                      {accounts
-                        .filter(account => account.type === type && account.id !== selectedAccountId)
-                        .map(account => (
-                          <option key={`category-${account.id}`} value={account.id}>
-                            {account.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                  ));
-                })()}
-              </select>
-            </div>
-          </td>
-          <td>
-            <input
-              type="text"
-              name="notes"
-              value={editFormData.notes}
-              onChange={handleEditFormChange}
-              className={styles.editInput}
-            />
-          </td>
-          <td className={styles.actionButtons}>
-            <button
-              type="button"
-              onClick={handleSaveClick}
-              className={styles.saveButton}
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={handleCancelClick}
-              className={styles.cancelButton}
-            >
-              Cancel
-            </button>
-          </td>
-        </tr>
-      );
-    }
-
-    return (
-      <tr
-        key={transaction.id}
-        className={styles.clickableRow}
-        onClick={() => handleRowClick(transaction)}
-      >
-        <td className={styles.checkboxColumn} onClick={(e) => e.stopPropagation()}>
-          <input
-            type="checkbox"
-            checked={selectedTransactions.includes(transaction.id)}
-            onChange={(e) => handleSelectTransaction(e, transaction.id)}
-            className={styles.checkbox}
-          />
-        </td>
-        <td>{formatDate(transaction.date)}</td>
-        <td className={styles.amountCell}>
-          ${getAdjustedAmount(transaction)}
-        </td>
-        <td>{getCategoryName(transaction)}</td>
-        <td>{transaction.notes}</td>
-      </tr>
-    );
-  };
-
   return (
     <div className={styles.tableContainer}>
-      {/* Bulk Edit Modal */}
-      <BulkEditModal
-        isOpen={isBulkEditModalOpen}
-        onClose={() => setIsBulkEditModalOpen(false)}
-        onSubmit={handleBulkEditSubmit}
-        transactionIds={selectedTransactions}
-        accounts={accounts}
-        selectedAccountId={selectedAccountId}
-      />
-
-      {/* Reconcile Confirmation Modal */}
-      <ReconcileConfirmationModal
-        isOpen={isReconcileModalOpen}
-        onClose={() => setIsReconcileModalOpen(false)}
-        onConfirm={handleReconcileConfirm}
-        transactions={transactionsToReconcile}
-        selectedAccountId={selectedAccountId}
+      {/* Modals */}
+      <ModalContainer
+        isBulkEditModalOpen={isBulkEditModalOpen}
+        isReconcileModalOpen={isReconcileModalOpen}
+        bulkEditError={bulkEditError}
+        transactionsToReconcile={transactionsToReconcile}
         currentReconciledBalance={currentReconciledBalance}
+        selectedTransactions={selectedTransactions}
+        selectedAccountId={selectedAccountId}
         accounts={accounts}
+        onCloseBulkEditModal={() => setIsBulkEditModalOpen(false)}
+        onCloseReconcileModal={() => setIsReconcileModalOpen(false)}
+        onBulkEditSubmit={handleBulkEditSubmit}
+        onReconcileConfirm={handleReconcileConfirm}
+        styles={styles}
       />
 
-      {/* Error message for bulk edit */}
-      {bulkEditError && (
-        <div className={styles.errorMessage}>
-          {bulkEditError}
-        </div>
-      )}
-
-      {/* Placeholder for bulk actions - only shown when no transactions are selected */}
-      {selectedTransactions.length === 0 && (
-        <div className={styles.bulkActionsPlaceholder}></div>
-      )}
-
-      {/* Bulk Actions Bar - only shown when transactions are selected */}
-      {selectedTransactions.length > 0 && (() => {
-        // Determine the statuses of selected transactions
-        const selectedTransactionObjects = transactions.filter(t => selectedTransactions.includes(t.id));
-        const hasReviewTransactions = selectedTransactionObjects.some(t => t.status === 'review');
-        const hasCategorizedTransactions = selectedTransactionObjects.some(t => t.status === 'categorized');
-        const hasReconciledTransactions = selectedTransactionObjects.some(t => t.status === 'reconciled');
-
-        // Determine which status buttons to show based on the rules
-        const showMarkAsReview = hasCategorizedTransactions || hasReconciledTransactions;
-        const showMarkAsCategorized = hasReviewTransactions || hasReconciledTransactions;
-        const showMarkAsReconciled = hasCategorizedTransactions; // Only categorized can be marked as reconciled
-
-        return (
-          <div className={styles.bulkActionsContainer}>
-            <span className={styles.selectedCount}>
-              {selectedTransactions.length} transaction{selectedTransactions.length !== 1 ? 's' : ''} selected
-            </span>
-            <button
-              className={`${styles.bulkActionButton} ${styles.editButton}`}
-              onClick={handleBulkEdit}
-            >
-              Edit Transactions
-            </button>
-            <button
-              className={`${styles.bulkActionButton} ${styles.deleteButton}`}
-              onClick={handleBulkDelete}
-            >
-              Delete Transactions
-            </button>
-
-            {/* Status update buttons */}
-            {showMarkAsReview && (
-              <button
-                className={`${styles.bulkActionButton} ${styles.reviewButton}`}
-                onClick={() => handleBulkStatusUpdate('review')}
-              >
-                Mark as Review
-              </button>
-            )}
-
-            {showMarkAsCategorized && (
-              <button
-                className={`${styles.bulkActionButton} ${styles.categorizeButton}`}
-                onClick={() => handleBulkStatusUpdate('categorized')}
-              >
-                Mark as Categorized
-              </button>
-            )}
-
-            {showMarkAsReconciled && (
-              <button
-                className={`${styles.bulkActionButton} ${styles.reconcileButton}`}
-                onClick={() => handleBulkStatusUpdate('reconciled')}
-              >
-                Mark as Reconciled
-              </button>
-            )}
-          </div>
-        );
-      })()}
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedTransactions={selectedTransactions}
+        transactions={transactions}
+        handleBulkEdit={handleBulkEdit}
+        handleBulkDelete={handleBulkDelete}
+        handleBulkStatusUpdate={handleBulkStatusUpdate}
+        styles={styles}
+      />
 
       {transactions.length === 0 ? (
         <div className={styles.noTransactions}>
@@ -640,45 +397,31 @@ const TransactionTable = ({
         </div>
       ) : (
         <table className={styles.transactionsTable}>
-          <thead>
-            <tr>
-              <th className={styles.checkboxColumn}>
-                <input
-                  type="checkbox"
-                  checked={selectAll}
-                  onChange={handleSelectAll}
-                  className={`${styles.checkbox} ${styles.selectAllCheckbox}`}
-                />
-              </th>
-              <th
-                onClick={() => onSort('date')}
-                className={styles.sortableHeader}
-              >
-                Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-              <th
-                onClick={() => onSort('amount')}
-                className={styles.sortableHeader}
-              >
-                Amount {sortField === 'amount' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-              <th
-                onClick={() => onSort('category')}
-                className={styles.sortableHeader}
-              >
-                Category {sortField === 'category' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-              <th
-                onClick={() => onSort('description')}
-                className={styles.sortableHeader}
-              >
-                Description {sortField === 'description' && (sortDirection === 'asc' ? '↑' : '↓')}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map(transaction => renderRow(transaction))}
-          </tbody>
+          {/* Table Header */}
+          <TransactionTableHeader
+            selectAll={selectAll}
+            handleSelectAll={handleSelectAll}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSort={onSort}
+            styles={styles}
+          />
+
+          {/* Table Body */}
+          <TransactionTableBody
+            transactions={transactions}
+            editingId={editingId}
+            editFormData={editFormData}
+            handleEditFormChange={handleEditFormChange}
+            handleSaveClick={handleSaveClick}
+            handleCancelClick={handleCancelClick}
+            handleRowClick={handleRowClick}
+            selectedAccountId={selectedAccountId}
+            accounts={accounts}
+            selectedTransactions={selectedTransactions}
+            handleSelectTransaction={handleSelectTransaction}
+            styles={styles}
+          />
         </table>
       )}
     </div>
