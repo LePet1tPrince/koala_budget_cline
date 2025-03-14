@@ -2,7 +2,9 @@ import { ButtonStyles, FormStyles, TransactionTableStyles as styles } from '../.
 import { useEffect, useState } from 'react';
 
 import BulkEditModal from './BulkEditModal';
+import ReconcileConfirmationModal from './ReconcileConfirmationModal';
 import { bulkUpdateTransactions } from '../../services/transactionService';
+import { getAccountById } from '../../services/accountService';
 
 const TransactionTable = ({
   transactions,
@@ -33,6 +35,11 @@ const TransactionTable = ({
   const [selectAll, setSelectAll] = useState(false);
   const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
   const [bulkEditError, setBulkEditError] = useState(null);
+
+  // State for reconciliation confirmation
+  const [isReconcileModalOpen, setIsReconcileModalOpen] = useState(false);
+  const [transactionsToReconcile, setTransactionsToReconcile] = useState([]);
+  const [currentReconciledBalance, setCurrentReconciledBalance] = useState(0);
 
   // Instead of resetting selections when transactions change,
   // we'll maintain selections for IDs that still exist
@@ -153,21 +160,71 @@ const TransactionTable = ({
     }
   };
 
-  const handleBulkStatusUpdate = (status) => {
-    Promise.all(selectedTransactions.map(id => onUpdateStatus(id, status)))
-      .then(() => {
-        // Keep selections after status update to allow for multiple operations
-        // The user can manually deselect if needed
+  // Handle reconciliation confirmation
+  const handleReconcileConfirm = async (transactionIds, targetStatus) => {
+    // Close the modal
+    setIsReconcileModalOpen(false);
 
-        // Refresh the data to update account balances
-        if (onRefresh) {
-          onRefresh();
+    try {
+      // Update the transactions to the target status
+      await Promise.all(transactionIds.map(id => onUpdateStatus(id, targetStatus)));
+
+      // Refresh the account data to get the updated reconciled balance
+      if (selectedAccountId) {
+        const updatedAccount = await getAccountById(selectedAccountId);
+        console.log('Updated account data:', updatedAccount);
+      }
+
+      // Refresh the transactions data
+      if (onRefresh) {
+        await onRefresh();
+      }
+    } catch (error) {
+      console.error('Error updating transaction status:', error);
+      alert('Failed to update status for some transactions. Please try again.');
+    }
+  };
+
+  // Handle bulk status update
+  const handleBulkStatusUpdate = async (status) => {
+    // Get the selected transactions
+    const selectedTransactionObjects = transactions.filter(t => selectedTransactions.includes(t.id));
+
+    // Get the current reconciled balance from the selected account
+    const selectedAccount = accounts.find(acc => acc.id === selectedAccountId);
+    const reconciledBalance = selectedAccount ? selectedAccount.reconciled_balance : 0;
+
+    // Check if any of the selected transactions are currently reconciled
+    const hasReconciledTransactions = selectedTransactionObjects.some(t => t.status === 'reconciled');
+
+    // Show confirmation modal when:
+    // 1. Marking transactions as reconciled
+    // 2. Changing status of any reconciled transactions (unreconciling)
+    if (status === 'reconciled' || hasReconciledTransactions) {
+      // Set the state for the reconciliation confirmation modal
+      setTransactionsToReconcile(selectedTransactionObjects);
+      setCurrentReconciledBalance(reconciledBalance);
+      setIsReconcileModalOpen(true);
+    } else {
+      // For other statuses with no reconciliation impact, just update directly
+      try {
+        await Promise.all(selectedTransactions.map(id => onUpdateStatus(id, status)));
+
+        // Refresh the account data to get the updated reconciled balance
+        if (selectedAccountId) {
+          const updatedAccount = await getAccountById(selectedAccountId);
+          console.log('Updated account data:', updatedAccount);
         }
-      })
-      .catch(error => {
+
+        // Refresh the transactions data
+        if (onRefresh) {
+          await onRefresh();
+        }
+      } catch (error) {
         console.error('Error updating transaction status:', error);
         alert('Failed to update status for some transactions. Please try again.');
-      });
+      }
+    }
   };
 
   // Start editing a transaction
@@ -490,6 +547,17 @@ const TransactionTable = ({
         transactionIds={selectedTransactions}
         accounts={accounts}
         selectedAccountId={selectedAccountId}
+      />
+
+      {/* Reconcile Confirmation Modal */}
+      <ReconcileConfirmationModal
+        isOpen={isReconcileModalOpen}
+        onClose={() => setIsReconcileModalOpen(false)}
+        onConfirm={handleReconcileConfirm}
+        transactions={transactionsToReconcile}
+        selectedAccountId={selectedAccountId}
+        currentReconciledBalance={currentReconciledBalance}
+        accounts={accounts}
       />
 
       {/* Error message for bulk edit */}

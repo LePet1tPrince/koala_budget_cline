@@ -68,3 +68,79 @@
   gap: 1rem;
   margin-top: 1.5rem;
 }
+
+/* Reconciliation confirmation modal styles */
+.modalBody {
+  margin-bottom: 1.5rem;
+  font-family: Arial, sans-serif;
+  color: #404040;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cancelButton {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.confirmButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.confirmButton:hover {
+  background-color: #0069d9;
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+}
+
+.reconcileDetails {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  border: 1px solid #e9ecef;
+}
+
+.reconcileRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.reconcileRow:last-child {
+  border-bottom: none;
+}
+
+.newBalance {
+  font-weight: bold;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.amount {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
