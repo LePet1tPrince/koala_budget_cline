@@ -99,8 +99,14 @@ docker-compose run --rm backend sh -c "python manage.py makemigrations"
 
 ### Running Tests
 ```bash
-docker-compose exec backend python manage.py test
+# Backend tests
+docker-compose run --rm backend sh -c "python manage.py test"
+
+# Frontend tests
+docker-compose run --rm frontend sh -c "npm test"
 ```
+
+For more detailed information about testing, see the [TESTING.md](TESTING.md) file.
 
 ### Code Style
 - Backend: PEP 8
