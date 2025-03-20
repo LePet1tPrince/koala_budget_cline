@@ -1,275 +1,5 @@
-.tabContainer {
-  display: flex;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #8A8C8E; /* Light Gray */
-}
-
-.tabButton {
-  padding: 10px 20px;
-  background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
-  font-size: 16px;
-  font-weight: 500;
-  color: #8A8C8E; /* Light Gray */
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: Arial, sans-serif;
-}
-
-.tabButton:hover {
-  color: #404040; /* Dark Gray */
-}
-
-.activeTab {
-  color: #2E83B7; /* Primary Blue */
-  border-bottom: 3px solid #2E83B7; /* Primary Blue */
-}
-
-.reportContainer {
-  margin-top: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.monthSelectorContainer {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 20px;
-}
-
-.monthSelector {
-  display: flex;
-  align-items: center;
-  width: 300px;
-  padding: 10px;
-  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.monthSelector label {
-  margin-right: 10px;
-  font-weight: bold;
-  white-space: nowrap;
-  font-family: Arial, sans-serif;
-  color: #404040; /* Dark Gray */
-}
-
-.monthSelector input {
-  padding: 8px;
-  border: 1px solid #8A8C8E; /* Light Gray */
-  border-radius: 4px;
-  font-size: 14px;
-  flex-grow: 1;
-  font-family: Georgia, serif;
-}
-
-.monthSelector input:focus {
-  outline: none;
-  border-color: #50A6D3; /* Light Blue */
-  box-shadow: 0 0 0 0.2rem rgba(80, 166, 211, 0.25); /* Light Blue with opacity */
-}
-
-.monthNavButton {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #8A8C8E; /* Light Gray */
-  padding: 0 10px;
-  transition: color 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.monthNavButton:hover {
-  color: #2E83B7; /* Primary Blue */
-}
-
-.monthNavButton:focus {
-  outline: none;
-  color: #50A6D3; /* Light Blue */
-}
-
-.tableContainer {
-  margin-top: 20px;
-  overflow-x: auto;
-  width: 100%;
-}
-
-.reportTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.reportTable th,
-.reportTable td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
-}
-
-.reportTable th {
-  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
-  font-weight: bold;
-  color: #404040; /* Dark Gray */
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  font-family: Arial, sans-serif;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.reportTable td {
-  font-family: Georgia, serif;
-}
-
-.reportTable tr:hover {
-  background-color: rgba(138, 140, 142, 0.05); /* Light Gray with opacity */
-}
-
-.reportTable tr:last-child td {
-  border-bottom: none;
-}
-
-.accountTypeRow td {
-  padding-top: 15px;
-  padding-bottom: 15px;
-  background-color: rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
-  font-weight: bold;
-  color: #404040; /* Dark Gray */
-  font-family: Arial, sans-serif;
-}
-
-.subAccountTypeRow td {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
-  font-weight: bold;
-  color: #8A8C8E; /* Light Gray */
-  font-style: italic;
-  padding-left: 25px;
-  font-family: Arial, sans-serif;
-}
-
-.totalRow td {
-  font-weight: bold;
-  border-top: 2px solid #8A8C8E; /* Light Gray */
-  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
-  font-family: Arial, sans-serif;
-}
-
-.subTotalRow td {
-  font-weight: bold;
-  border-top: 1px solid #8A8C8E; /* Light Gray */
-  font-style: italic;
-  padding-left: 25px;
-  font-family: Arial, sans-serif;
-}
-
-.grandTotalRow td {
-  font-weight: bold;
-  border-top: 3px double #8A8C8E; /* Light Gray */
-  background-color: rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
-  font-size: 1.1em;
-  font-family: Arial, sans-serif;
-}
-
-.currencyCell {
-  text-align: right;
-  font-family: Georgia, serif;
-}
-
-.positive {
-  color: #289A82; /* Primary Green */
-  font-weight: bold;
-  font-family: Georgia, serif;
-}
-
-.negative {
-  color: #D25425; /* Primary Orange */
-  font-weight: bold;
-  font-family: Georgia, serif;
-}
-
-.dateRangeContainer {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.dateRangeContainer .monthSelector {
-  width: 250px;
-}
-
-.dateRangePickerContainer {
-  margin-bottom: 20px;
-  max-width: 300px;
-}
-
-/* Sankey Diagram Styles */
-.sankeyContainer {
-  margin-top: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.dashboardSummary {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  padding: 15px;
-  background-color: rgba(138, 140, 142, 0.1); /* Light Gray with opacity */
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.summaryItem {
-  flex: 1;
-  text-align: center;
-  padding: 10px;
-}
-
-.summaryItem h3 {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: #404040; /* Dark Gray */
-  font-family: Arial, sans-serif;
-}
-
-.summaryItem p {
-  font-size: 20px;
-  font-weight: bold;
-  font-family: Georgia, serif;
-  color: #404040; /* Dark Gray */
-}
-
-.accountNameCell {
-  display: flex;
-  align-items: center;
-  font-family: Georgia, serif;
-}
-
-.accountIcon {
-  font-size: 1.2rem;
-  margin-right: 0.5rem;
-}
-
 /* Saving Goals Report Styles */
+
 .editModeToggle {
   display: flex;
   justify-content: flex-end;
@@ -322,8 +52,8 @@
   padding: 20px;
   border-radius: 8px;
   text-align: center;
-  margin: 30px auto;
-  max-width: 300px;
+  margin: 0;
+  width: 100%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
 }
@@ -573,18 +303,7 @@
   margin: 8px 0;
 }
 
-/* Chart Styles */
-.chartContainer {
-  margin: 0;
-  width: 100%;
-  height: 300px;
-}
-
-.chartSection {
-  margin: 0;
-  flex: 1;
-}
-
+/* Net Worth Chart Layout */
 .netWorthContainer {
   display: flex;
   align-items: stretch;
@@ -594,4 +313,9 @@
 
 .netWorthCardContainer {
   flex: 0 0 300px;
+}
+
+.chartSection {
+  margin: 0;
+  flex: 1;
 }

@@ -126,3 +126,16 @@ export const allocateRemaining = async (savingId, leftToAssign) => {
     throw error;
   }
 };
+
+// Get historical net worth data
+export const getNetWorthHistory = async (startDate, endDate, interval = 'monthly') => {
+  try {
+    const response = await apiClient.get(
+      `/reports/net-worth-history/?start_date=${startDate}&end_date=${endDate}&interval=${interval}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching net worth history:`, error);
+    throw error;
+  }
+};

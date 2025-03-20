@@ -1,10 +1,11 @@
 from rest_framework import views, permissions, status
 from rest_framework.response import Response
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db.models import Q, Sum
 from django.contrib.auth import get_user_model
 from accounts.models import Account, Transaction, AccountTypes, Saving
 from decimal import Decimal
+import calendar
 
 User = get_user_model()
 
@@ -284,6 +285,127 @@ class BalanceReportView(views.APIView):
                 })
 
             return Response(balance_data)
+
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class NetWorthHistoryView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        """
+        Get historical net worth data for a date range.
+
+        Query parameters:
+        - start_date: The start date of the history period (format: YYYY-MM-DD)
+        - end_date: The end date of the history period (format: YYYY-MM-DD)
+        - interval: The interval between data points (daily, weekly, monthly)
+        """
+        try:
+            # Get the date range parameters
+            start_date_str = request.query_params.get('start_date')
+            end_date_str = request.query_params.get('end_date')
+            interval = request.query_params.get('interval', 'monthly')
+
+            if not start_date_str or not end_date_str:
+                return Response(
+                    {"detail": "start_date and end_date parameters are required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Parse the dates
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                return Response(
+                    {"detail": "Invalid date format. Expected YYYY-MM-DD"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validate interval
+            if interval not in ['daily', 'weekly', 'monthly']:
+                return Response(
+                    {"detail": "Invalid interval. Must be one of: daily, weekly, monthly"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Generate dates based on interval
+            dates = []
+            if interval == 'daily':
+                current_date = start_date
+                while current_date <= end_date:
+                    dates.append(current_date)
+                    current_date += timedelta(days=1)
+            elif interval == 'weekly':
+                current_date = start_date
+                while current_date <= end_date:
+                    dates.append(current_date)
+                    current_date += timedelta(days=7)
+            else:  # monthly
+                current_date = start_date.replace(day=1)  # Start at beginning of month
+                while current_date <= end_date:
+                    dates.append(current_date)
+                    # Move to next month
+                    if current_date.month == 12:
+                        current_date = current_date.replace(year=current_date.year + 1, month=1)
+                    else:
+                        current_date = current_date.replace(month=current_date.month + 1)
+
+                # Add end_date if it's not already included
+                if dates[-1] < end_date:
+                    dates.append(end_date)
+
+            # Get all asset and liability accounts for the user
+            accounts = Account.objects.filter(
+                user=request.user,
+                type__in=[AccountTypes.asset, AccountTypes.liability]
+            )
+
+            # Calculate net worth for each date
+            history_data = []
+            for date in dates:
+                net_worth = Decimal('0.00')
+
+                for account in accounts:
+                    # Get all transactions for this account up to the date
+                    transactions = Transaction.objects.filter(
+                        Q(debit=account) | Q(credit=account),
+                        date__lte=date,
+                        user=request.user
+                    )
+
+                    # Calculate the balance
+                    debit_sum = transactions.filter(debit=account).aggregate(
+                        total=Sum('amount')
+                    )['total'] or Decimal('0.00')
+
+                    credit_sum = transactions.filter(credit=account).aggregate(
+                        total=Sum('amount')
+                    )['total'] or Decimal('0.00')
+
+                    # Calculate balance based on account type
+                    if account.type == AccountTypes.asset:
+                        # For asset accounts: debits are positive, credits are negative
+                        balance = debit_sum - credit_sum
+                        net_worth += balance
+                    elif account.type == AccountTypes.liability:
+                        # For liability accounts: credits are positive, debits are negative
+                        balance = credit_sum - debit_sum
+                        net_worth -= balance
+
+                # Format date as string for JSON serialization
+                date_str = date.strftime('%Y-%m-%d')
+
+                history_data.append({
+                    'date': date_str,
+                    'net_worth': float(net_worth)  # Convert Decimal to float for JSON
+                })
+
+            return Response(history_data)
 
         except Exception as e:
             return Response(

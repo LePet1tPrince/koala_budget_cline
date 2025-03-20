@@ -16,7 +16,7 @@ export { default as TransactionTableStyles } from './transactions/TransactionTab
 export { default as BudgetTableStyles } from './budget/BudgetTable.module.css';
 
 // Reports
-export { default as ReportsStyles } from './reports/Reports.module.css';
+export { ReportsStyles, CommonStyles, FlowStyles, SavingGoalsStyles, ChartStyles } from './reports';
 
 // Forms
 export { default as FormStyles } from './forms/Form.module.css';

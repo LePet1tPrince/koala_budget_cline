@@ -6,8 +6,9 @@ import {
   updateSavingGoalTarget
 } from '../../services/reportService';
 
+import NetWorthChart from './NetWorthChart';
 import { getAccounts } from '../../services/accountService';
-import { ReportsStyles as styles } from '../../styles/modules';
+import { SavingGoalsStyles as styles } from '../../styles/modules/reports';
 
 const SavingGoalsReport = () => {
   const [data, setData] = useState(null);
@@ -187,12 +188,22 @@ const SavingGoalsReport = () => {
       </p>
 
 
-      {/* Net Worth Card */}
-      <div className={styles.netWorthCard}>
-        <h3>Net Worth</h3>
-        <p className={styles.netWorthAmount}>{formatCurrency(data.net_worth)}</p>
-        <div className={`${styles.leftToAllocate} ${data.left_to_allocate >= 0 ? styles.leftToAllocatePositive : styles.leftToAllocateNegative}`}>
-          Left to Assign: {formatCurrency(data.left_to_allocate)}
+      {/* Net Worth Section - Chart and Card side by side */}
+      <div className={styles.netWorthContainer}>
+        {/* Net Worth Chart */}
+        <div className={styles.chartSection}>
+          <NetWorthChart months={12} />
+        </div>
+
+        {/* Net Worth Card */}
+        <div className={styles.netWorthCardContainer}>
+          <div className={styles.netWorthCard}>
+            <h3>Net Worth</h3>
+            <p className={styles.netWorthAmount}>{formatCurrency(data.net_worth)}</p>
+            <div className={`${styles.leftToAllocate} ${data.left_to_allocate >= 0 ? styles.leftToAllocatePositive : styles.leftToAllocateNegative}`}>
+              Left to Assign: {formatCurrency(data.left_to_allocate)}
+            </div>
+          </div>
         </div>
       </div>
 
