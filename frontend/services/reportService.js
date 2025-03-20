@@ -74,3 +74,55 @@ export const getBalanceReportData = async (asOfDate) => {
     throw error;
   }
 };
+
+// Get saving goals report data
+export const getSavingGoalsReport = async (asOfDate) => {
+  try {
+    // If no date is provided, the API will use today's date
+    const dateParam = asOfDate ? `?as_of_date=${asOfDate}` : '';
+    const response = await apiClient.get(`/reports/saving-goals/${dateParam}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching saving goals report data:', error);
+    throw error;
+  }
+};
+
+// Update saving goal target
+export const updateSavingGoalTarget = async (savingId, target) => {
+  try {
+    const response = await apiClient.patch(`/savings/${savingId}/update_target/`, {
+      target: target
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating saving goal target for ID ${savingId}:`, error);
+    throw error;
+  }
+};
+
+// Update saving goal balance
+export const updateSavingGoalBalance = async (savingId, balance) => {
+  try {
+    const response = await apiClient.patch(`/savings/${savingId}/update_balance/`, {
+      balance: balance
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating saving goal balance for ID ${savingId}:`, error);
+    throw error;
+  }
+};
+
+// Allocate remaining funds to a saving goal
+export const allocateRemaining = async (savingId, leftToAssign) => {
+  try {
+    const response = await apiClient.patch(`/savings/${savingId}/allocate_remaining/`, {
+      left_to_assign: leftToAssign
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error allocating remaining funds to saving goal ID ${savingId}:`, error);
+    throw error;
+  }
+};

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from datetime import datetime
 from django.db.models import Q, Sum
 from django.contrib.auth import get_user_model
-from accounts.models import Account, Transaction, AccountTypes
+from accounts.models import Account, Transaction, AccountTypes, Saving
 from decimal import Decimal
 
 User = get_user_model()
@@ -85,6 +85,126 @@ class FlowReportView(views.APIView):
                 })
 
             return Response(flow_data)
+
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class SavingGoalsReportView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        """
+        Get saving goals report data.
+
+        Query parameters:
+        - as_of_date: The date to calculate balances up to (format: YYYY-MM-DD)
+        """
+        try:
+            # Get the as_of_date parameter
+            as_of_date_str = request.query_params.get('as_of_date')
+            if not as_of_date_str:
+                # Default to today
+                as_of_date = datetime.now().date()
+            else:
+                # Parse the date
+                try:
+                    as_of_date = datetime.strptime(as_of_date_str, '%Y-%m-%d').date()
+                except ValueError:
+                    return Response(
+                        {"detail": "Invalid date format. Expected YYYY-MM-DD"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            # Get all asset and liability accounts for the user
+            asset_liability_accounts = Account.objects.filter(
+                user=request.user,
+                type__in=[AccountTypes.asset, AccountTypes.liability]
+            )
+
+            # Calculate net worth
+            net_worth = Decimal('0.00')
+            account_data = []
+
+            for account in asset_liability_accounts:
+                # Get all transactions for this account up to the as_of_date
+                transactions = Transaction.objects.filter(
+                    Q(debit=account) | Q(credit=account),
+                    date__lte=as_of_date,
+                    user=request.user
+                )
+
+                # Calculate the balance
+                debit_sum = transactions.filter(debit=account).aggregate(
+                    total=Sum('amount')
+                )['total'] or Decimal('0.00')
+
+                credit_sum = transactions.filter(credit=account).aggregate(
+                    total=Sum('amount')
+                )['total'] or Decimal('0.00')
+
+                # Calculate balance based on account type
+                if account.type == AccountTypes.asset:
+                    # For asset accounts: debits are positive, credits are negative
+                    balance = debit_sum - credit_sum
+                    net_worth += balance
+                elif account.type == AccountTypes.liability:
+                    # For liability accounts: credits are positive, debits are negative
+                    balance = credit_sum - debit_sum
+                    net_worth -= balance
+                else:
+                    balance = Decimal('0.00')
+
+                account_data.append({
+                    'id': account.id,
+                    'name': account.name,
+                    'type': account.type,
+                    'icon': account.icon,
+                    'balance': balance
+                })
+
+            # Get all saving goals for the user
+            savings = Saving.objects.filter(user=request.user)
+
+            # Calculate total allocated amount (sum of current balances, not targets)
+            total_allocated = sum(saving.balance for saving in savings)
+
+            # Calculate left to allocate
+            left_to_allocate = net_worth - total_allocated
+
+            # Prepare saving goals data
+            saving_goals_data = []
+            for saving in savings:
+                contributing_accounts = []
+                for account in saving.contributing_accounts.all():
+                    contributing_accounts.append({
+                        'id': account.id,
+                        'name': account.name,
+                        'type': account.type,
+                        'icon': account.icon
+                    })
+
+                saving_goals_data.append({
+                    'id': saving.id,
+                    'name': saving.account.name,
+                    'target': saving.target,
+                    'balance': saving.balance,
+                    'progress_percentage': saving.progress_percentage,
+                    'contributing_accounts': contributing_accounts
+                })
+
+            # Prepare response data
+            response_data = {
+                'net_worth': net_worth,
+                'total_allocated': total_allocated,
+                'left_to_allocate': left_to_allocate,
+                'accounts': account_data,
+                'saving_goals': saving_goals_data
+            }
+
+            return Response(response_data)
 
         except Exception as e:
             return Response(

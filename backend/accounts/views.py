@@ -5,10 +5,10 @@ from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Q, Sum
-from .models import SubAccountType, Account, Transaction, AccountTypes
+from .models import SubAccountType, Account, Transaction, AccountTypes, Saving
 from .serializers import (
     UserSerializer, UserCreateSerializer, SubAccountTypeSerializer,
-    AccountSerializer, TransactionSerializer
+    AccountSerializer, TransactionSerializer, SavingSerializer
 )
 from decimal import Decimal
 from .permissions import IsOwner
@@ -519,3 +519,247 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         # Return the result
         return Response(result)
+
+class SavingViewSet(viewsets.ModelViewSet):
+    serializer_class = SavingSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+
+    def get_queryset(self):
+        return Saving.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            print(f"Error creating saving: {e}")
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=True, methods=['patch'])
+    def update_target(self, request, pk=None):
+        """
+        Update the target amount for a saving goal.
+        """
+        saving = self.get_object()
+        target = request.data.get('target')
+
+        if target is None:
+            return Response(
+                {"detail": "Target amount is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Convert target to Decimal instead of float
+            target = Decimal(str(target))
+            if target < 0:
+                return Response(
+                    {"detail": "Target amount cannot be negative"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            saving.target = target
+            saving.save()
+
+            serializer = self.get_serializer(saving)
+            return Response(serializer.data)
+        except ValueError:
+            return Response(
+                {"detail": "Invalid target amount"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=True, methods=['patch'])
+    def update_contributing_accounts(self, request, pk=None):
+        """
+        Update the contributing accounts for a saving goal.
+        """
+        saving = self.get_object()
+        account_ids = request.data.get('account_ids', [])
+
+        if not isinstance(account_ids, list):
+            return Response(
+                {"detail": "Account IDs must be provided as a list"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Validate that all accounts exist and belong to the user
+            accounts = Account.objects.filter(
+                id__in=account_ids,
+                user=request.user,
+                type__in=[AccountTypes.asset, AccountTypes.liability]
+            )
+
+            if len(accounts) != len(account_ids):
+                # Find which account IDs don't exist
+                found_ids = [str(a.id) for a in accounts]
+                missing_ids = [str(aid) for aid in account_ids if str(aid) not in found_ids]
+                return Response(
+                    {
+                        "detail": "Some accounts were not found or are not valid contributing accounts",
+                        "missing_ids": missing_ids
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Update contributing accounts
+            saving.contributing_accounts.set(accounts)
+
+            serializer = self.get_serializer(saving)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response(
+                {"detail": f"Error updating contributing accounts: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=True, methods=['patch'])
+    def update_balance(self, request, pk=None):
+        """
+        Update the balance of a saving goal by creating a transaction.
+        """
+        saving = self.get_object()
+        new_balance = request.data.get('balance')
+
+        if new_balance is None:
+            return Response(
+                {"detail": "Balance amount is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Convert balance to Decimal
+            new_balance = Decimal(str(new_balance))
+            if new_balance < 0:
+                return Response(
+                    {"detail": "Balance amount cannot be negative"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Calculate the difference between current and new balance
+            current_balance = saving.balance
+            difference = new_balance - current_balance
+
+            if difference == 0:
+                # No change needed
+                serializer = self.get_serializer(saving)
+                return Response(serializer.data)
+
+            # Find or create an equity account for balance adjustments
+            equity_account, created = Account.objects.get_or_create(
+                user=request.user,
+                name="Balance Adjustments",
+                type=AccountTypes.equity,
+                defaults={
+                    'num': Account.objects.filter(user=request.user).aggregate(models.Max('num'))['num__max'] + 1 if Account.objects.filter(user=request.user).exists() else 1000
+                }
+            )
+
+            # Create a transaction to adjust the balance
+            # If difference is positive, debit the goal account (increase balance)
+            # If difference is negative, credit the goal account (decrease balance)
+            if difference > 0:
+                debit_account = saving.account
+                credit_account = equity_account
+                amount = difference
+            else:
+                debit_account = equity_account
+                credit_account = saving.account
+                amount = abs(difference)
+
+            # Create the transaction
+            transaction = Transaction.objects.create(
+                user=request.user,
+                date=datetime.now().date(),
+                amount=amount,
+                debit=debit_account,
+                credit=credit_account,
+                notes=f"Balance adjustment for {saving.account.name}"
+            )
+
+            # Update account balances
+            debit_account.update_balance()
+            credit_account.update_balance()
+
+            serializer = self.get_serializer(saving)
+            return Response(serializer.data)
+        except ValueError:
+            return Response(
+                {"detail": "Invalid balance amount"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {"detail": f"Error updating balance: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @action(detail=True, methods=['patch'])
+    def allocate_remaining(self, request, pk=None):
+        """
+        Allocate the remaining 'Left to assign' amount to this saving goal.
+        """
+        saving = self.get_object()
+        left_to_assign = request.data.get('left_to_assign')
+
+        if left_to_assign is None:
+            return Response(
+                {"detail": "Left to assign amount is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Convert left_to_assign to Decimal
+            left_to_assign = Decimal(str(left_to_assign))
+            if left_to_assign <= 0:
+                return Response(
+                    {"detail": "Left to assign amount must be positive"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Calculate the new balance
+            current_balance = saving.balance
+            new_balance = current_balance + left_to_assign
+
+            # Find or create an equity account for balance adjustments
+            equity_account, created = Account.objects.get_or_create(
+                user=request.user,
+                name="Balance Adjustments",
+                type=AccountTypes.equity,
+                defaults={
+                    'num': Account.objects.filter(user=request.user).aggregate(models.Max('num'))['num__max'] + 1 if Account.objects.filter(user=request.user).exists() else 1000
+                }
+            )
+
+            # Create a transaction to adjust the balance
+            transaction = Transaction.objects.create(
+                user=request.user,
+                date=datetime.now().date(),
+                amount=left_to_assign,
+                debit=saving.account,
+                credit=equity_account,
+                notes=f"Allocated remaining funds to {saving.account.name}"
+            )
+
+            # Update account balances
+            saving.account.update_balance()
+            equity_account.update_balance()
+
+            serializer = self.get_serializer(saving)
+            return Response(serializer.data)
+        except ValueError:
+            return Response(
+                {"detail": "Invalid amount"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {"detail": f"Error allocating remaining amount: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )

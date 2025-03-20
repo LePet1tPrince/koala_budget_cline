@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import SubAccountType, Account, Transaction
+from .models import SubAccountType, Account, Transaction, Saving
 
 User = get_user_model()
 
@@ -59,3 +59,42 @@ class TransactionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+class SavingSerializer(serializers.ModelSerializer):
+    account = AccountSerializer(read_only=True)
+    account_id = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        source='account',
+        write_only=True
+    )
+    contributing_accounts = AccountSerializer(many=True, read_only=True)
+    contributing_account_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        source='contributing_accounts',
+        write_only=True,
+        many=True,
+        required=False
+    )
+    balance = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        read_only=True
+    )
+    progress_percentage = serializers.FloatField(read_only=True)
+
+    class Meta:
+        model = Saving
+        fields = ('id', 'account', 'account_id', 'target', 'balance',
+                  'contributing_accounts', 'contributing_account_ids',
+                  'progress_percentage', 'user')
+        read_only_fields = ('id', 'user', 'balance', 'progress_percentage')
+
+    def create(self, validated_data):
+        contributing_accounts = validated_data.pop('contributing_accounts', [])
+        validated_data['user'] = self.context['request'].user
+        saving = Saving.objects.create(**validated_data)
+
+        if contributing_accounts:
+            saving.contributing_accounts.set(contributing_accounts)
+
+        return saving

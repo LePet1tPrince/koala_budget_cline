@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from decimal import Decimal
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -169,3 +170,44 @@ class Transaction(models.Model):
 
     def __str__(self):
         return str(self.amount) + " - " + str(self.credit) + " -> " + str(self.debit) + " - " + str(self.notes)
+
+class Saving(models.Model):
+    account = models.OneToOneField(
+        Account,
+        on_delete=models.CASCADE,
+        related_name='saving',
+        limit_choices_to={'type': AccountTypes.goal}
+    )
+    target = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00')
+    )
+    contributing_accounts = models.ManyToManyField(
+        Account,
+        related_name='contributes_to',
+        blank=True,
+        limit_choices_to={'type__in': [AccountTypes.asset, AccountTypes.liability]}
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='savings')
+
+    def __str__(self):
+        return f"Saving for {self.account.name} - Target: {self.target}"
+
+    @property
+    def balance(self):
+        """
+        Return the balance of the associated account.
+        """
+        return self.account.balance or Decimal('0.00')
+
+    @property
+    def progress_percentage(self):
+        """
+        Calculate the percentage of the target that has been saved.
+        """
+        if self.target and self.target > 0:
+            # Convert target to Decimal to ensure type compatibility
+            target_decimal = Decimal(str(self.target))
+            return min(100, (self.balance / target_decimal) * 100)
+        return 0

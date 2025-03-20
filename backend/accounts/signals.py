@@ -4,7 +4,7 @@ from django.db import transaction
 from django.db.models import Sum, Q
 from decimal import Decimal
 
-from .models import Transaction, Account
+from .models import Transaction, Account, Saving, AccountTypes
 
 def update_account_balance(account_id):
     """
@@ -54,6 +54,18 @@ def update_balances_on_transaction_change(sender, instance, created, **kwargs):
         # Update both accounts involved in the transaction
         update_account_balance(instance.debit.id)
         update_account_balance(instance.credit.id)
+
+@receiver(post_save, sender=Account)
+def create_saving_for_goal_account(sender, instance, created, **kwargs):
+    """
+    Create a Saving object when a new Goal account is created.
+    """
+    if created and instance.type == AccountTypes.goal:
+        Saving.objects.create(
+            account=instance,
+            user=instance.user,
+            target=0.00  # Default target is 0
+        )
 
 @receiver(post_delete, sender=Transaction)
 def update_balances_on_transaction_delete(sender, instance, **kwargs):
