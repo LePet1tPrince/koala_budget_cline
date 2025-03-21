@@ -126,6 +126,7 @@ const TransactionList = ({
         onUpdateStatus={onUpdateStatus}
         onRefresh={onRefresh} // Pass the refresh function to TransactionTable
         merchants={merchants}
+        showFilters={false} // Disable filter buttons for bank feed page
       />
 
       {totalPages > 1 && (

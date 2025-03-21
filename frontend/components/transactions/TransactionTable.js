@@ -21,7 +21,8 @@ const TransactionTable = ({
   onRefresh,
   merchants = [],
   showAllColumns = false, // New prop to control which columns to show
-  initialColumnFilters = {} // Initial column filters
+  initialColumnFilters = {}, // Initial column filters
+  showFilters = true // New prop to control whether to show filter buttons
 }) => {
   // State for column filters - now we'll pass changes up to the parent
   const [columnFilters, setColumnFilters] = useState(initialColumnFilters);
@@ -475,8 +476,9 @@ const TransactionTable = ({
           sortDirection={sortDirection}
           onSort={onSort}
           styles={styles}
-          showAllColumns={showAllColumns}
-          columnFilters={columnFilters}
+            showAllColumns={showAllColumns}
+            columnFilters={columnFilters}
+            showFilters={showFilters}
           onColumnFilterChange={(column, value) => {
             // Update local state
             const newFilters = {

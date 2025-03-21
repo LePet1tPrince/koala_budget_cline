@@ -11,6 +11,7 @@ const TransactionTableHeader = ({
   styles,
   showAllColumns = false, // New prop to control which columns to show
   columnFilters = {},
+  showFilters = true, // New prop to control whether to show filter buttons
   onColumnFilterChange,
   accounts = [],
   merchants = []
@@ -67,12 +68,14 @@ const TransactionTableHeader = ({
               <span onClick={() => onSort('date')}>
                 Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
               </span>
-              <button
-                className={`${styles.filterButton} ${columnFilters.date && (columnFilters.date.from || columnFilters.date.to) ? styles.filterActive : ''}`}
-                onClick={(e) => handleFilterClick(e, 'date')}
-              >
-                <span className={styles.filterIcon}>⚡</span>
-              </button>
+              {showFilters && (
+                <button
+                  className={`${styles.filterButton} ${columnFilters.date && (columnFilters.date.from || columnFilters.date.to) ? styles.filterActive : ''}`}
+                  onClick={(e) => handleFilterClick(e, 'date')}
+                >
+                  <span className={styles.filterIcon}>⚡</span>
+                </button>
+              )}
             </div>
           </th>
           <th className={styles.sortableHeader}>
@@ -80,12 +83,14 @@ const TransactionTableHeader = ({
               <span onClick={() => onSort('merchant')}>
                 Merchant {sortField === 'merchant' && (sortDirection === 'asc' ? '↑' : '↓')}
               </span>
-              <button
-                className={`${styles.filterButton} ${columnFilters.merchant ? styles.filterActive : ''}`}
-                onClick={(e) => handleFilterClick(e, 'merchant')}
-              >
-                <span className={styles.filterIcon}>⚡</span>
-              </button>
+              {showFilters && (
+                <button
+                  className={`${styles.filterButton} ${columnFilters.merchant ? styles.filterActive : ''}`}
+                  onClick={(e) => handleFilterClick(e, 'merchant')}
+                >
+                  <span className={styles.filterIcon}>⚡</span>
+                </button>
+              )}
             </div>
           </th>
           <th className={styles.sortableHeader}>
@@ -93,12 +98,14 @@ const TransactionTableHeader = ({
               <span onClick={() => onSort('amount')}>
                 Amount {sortField === 'amount' && (sortDirection === 'asc' ? '↑' : '↓')}
               </span>
-              <button
-                className={`${styles.filterButton} ${columnFilters.amount && (columnFilters.amount.min || columnFilters.amount.max) ? styles.filterActive : ''}`}
-                onClick={(e) => handleFilterClick(e, 'amount')}
-              >
-                <span className={styles.filterIcon}>⚡</span>
-              </button>
+              {showFilters && (
+                <button
+                  className={`${styles.filterButton} ${columnFilters.amount && (columnFilters.amount.min || columnFilters.amount.max) ? styles.filterActive : ''}`}
+                  onClick={(e) => handleFilterClick(e, 'amount')}
+                >
+                  <span className={styles.filterIcon}>⚡</span>
+                </button>
+              )}
             </div>
           </th>
 
@@ -109,12 +116,14 @@ const TransactionTableHeader = ({
                 <span onClick={() => onSort('debit')}>
                   Debit Account {sortField === 'debit' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </span>
-                <button
-                  className={`${styles.filterButton} ${columnFilters.debit ? styles.filterActive : ''}`}
-                  onClick={(e) => handleFilterClick(e, 'debit')}
-                >
-                  <span className={styles.filterIcon}>⚡</span>
-                </button>
+                {showFilters && (
+                  <button
+                    className={`${styles.filterButton} ${columnFilters.debit ? styles.filterActive : ''}`}
+                    onClick={(e) => handleFilterClick(e, 'debit')}
+                  >
+                    <span className={styles.filterIcon}>⚡</span>
+                  </button>
+                )}
               </div>
             </th>
           )}
@@ -125,12 +134,14 @@ const TransactionTableHeader = ({
                 <span onClick={() => onSort('credit')}>
                   Credit Account {sortField === 'credit' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </span>
-                <button
-                  className={`${styles.filterButton} ${columnFilters.credit ? styles.filterActive : ''}`}
-                  onClick={(e) => handleFilterClick(e, 'credit')}
-                >
-                  <span className={styles.filterIcon}>⚡</span>
-                </button>
+                {showFilters && (
+                  <button
+                    className={`${styles.filterButton} ${columnFilters.credit ? styles.filterActive : ''}`}
+                    onClick={(e) => handleFilterClick(e, 'credit')}
+                  >
+                    <span className={styles.filterIcon}>⚡</span>
+                  </button>
+                )}
               </div>
             </th>
           )}
@@ -142,12 +153,14 @@ const TransactionTableHeader = ({
                 <span onClick={() => onSort('category')}>
                   Category {sortField === 'category' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </span>
-                <button
-                  className={`${styles.filterButton} ${columnFilters.category ? styles.filterActive : ''}`}
-                  onClick={(e) => handleFilterClick(e, 'category')}
-                >
-                  <span className={styles.filterIcon}>⚡</span>
-                </button>
+                {showFilters && (
+                  <button
+                    className={`${styles.filterButton} ${columnFilters.category ? styles.filterActive : ''}`}
+                    onClick={(e) => handleFilterClick(e, 'category')}
+                  >
+                    <span className={styles.filterIcon}>⚡</span>
+                  </button>
+                )}
               </div>
             </th>
           )}
@@ -157,12 +170,14 @@ const TransactionTableHeader = ({
               <span onClick={() => onSort('description')}>
                 Description {sortField === 'description' && (sortDirection === 'asc' ? '↑' : '↓')}
               </span>
-              <button
-                className={`${styles.filterButton} ${columnFilters.description ? styles.filterActive : ''}`}
-                onClick={(e) => handleFilterClick(e, 'description')}
-              >
-                <span className={styles.filterIcon}>⚡</span>
-              </button>
+              {showFilters && (
+                <button
+                  className={`${styles.filterButton} ${columnFilters.description ? styles.filterActive : ''}`}
+                  onClick={(e) => handleFilterClick(e, 'description')}
+                >
+                  <span className={styles.filterIcon}>⚡</span>
+                </button>
+              )}
             </div>
           </th>
 
@@ -173,12 +188,14 @@ const TransactionTableHeader = ({
                 <span onClick={() => onSort('status')}>
                   Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </span>
-                <button
-                  className={`${styles.filterButton} ${columnFilters.status ? styles.filterActive : ''}`}
-                  onClick={(e) => handleFilterClick(e, 'status')}
-                >
-                  <span className={styles.filterIcon}>⚡</span>
-                </button>
+                {showFilters && (
+                  <button
+                    className={`${styles.filterButton} ${columnFilters.status ? styles.filterActive : ''}`}
+                    onClick={(e) => handleFilterClick(e, 'status')}
+                  >
+                    <span className={styles.filterIcon}>⚡</span>
+                  </button>
+                )}
               </div>
             </th>
           )}
