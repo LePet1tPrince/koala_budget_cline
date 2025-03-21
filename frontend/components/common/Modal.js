@@ -1,7 +1,7 @@
 import { ModalStyles as styles } from '../../styles/modules';
 import { useEffect } from 'react';
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, onClose, title, children, contentClassName }) => {
   // Close modal when Escape key is pressed
   useEffect(() => {
     const handleEsc = (event) => {
@@ -40,7 +40,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
       onClick={onClose}
     >
       <div
-        className={styles.modalContent}
+        className={contentClassName || styles.modalContent}
         onClick={(e) => e.stopPropagation()}
       >
         <div className={styles.modalHeader}>

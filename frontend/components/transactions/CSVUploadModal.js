@@ -12,6 +12,7 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
     description: null,
     amount: null,
     category: null,
+    merchant: null,
     has_header: true
   });
   const [step, setStep] = useState(1); // 1: File selection, 2: Column mapping
@@ -28,6 +29,7 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
       description: null,
       amount: null,
       category: null,
+      merchant: null,
       has_header: true
     });
     setStep(1);
@@ -83,6 +85,8 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
             mapping.amount = index;
           } else if (/category|cat|type|account/i.test(header)) {
             mapping.category = index;
+          } else if (/merchant|vendor|payee|shop|store/i.test(header)) {
+            mapping.merchant = index;
           }
         });
 
@@ -158,7 +162,12 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Import Transactions from CSV">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Import Transactions from CSV"
+      contentClassName={modalStyles.wideModalContent}
+    >
       {step === 1 && (
         <div className={modalStyles.modalBody}>
           <div
@@ -254,11 +263,12 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
               value={columnMapping.date === null ? '' : columnMapping.date}
               onChange={(e) => handleMappingChange('date', e.target.value)}
               required
+              className={formStyles.input}
             >
               <option value="">Select a column</option>
-              {csvData[0].map((_, index) => (
+              {csvData[0].map((header, index) => (
                 <option key={index} value={index}>
-                  Column {index + 1}{columnMapping.has_header ? `: ${csvData[0][index]}` : ''}
+                  {columnMapping.has_header ? header : `Column ${index + 1}`}
                 </option>
               ))}
             </select>
@@ -271,11 +281,12 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
               value={columnMapping.amount === null ? '' : columnMapping.amount}
               onChange={(e) => handleMappingChange('amount', e.target.value)}
               required
+              className={formStyles.input}
             >
               <option value="">Select a column</option>
-              {csvData[0].map((_, index) => (
+              {csvData[0].map((header, index) => (
                 <option key={index} value={index}>
-                  Column {index + 1}{columnMapping.has_header ? `: ${csvData[0][index]}` : ''}
+                  {columnMapping.has_header ? header : `Column ${index + 1}`}
                 </option>
               ))}
             </select>
@@ -287,11 +298,29 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
               id="description-column"
               value={columnMapping.description === null ? '' : columnMapping.description}
               onChange={(e) => handleMappingChange('description', e.target.value)}
+              className={formStyles.input}
             >
               <option value="">Select a column</option>
-              {csvData[0].map((_, index) => (
+              {csvData[0].map((header, index) => (
                 <option key={index} value={index}>
-                  Column {index + 1}{columnMapping.has_header ? `: ${csvData[0][index]}` : ''}
+                  {columnMapping.has_header ? header : `Column ${index + 1}`}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={formStyles.formGroup}>
+            <label htmlFor="merchant-column">Merchant Column (optional):</label>
+            <select
+              id="merchant-column"
+              value={columnMapping.merchant === null ? '' : columnMapping.merchant}
+              onChange={(e) => handleMappingChange('merchant', e.target.value)}
+              className={formStyles.input}
+            >
+              <option value="">Select a column</option>
+              {csvData[0].map((header, index) => (
+                <option key={index} value={index}>
+                  {columnMapping.has_header ? header : `Column ${index + 1}`}
                 </option>
               ))}
             </select>
@@ -303,11 +332,12 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
               id="category-column"
               value={columnMapping.category === null ? '' : columnMapping.category}
               onChange={(e) => handleMappingChange('category', e.target.value)}
+              className={formStyles.input}
             >
               <option value="">Select a column</option>
-              {csvData[0].map((_, index) => (
+              {csvData[0].map((header, index) => (
                 <option key={index} value={index}>
-                  Column {index + 1}{columnMapping.has_header ? `: ${csvData[0][index]}` : ''}
+                  {columnMapping.has_header ? header : `Column ${index + 1}`}
                 </option>
               ))}
             </select>
@@ -315,26 +345,29 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
 
           {error && <p className={formStyles.errorText}>{error}</p>}
 
-          <div className={modalStyles.modalFooter}>
+          <div className={formStyles.mappingFooter}>
+            <div>
+              <button
+                className={formStyles.backButton}
+                onClick={() => setStep(1)}
+                disabled={isUploading}
+              >
+                Back
+              </button>
+              <button
+                className={buttonStyles.cancelButton}
+                onClick={handleClose}
+                disabled={isUploading}
+              >
+                Cancel
+              </button>
+            </div>
             <button
-              className={buttonStyles.backButton}
-              onClick={() => setStep(1)}
-            >
-              Back
-            </button>
-            <button
-              className={buttonStyles.primaryButton}
+              className={formStyles.uploadButton}
               onClick={handleUpload}
               disabled={isUploading || columnMapping.date === null || columnMapping.amount === null}
             >
-              {isUploading ? 'Uploading...' : 'Upload'}
-            </button>
-            <button
-              className={buttonStyles.cancelButton}
-              onClick={handleClose}
-              disabled={isUploading}
-            >
-              Cancel
+              {isUploading ? 'Uploading...' : 'Upload Transactions'}
             </button>
           </div>
         </div>

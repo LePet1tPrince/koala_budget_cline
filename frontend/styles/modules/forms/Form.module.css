@@ -132,6 +132,97 @@
   font-family: Georgia, serif;
 }
 
+/* CSV Mapping Styles */
+.previewTable {
+  margin: 1.5rem 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.previewTable table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Georgia, serif;
+}
+
+.previewTable th {
+  background-color: #f5f5f5;
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.previewTable td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid #f0f0f0;
+}
+
+.previewTable tr:last-child td {
+  border-bottom: none;
+}
+
+.previewTable tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.mappingFooter {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.backButton {
+  background-color: #f5f5f5;
+  color: #404040;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  margin-right: 1rem;
+}
+
+.backButton:hover {
+  background-color: #e0e0e0;
+}
+
+.uploadButton {
+  background-color: #289A82; /* Primary Green */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.uploadButton:hover {
+  background-color: #1E7A68; /* Slightly darker green */
+}
+
+.uploadButton:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+}
+
 .input,
 .inputError {
   width: 100%;

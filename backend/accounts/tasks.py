@@ -5,7 +5,7 @@ from datetime import datetime
 from celery import shared_task
 from django.db import transaction
 from django.contrib.auth import get_user_model
-from .models import Account, Transaction
+from .models import Account, Transaction, Merchant
 
 User = get_user_model()
 
@@ -130,10 +130,11 @@ def process_csv_transactions(file_content, column_mapping, selected_account_id, 
 
             # Extract data from the row based on column mapping
             try:
-                date_str = row[column_mapping['date']] if 'date' in column_mapping else None
-                description = row[column_mapping['description']] if 'description' in column_mapping else None
-                amount_str = row[column_mapping['amount']] if 'amount' in column_mapping else None
-                category = row[column_mapping['category']] if 'category' in column_mapping else None
+                date_str = row[column_mapping['date']] if 'date' in column_mapping and column_mapping['date'] is not None else None
+                description = row[column_mapping['description']] if 'description' in column_mapping and column_mapping['description'] is not None else None
+                amount_str = row[column_mapping['amount']] if 'amount' in column_mapping and column_mapping['amount'] is not None else None
+                category = row[column_mapping['category']] if 'category' in column_mapping and column_mapping['category'] is not None else None
+                merchant = row[column_mapping['merchant']] if 'merchant' in column_mapping and column_mapping['merchant'] is not None else None
             except IndexError:
                 results['failed'] += 1
                 results['errors'].append(f"Row {row_index}: Column index out of range. Check your column mapping.")
@@ -190,6 +191,14 @@ def process_csv_transactions(file_content, column_mapping, selected_account_id, 
                     debit_account = category_account
                     credit_account = selected_account
 
+                # Find or create merchant if provided
+                merchant_obj = None
+                if merchant:
+                    merchant_obj, _ = Merchant.objects.get_or_create(
+                        name=merchant,
+                        user=user
+                    )
+
                 # Create the transaction using atomic transaction
                 with transaction.atomic():
                     Transaction.objects.create(
@@ -198,6 +207,7 @@ def process_csv_transactions(file_content, column_mapping, selected_account_id, 
                         debit=debit_account,
                         credit=credit_account,
                         notes=description or '',
+                        merchant=merchant_obj,
                         user=user
                     )
 
