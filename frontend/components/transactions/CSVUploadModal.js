@@ -166,15 +166,28 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
             className={`${formStyles.dropzone} ${isDragActive ? formStyles.dropzoneActive : ''}`}
           >
             <input {...getInputProps()} ref={fileInputRef} />
+            <div className={formStyles.dropzoneIcon}>
+              📄
+            </div>
             {isDragActive ? (
-              <p>Drop the CSV file here...</p>
+              <p className={formStyles.dropzoneText}>Drop the CSV file here...</p>
             ) : (
-              <div>
-                <p>Drag and drop a CSV file here, or click to select a file</p>
+              <>
+                <p className={formStyles.dropzoneText}>Drag and drop a CSV file here</p>
                 <p className={formStyles.dropzoneHint}>
                   The file should contain columns for date, amount, and optionally description and category.
                 </p>
-              </div>
+                <button
+                  type="button"
+                  className={formStyles.browseButton}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current.click();
+                  }}
+                >
+                  Browse Files
+                </button>
+              </>
             )}
           </div>
 

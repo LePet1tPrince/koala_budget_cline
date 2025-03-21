@@ -66,6 +66,72 @@
   font-family: Arial, sans-serif;
 }
 
+/* Enhanced Dropzone Styles */
+.dropzone {
+  border: 2px dashed #8A8C8E;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropzoneActive {
+  border-color: #289A82; /* Primary Green */
+  background-color: rgba(40, 154, 130, 0.05);
+}
+
+.dropzoneIcon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #8A8C8E;
+}
+
+.dropzoneText {
+  margin-bottom: 1rem;
+  color: #404040;
+  font-family: Georgia, serif;
+}
+
+.dropzoneHint {
+  font-size: 0.8rem;
+  color: #8A8C8E;
+  margin-bottom: 1.5rem;
+}
+
+.browseButton {
+  background-color: #50A6D3; /* Light Blue */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.browseButton:hover {
+  background-color: #3d8eb9;
+}
+
+.fileInfo {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #f0f8ff;
+  border-radius: 4px;
+  border-left: 4px solid #50A6D3;
+  font-family: Georgia, serif;
+}
+
 .input,
 .inputError {
   width: 100%;
