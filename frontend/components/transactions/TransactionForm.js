@@ -1,9 +1,11 @@
-import { FormStyles as styles } from '../../styles/modules';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-const TransactionForm = ({ accounts, selectedAccountId, onSubmit, onCancel }) => {
+import { FormStyles as styles } from '../../styles/modules';
+
+const TransactionForm = ({ accounts, selectedAccountId, onSubmit, onCancel, merchants = [] }) => {
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
+    merchant: '',
     amount: '',
     category: '',
     debit: '',
@@ -13,6 +15,69 @@ const TransactionForm = ({ accounts, selectedAccountId, onSubmit, onCancel }) =>
   });
 
   const [errors, setErrors] = useState({});
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const merchantInputRef = useRef(null);
+  const [filteredMerchants, setFilteredMerchants] = useState([]);
+
+  // Update filtered merchants when merchant input or merchants list changes
+  useEffect(() => {
+    if (formData.merchant && formData.merchant.length > 0) {
+      const filtered = merchants
+        .filter(merchant =>
+          merchant.toLowerCase().includes(formData.merchant.toLowerCase()) &&
+          merchant.toLowerCase() !== formData.merchant.toLowerCase()
+        )
+        .slice(0, 5);
+
+      setFilteredMerchants(filtered);
+
+      // Reset selected index when filtered list changes
+      setSelectedSuggestionIndex(-1);
+    } else {
+      setFilteredMerchants([]);
+      setSelectedSuggestionIndex(-1);
+    }
+  }, [formData.merchant, merchants]);
+
+  // Handle keyboard navigation for merchant suggestions
+  const handleMerchantKeyDown = (e) => {
+    // Only process if we have suggestions
+    if (filteredMerchants.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prevIndex =>
+          prevIndex < filteredMerchants.length - 1 ? prevIndex + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prevIndex =>
+          prevIndex > 0 ? prevIndex - 1 : filteredMerchants.length - 1
+        );
+        break;
+      case 'Enter':
+        // If a suggestion is selected, use it
+        if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < filteredMerchants.length) {
+          e.preventDefault();
+          setFormData({
+            ...formData,
+            merchant: filteredMerchants[selectedSuggestionIndex]
+          });
+          setSelectedSuggestionIndex(-1);
+          setFilteredMerchants([]);
+        }
+        break;
+      case 'Escape':
+        // Close suggestions
+        setSelectedSuggestionIndex(-1);
+        setFilteredMerchants([]);
+        break;
+      default:
+        break;
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -107,6 +172,7 @@ const TransactionForm = ({ accounts, selectedAccountId, onSubmit, onCancel }) =>
 
       const submissionData = {
         date: formData.date,
+        merchant_name: formData.merchant,
         amount,
         debit: parseInt(formData.debit, 10),
         credit: parseInt(formData.credit, 10),
@@ -131,6 +197,43 @@ const TransactionForm = ({ accounts, selectedAccountId, onSubmit, onCancel }) =>
           className={errors.date ? styles.inputError : styles.input}
         />
         {errors.date && <p className={styles.errorText}>{errors.date}</p>}
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="merchant">Merchant</label>
+        <div className={styles.autocompleteContainer}>
+          <input
+            type="text"
+            id="merchant"
+            name="merchant"
+            value={formData.merchant}
+            onChange={handleChange}
+            onKeyDown={handleMerchantKeyDown}
+            ref={merchantInputRef}
+            className={styles.input}
+            autoComplete="off"
+            placeholder="Start typing to see suggestions..."
+          />
+          {filteredMerchants.length > 0 && (
+            <div className={styles.suggestionsList}>
+              {filteredMerchants.map((merchant, index) => (
+                <div
+                  key={merchant}
+                  className={`${styles.suggestionItem} ${index === selectedSuggestionIndex ? styles.selectedSuggestion : ''}`}
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      merchant: merchant
+                    });
+                    setFilteredMerchants([]);
+                  }}
+                >
+                  {merchant}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className={styles.formGroup}>

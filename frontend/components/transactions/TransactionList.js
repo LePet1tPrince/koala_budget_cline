@@ -15,7 +15,8 @@ const TransactionList = ({
   statusFilter,
   searchTerm = '',
   pageSize = 10,
-  onRefresh // New prop for refreshing transactions
+  onRefresh, // New prop for refreshing transactions
+  merchants = []
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -39,12 +40,16 @@ const TransactionList = ({
         ? (transaction.credit_account ? transaction.credit_account.name : '')
         : (transaction.debit_account ? transaction.debit_account.name : '');
 
+      // Search in merchant
+      const merchant = transaction.merchant || '';
+
       // Search in description (notes)
       const description = transaction.notes || '';
 
       return (
         amountStr.includes(searchLower) ||
         categoryName.toLowerCase().includes(searchLower) ||
+        merchant.toLowerCase().includes(searchLower) ||
         description.toLowerCase().includes(searchLower)
       );
     }
@@ -68,6 +73,10 @@ const TransactionList = ({
         const bAmount = parseFloat(b.amount) || 0;
         aValue = a.credit === selectedAccountId ? -aAmount : aAmount;
         bValue = b.credit === selectedAccountId ? -bAmount : bAmount;
+        break;
+      case 'merchant':
+        aValue = (a.merchant || '').toLowerCase();
+        bValue = (b.merchant || '').toLowerCase();
         break;
       case 'category':
         // Use the category name logic for sorting
@@ -116,6 +125,7 @@ const TransactionList = ({
         onDelete={onDelete}
         onUpdateStatus={onUpdateStatus}
         onRefresh={onRefresh} // Pass the refresh function to TransactionTable
+        merchants={merchants}
       />
 
       {totalPages > 1 && (

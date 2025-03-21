@@ -139,6 +139,18 @@ class Account(models.Model):
             reconciled_balance=self.reconciled_balance
         )
 
+class Merchant(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='merchants')
+
+    # Optional fields we could add in the future:
+    # logo = models.CharField(max_length=10, blank=True, null=True)  # For emoji or icon
+    # category = models.ForeignKey(SubAccountType, on_delete=models.SET_NULL, null=True, blank=True)
+    # website = models.URLField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
 class TransactionStatus(models.TextChoices):
     REVIEW = 'review', 'Review'
     CATEGORIZED = 'categorized', 'Categorized'
@@ -148,6 +160,9 @@ class TransactionStatus(models.TextChoices):
 class Transaction(models.Model):
     date = models.DateField(auto_now_add=False)
     updated = models.DateTimeField(auto_now=True)
+    # Replace CharField with ForeignKey
+    # merchant = models.CharField(max_length=100, null=True, blank=True)
+    merchant = models.ForeignKey(Merchant, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
     amount = models.DecimalField(max_digits=10,decimal_places=2)
     debit = models.ForeignKey(Account,
         blank=False,
@@ -169,7 +184,8 @@ class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transactions')
 
     def __str__(self):
-        return str(self.amount) + " - " + str(self.credit) + " -> " + str(self.debit) + " - " + str(self.notes)
+        merchant_name = self.merchant.name if self.merchant else ""
+        return f"{self.amount} - {self.credit} -> {self.debit} - {merchant_name} - {self.notes}"
 
 class Saving(models.Model):
     account = models.OneToOneField(

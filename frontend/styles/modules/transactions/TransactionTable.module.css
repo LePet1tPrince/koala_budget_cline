@@ -400,3 +400,35 @@ input[type="date"].editInput {
   font-size: 0.875rem;
   color: #404040; /* Dark Gray */
 }
+
+/* Autocomplete Styles */
+.autocompleteContainer {
+  position: relative;
+  width: 100%;
+}
+
+.suggestionsList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background-color: white;
+  border: 1px solid #8A8C8E;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.suggestionItem {
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: 'Roboto Flex', sans-serif;
+}
+
+.suggestionItem:hover {
+  background-color: rgba(80, 166, 211, 0.1);
+}

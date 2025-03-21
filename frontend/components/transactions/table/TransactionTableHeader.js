@@ -26,6 +26,12 @@ const TransactionTableHeader = ({
           Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
         </th>
         <th
+          onClick={() => onSort('merchant')}
+          className={styles.sortableHeader}
+        >
+          Merchant {sortField === 'merchant' && (sortDirection === 'asc' ? '↑' : '↓')}
+        </th>
+        <th
           onClick={() => onSort('amount')}
           className={styles.sortableHeader}
         >

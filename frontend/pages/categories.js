@@ -328,7 +328,7 @@ export default function Categories() {
                   className={styles.createCategoryButton}
                   onClick={() => setShowIncomeForm(true)}
                 >
-                  + Create Income Category
+                  + Create Income Group
                 </button>
               )}
             </div>
@@ -366,7 +366,7 @@ export default function Categories() {
                   className={styles.createCategoryButton}
                   onClick={() => setShowExpenseForm(true)}
                 >
-                  + Create Expense Category
+                  + Create Expense Group
                 </button>
               )}
             </div>
@@ -388,18 +388,20 @@ export default function Categories() {
           </div>
         )}
 
-        {/* Account Modals */}
-        <Modal
-          isOpen={isAddAccountModalOpen}
-          onClose={() => setIsAddAccountModalOpen(false)}
-          title={`Add New ${selectedAccountType} Account`}
-        >
-          <AccountForm
-            accountTypes={subtypes.filter(st => st.account_type === selectedAccountType)}
-            onSubmit={handleAddAccount}
-            onCancel={() => setIsAddAccountModalOpen(false)}
-          />
-        </Modal>
+      {/* Account Modals */}
+      <Modal
+        isOpen={isAddAccountModalOpen}
+        onClose={() => setIsAddAccountModalOpen(false)}
+        title={`Add New ${selectedAccountType} Account`}
+      >
+        <AccountForm
+          account={currentAccount}
+          accountTypes={subtypes.filter(st => st.account_type === selectedAccountType)}
+          onSubmit={handleAddAccount}
+          onCancel={() => setIsAddAccountModalOpen(false)}
+          showTypeSelector={false}
+        />
+      </Modal>
 
         <Modal
           isOpen={isEditAccountModalOpen}
@@ -411,6 +413,7 @@ export default function Categories() {
             accountTypes={subtypes}
             onSubmit={handleUpdateAccount}
             onCancel={() => setIsEditAccountModalOpen(false)}
+            showTypeSelector={false}
           />
         </Modal>
 

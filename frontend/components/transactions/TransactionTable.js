@@ -18,13 +18,15 @@ const TransactionTable = ({
   onUpdate,
   onDelete,
   onUpdateStatus,
-  onRefresh
+  onRefresh,
+  merchants = []
 }) => {
   // Debug: Log transactions to see their structure
   console.log('Transactions in table:', transactions);
   const [editingId, setEditingId] = useState(null);
   const [editFormData, setEditFormData] = useState({
     date: '',
+    merchant: '',
     amount: '',
     debit: '',
     credit: '',
@@ -246,6 +248,7 @@ const TransactionTable = ({
 
     setEditFormData({
       date: transaction.date,
+      merchant: transaction.merchant_details ? transaction.merchant_details.name : '',
       amount: displayAmount,
       category: categoryAccountId,
       debit: transaction.debit,
@@ -333,6 +336,7 @@ const TransactionTable = ({
     // Prepare data for API
     const updatedTransaction = {
       date: editFormData.date,
+      merchant_name: editFormData.merchant,
       amount,
       debit: editFormData.debit,
       credit: editFormData.credit,
@@ -421,6 +425,7 @@ const TransactionTable = ({
             selectedTransactions={selectedTransactions}
             handleSelectTransaction={handleSelectTransaction}
             styles={styles}
+            merchants={merchants}
           />
         </table>
       )}

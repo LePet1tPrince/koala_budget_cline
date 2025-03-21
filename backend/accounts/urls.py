@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views import UserViewSet, SubAccountTypeViewSet, AccountViewSet, TransactionViewSet, AccountBalanceView, SavingViewSet
+from .views import UserViewSet, SubAccountTypeViewSet, AccountViewSet, TransactionViewSet, AccountBalanceView, SavingViewSet, MerchantViewSet
 
 router = DefaultRouter()
 router.register('users', UserViewSet, basename='user')
@@ -12,6 +12,7 @@ router.register('subaccounttypes', SubAccountTypeViewSet)
 router.register('accounts', AccountViewSet, basename='account')
 router.register('transactions', TransactionViewSet, basename='transaction')
 router.register('savings', SavingViewSet, basename='saving')
+router.register('merchants', MerchantViewSet, basename='merchant')
 
 urlpatterns = [
     path('', include(router.urls)),

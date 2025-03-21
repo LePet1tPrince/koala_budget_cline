@@ -14,7 +14,8 @@ const TransactionRow = ({
   accounts,
   isSelected,
   onSelect,
-  styles
+  styles,
+  merchants = []
 }) => {
   // Determine if this row is being edited
   const isEditing = editingId === transaction.id;
@@ -33,6 +34,7 @@ const TransactionRow = ({
         isSelected={isSelected}
         onSelect={onSelect}
         styles={styles}
+        merchants={merchants}
       />
     );
   }

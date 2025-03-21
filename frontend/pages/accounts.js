@@ -39,8 +39,8 @@ export default function Accounts() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentAccount, setCurrentAccount] = useState(null);
 
-  // Get unique account types for the filter
-  const uniqueAccountTypes = ['all', ...new Set(accounts.filter(account => account.type).map(account => account.type))];
+  // Only show Asset and Liability account types for the filter
+  const uniqueAccountTypes = ['all', 'Asset', 'Liability'];
 
   // Filter accounts based on search query and type filter
   // Only show Asset and Liability accounts on this page
@@ -387,6 +387,7 @@ export default function Accounts() {
           accountTypes={accountTypes}
           onSubmit={handleAddAccount}
           onCancel={() => setIsAddModalOpen(false)}
+          restrictedTypes={['Asset', 'Liability']}
         />
       </Modal>
 
@@ -401,6 +402,7 @@ export default function Accounts() {
           accountTypes={accountTypes}
           onSubmit={handleUpdateAccount}
           onCancel={() => setIsEditModalOpen(false)}
+          restrictedTypes={['Asset', 'Liability']}
         />
       </Modal>
 

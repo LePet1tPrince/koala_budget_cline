@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import SubAccountType, Account, Transaction, Saving
+from .models import SubAccountType, Account, Transaction, Saving, Merchant
 
 User = get_user_model()
 
@@ -31,6 +31,12 @@ class SubAccountTypeSerializer(serializers.ModelSerializer):
         model = SubAccountType
         fields = '__all__'
 
+class MerchantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Merchant
+        fields = ('id', 'name', 'user')
+        read_only_fields = ('id', 'user')
+
 class AccountSerializer(serializers.ModelSerializer):
     sub_type = SubAccountTypeSerializer(read_only=True)
     sub_type_id = serializers.PrimaryKeyRelatedField(
@@ -49,16 +55,49 @@ class AccountSerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     debit_account = AccountSerializer(source='debit', read_only=True)
     credit_account = AccountSerializer(source='credit', read_only=True)
+    merchant_details = MerchantSerializer(source='merchant', read_only=True)
+    merchant_id = serializers.PrimaryKeyRelatedField(
+        queryset=Merchant.objects.all(),
+        source='merchant',
+        write_only=True,
+        required=False,
+        allow_null=True
+    )
+    merchant_name = serializers.CharField(write_only=True, required=False, allow_null=True)
 
     class Meta:
         model = Transaction
-        fields = ('id', 'date', 'amount', 'debit', 'credit', 'debit_account', 'credit_account',
+        fields = ('id', 'date', 'merchant', 'merchant_details', 'merchant_id', 'merchant_name',
+                 'amount', 'debit', 'credit', 'debit_account', 'credit_account',
                  'notes', 'is_reconciled', 'status', 'updated', 'user')
         read_only_fields = ('id', 'updated', 'user')
 
     def create(self, validated_data):
+        # Handle merchant creation/lookup by name if provided
+        merchant_name = validated_data.pop('merchant_name', None)
+        if merchant_name and not validated_data.get('merchant'):
+            user = self.context['request'].user
+            merchant, created = Merchant.objects.get_or_create(
+                name=merchant_name,
+                user=user
+            )
+            validated_data['merchant'] = merchant
+
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Similar logic for update method
+        merchant_name = validated_data.pop('merchant_name', None)
+        if merchant_name and not validated_data.get('merchant'):
+            user = self.context['request'].user
+            merchant, created = Merchant.objects.get_or_create(
+                name=merchant_name,
+                user=user
+            )
+            validated_data['merchant'] = merchant
+
+        return super().update(instance, validated_data)
 
 class SavingSerializer(serializers.ModelSerializer):
     account = AccountSerializer(read_only=True)

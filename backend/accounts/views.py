@@ -5,10 +5,10 @@ from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Q, Sum
-from .models import SubAccountType, Account, Transaction, AccountTypes, Saving
+from .models import SubAccountType, Account, Transaction, AccountTypes, Saving, Merchant
 from .serializers import (
     UserSerializer, UserCreateSerializer, SubAccountTypeSerializer,
-    AccountSerializer, TransactionSerializer, SavingSerializer
+    AccountSerializer, TransactionSerializer, SavingSerializer, MerchantSerializer
 )
 from decimal import Decimal
 from .permissions import IsOwner
@@ -133,17 +133,27 @@ class SubAccountTypeViewSet(viewsets.ModelViewSet):
             default_types = [
                 {"sub_type": "Checking", "account_type": "Asset"},
                 {"sub_type": "Savings", "account_type": "Asset"},
+                {"sub_type": "Investment", "account_type": "Asset"},
+                {"sub_type": "Loans to Others", "account_type": "Asset"},
                 {"sub_type": "Credit Card", "account_type": "Liability"},
                 {"sub_type": "Loan", "account_type": "Liability"},
                 {"sub_type": "Salary", "account_type": "Income"},
-                {"sub_type": "Investment", "account_type": "Income"},
+                {"sub_type": "Interest Income", "account_type": "Income"},
+                {"sub_type": "Freelance Income", "account_type": "Income"},
+                {"sub_type": "Investment Income", "account_type": "Income"},
                 {"sub_type": "Housing", "account_type": "Expense"},
                 {"sub_type": "Food", "account_type": "Expense"},
                 {"sub_type": "Transportation", "account_type": "Expense"},
                 {"sub_type": "Entertainment", "account_type": "Expense"},
-                {"sub_type": "Retained Earnings", "account_type": "Equity"},
                 {"sub_type": "Vacation", "account_type": "Goal"},
                 {"sub_type": "Emergency Fund", "account_type": "Goal"},
+                {"sub_type": "Downpayment", "account_type": "Goal"},
+                {"sub_type": "Car", "account_type": "Goal"},
+                {"sub_type": "Wedding", "account_type": "Goal"},
+                {"sub_type": "Education", "account_type": "Goal"},
+                {"sub_type": "Retirement", "account_type": "Goal"},
+                {"sub_type": "Savings", "account_type": "Goal"},
+
             ]
 
             for type_data in default_types:
@@ -175,6 +185,26 @@ class AccountViewSet(viewsets.ModelViewSet):
             return super().create(request, *args, **kwargs)
         except Exception as e:
             print(f"Error creating account: {e}")
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+class MerchantViewSet(viewsets.ModelViewSet):
+    serializer_class = MerchantSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+
+    def get_queryset(self):
+        return Merchant.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            print(f"Error creating merchant: {e}")
             return Response(
                 {"detail": str(e)},
                 status=status.HTTP_400_BAD_REQUEST

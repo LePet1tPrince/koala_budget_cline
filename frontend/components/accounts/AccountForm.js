@@ -3,20 +3,38 @@ import { useEffect, useState } from 'react';
 import EmojiPicker from 'emoji-picker-react';
 import { FormStyles as styles } from '../../styles/modules';
 
+// Helper function to get default icon based on account type
+const getDefaultIconForType = (type) => {
+  switch (type) {
+    case 'Asset': return '💰';
+    case 'Liability': return '💳';
+    case 'Income': return '💵';
+    case 'Expense': return '🛒';
+    case 'Equity': return '📊';
+    case 'Goal': return '🎯';
+    default: return '💰';
+  }
+};
+
 const AccountForm = ({
   account = null,
   accountTypes,
   onSubmit,
-  onCancel
+  onCancel,
+  showTypeSelector = true,
+  restrictedTypes = null,
+  hideInBankFeed = false
 }) => {
+  // Initialize form data with default values
+  const initialType = account?.type || 'Asset';
   const [formData, setFormData] = useState({
     name: '',
     num: '',
-    type: 'Asset',
+    type: initialType,
     sub_type_id: '',
     inBankFeed: false,
     balance: '0.00',
-    icon: '💰'
+    icon: getDefaultIconForType(initialType)
   });
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -38,19 +56,6 @@ const AccountForm = ({
     }
   }, [account]);
 
-  // Get default icon based on account type
-  const getDefaultIconForType = (type) => {
-    switch (type) {
-      case 'Asset': return '💰';
-      case 'Liability': return '💳';
-      case 'Income': return '💵';
-      case 'Expense': return '🛒';
-      case 'Equity': return '📊';
-      case 'Goal': return '🎯';
-      default: return '💰';
-    }
-  };
-
   // Handle emoji selection
   const handleEmojiClick = (emojiData) => {
     setFormData({
@@ -69,10 +74,17 @@ const AccountForm = ({
       [name]: type === 'checkbox' ? checked : value
     };
 
-    // If changing account type to something other than Asset or Liability,
-    // ensure inBankFeed is set to false
-    if (name === 'type' && value !== 'Asset' && value !== 'Liability') {
-      updatedFormData.inBankFeed = false;
+    // If changing account type
+    if (name === 'type') {
+      // Update the icon to match the new account type if the user hasn't customized it
+      if (formData.icon === getDefaultIconForType(formData.type)) {
+        updatedFormData.icon = getDefaultIconForType(value);
+      }
+
+      // If changing to something other than Asset or Liability, ensure inBankFeed is set to false
+      if (value !== 'Asset' && value !== 'Liability') {
+        updatedFormData.inBankFeed = false;
+      }
     }
 
     setFormData(updatedFormData);
@@ -128,17 +140,31 @@ const AccountForm = ({
 
   return (
     <form onSubmit={handleSubmit} className={styles.accountForm}>
-      <div className={styles.formGroup}>
-        <label htmlFor="name">Account Name</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className={errors.name ? styles.inputError : styles.input}
-        />
+      <div className={styles.formGroup} style={{ position: 'relative' }}>
+        <label htmlFor="name">Icon & Name</label>
+        <div className={styles.iconNameContainer}>
+          <div
+            className={styles.iconContainer}
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            <span className={styles.currentEmoji}>{formData.icon}</span>
+          </div>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className={styles.nameInput}
+            placeholder="Account Name"
+          />
+        </div>
         {errors.name && <p className={styles.errorText}>{errors.name}</p>}
+        {showEmojiPicker && (
+          <div className={styles.emojiPickerWrapper}>
+            <EmojiPicker onEmojiClick={handleEmojiClick} />
+          </div>
+        )}
       </div>
 
       <div className={styles.formGroup}>
@@ -154,43 +180,36 @@ const AccountForm = ({
         {errors.num && <p className={styles.errorText}>{errors.num}</p>}
       </div>
 
-      <div className={styles.formGroup}>
-        <label htmlFor="type">Account Type</label>
-        <select
-          id="type"
-          name="type"
-          value={formData.type}
-          onChange={handleChange}
-          className={errors.type ? styles.inputError : styles.input}
-        >
-          <option value="Asset">Asset</option>
-          <option value="Liability">Liability</option>
-          <option value="Income">Income</option>
-          <option value="Expense">Expense</option>
-          <option value="Equity">Equity</option>
-          <option value="Goal">Goal</option>
-        </select>
-        {errors.type && <p className={styles.errorText}>{errors.type}</p>}
-      </div>
-
-      <div className={styles.formGroup}>
-        <label htmlFor="icon">Account Icon</label>
-        <div className={styles.emojiPickerContainer}>
-          <button
-            type="button"
-            className={styles.emojiButton}
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+      {showTypeSelector && (
+        <div className={styles.formGroup}>
+          <label htmlFor="type">Account Type</label>
+          <select
+            id="type"
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            className={errors.type ? styles.inputError : styles.input}
           >
-            <span className={styles.currentEmoji}>{formData.icon}</span>
-            <span className={styles.emojiButtonText}>Change Icon</span>
-          </button>
-          {showEmojiPicker && (
-            <div className={styles.emojiPickerWrapper}>
-              <EmojiPicker onEmojiClick={handleEmojiClick} />
-            </div>
-          )}
+            {restrictedTypes ? (
+              // Only show restricted types if provided
+              restrictedTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))
+            ) : (
+              // Otherwise show all types
+              <>
+                <option value="Asset">Asset</option>
+                <option value="Liability">Liability</option>
+                <option value="Income">Income</option>
+                <option value="Expense">Expense</option>
+                <option value="Equity">Equity</option>
+                <option value="Goal">Goal</option>
+              </>
+            )}
+          </select>
+          {errors.type && <p className={styles.errorText}>{errors.type}</p>}
         </div>
-      </div>
+      )}
 
       <div className={styles.formGroup}>
         <label htmlFor="sub_type_id">Sub Type</label>
@@ -223,8 +242,8 @@ const AccountForm = ({
         {errors.balance && <p className={styles.errorText}>{errors.balance}</p>}
       </div>
 
-      {/* Only show bank feed toggle for Asset and Liability accounts */}
-      {(formData.type === 'Asset' || formData.type === 'Liability') && (
+      {/* Only show bank feed toggle for Asset and Liability accounts if not hidden */}
+      {!hideInBankFeed && (formData.type === 'Asset' || formData.type === 'Liability') && (
         <div className={styles.formGroup}>
           <label className={styles.checkboxLabel}>
             <input

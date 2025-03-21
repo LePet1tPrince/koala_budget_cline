@@ -23,6 +23,7 @@ import TransactionActionButtons from '../components/transactions/TransactionActi
 import TransactionFilters from '../components/transactions/TransactionFilters';
 import TransactionForm from '../components/transactions/TransactionForm';
 import TransactionList from '../components/transactions/TransactionList';
+import { getMerchants } from '../services/merchantService';
 import { useNotification } from '../contexts/NotificationContext';
 
 // Layout components
@@ -57,6 +58,7 @@ export default function Transactions() {
   const [selectedAccountId, setSelectedAccountId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [uniqueMerchants, setUniqueMerchants] = useState([]);
 
   // Status filter state
   const [statusFilter, setStatusFilter] = useState('review'); // 'review', 'categorized', 'reconciled', 'all'
@@ -100,7 +102,20 @@ export default function Transactions() {
   // Notification context
   const { showSuccess, showError } = useNotification();
 
-  // Fetch accounts and transactions on component mount
+  // Extract unique merchant names from transactions
+  useEffect(() => {
+    if (transactions && transactions.length > 0) {
+      const merchants = transactions
+        .map(t => t.merchant_details ? t.merchant_details.name : '')
+        .filter(merchant => merchant && merchant.trim() !== '')
+        .filter((merchant, index, self) => self.indexOf(merchant) === index)
+        .sort();
+
+      setUniqueMerchants(merchants);
+    }
+  }, [transactions]);
+
+  // Fetch accounts, transactions, and merchants on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -116,6 +131,17 @@ export default function Transactions() {
         const bankFeedData = await getBankFeedAccounts();
         console.log('Bank feed accounts:', bankFeedData);
         setBankFeedAccounts(bankFeedData);
+
+        // Fetch merchants for the merchant dropdown
+        try {
+          const merchantsData = await getMerchants();
+          console.log('Merchants:', merchantsData);
+          const merchantNames = merchantsData.map(m => m.name);
+          setUniqueMerchants(merchantNames);
+        } catch (merchantErr) {
+          console.error('Error fetching merchants:', merchantErr);
+          // Don't set an error, just continue with empty merchants list
+        }
 
         // Get the saved account ID from localStorage
         const savedAccountId = localStorage.getItem('selectedAccountId');
@@ -447,6 +473,7 @@ export default function Transactions() {
           statusFilter={statusFilter}
           searchTerm={searchTerm}
           pageSize={pageSize}
+          merchants={uniqueMerchants}
           onRefresh={async () => {
             // Dedicated refresh function that doesn't rely on updating a transaction
             try {
@@ -488,6 +515,7 @@ export default function Transactions() {
           selectedAccountId={selectedAccountId}
           onSubmit={handleAddTransaction}
           onCancel={() => setIsAddModalOpen(false)}
+          merchants={uniqueMerchants}
         />
       </Modal>
 

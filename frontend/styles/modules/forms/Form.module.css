@@ -11,6 +11,53 @@
   margin-bottom: 1rem;
 }
 
+.inlineFormGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.iconNameContainer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 1px solid #8A8C8E;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  /* background-color: #222; */
+  border-right: 1px solid #8A8C8E;
+  cursor: pointer;
+  min-width: 40px;
+}
+
+.currentEmoji {
+  font-size: 1.5rem;
+}
+
+.iconContainer .currentEmoji {
+  color: white;
+}
+
+.nameInput {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  font-size: 1rem;
+  font-family: Georgia, serif;
+}
+
+.nameInput:focus {
+  outline: none;
+}
+
 .formGroup label {
   display: block;
   margin-bottom: 0.5rem;
@@ -157,4 +204,43 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
+  left: 0;
+  top: 100%;
+}
+
+/* Autocomplete Styles */
+.autocompleteContainer {
+  position: relative;
+  width: 100%;
+}
+
+.suggestionsList {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background-color: white;
+  border: 1px solid #8A8C8E;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.suggestionItem {
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: Georgia, serif;
+}
+
+.suggestionItem:hover {
+  background-color: rgba(80, 166, 211, 0.1);
+}
+
+.selectedSuggestion {
+  background-color: rgba(80, 166, 211, 0.2);
+  border-left: 3px solid #50A6D3;
 }

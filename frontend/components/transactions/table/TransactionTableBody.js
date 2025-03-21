@@ -13,7 +13,8 @@ const TransactionTableBody = ({
   accounts,
   selectedTransactions,
   handleSelectTransaction,
-  styles
+  styles,
+  merchants = []
 }) => {
   if (transactions.length === 0) {
     return (
@@ -44,6 +45,7 @@ const TransactionTableBody = ({
           isSelected={selectedTransactions.includes(transaction.id)}
           onSelect={handleSelectTransaction}
           styles={styles}
+          merchants={merchants}
         />
       ))}
     </tbody>

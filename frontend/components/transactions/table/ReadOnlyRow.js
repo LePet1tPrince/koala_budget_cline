@@ -31,6 +31,7 @@ const ReadOnlyRow = ({
         />
       </td>
       <td>{formatDate(transaction.date)}</td>
+      <td>{transaction.merchant_details ? transaction.merchant_details.name : ''}</td>
       <td className={styles.amountCell}>
         ${getAdjustedAmount(transaction, selectedAccountId)}
       </td>

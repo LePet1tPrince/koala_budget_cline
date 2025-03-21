@@ -67,7 +67,7 @@ const CategoryGroup = ({
               window.openAddAccountModal && window.openAddAccountModal(accountType, subtype.id);
             }}
           >
-            + Add Account
+            + Add Category
           </button>
         </div>
       )}

@@ -189,6 +189,12 @@ export default function Goals() {
     }
   };
 
+  // Set initial account type to 'Goal' when opening the add modal
+  const openAddModal = () => {
+    setCurrentAccount({ type: 'Goal' });
+    setIsAddModalOpen(true);
+  };
+
   // Open edit modal with selected account
   const openEditModal = (account) => {
     setCurrentAccount(account);
@@ -208,7 +214,7 @@ export default function Goals() {
       {/* Add Goal Button */}
       <button
         className={styles.addButton}
-        onClick={() => setIsAddModalOpen(true)}
+        onClick={openAddModal}
       >
         + Add Goal
       </button>
@@ -349,9 +355,12 @@ export default function Goals() {
         title="Add New Goal"
       >
         <AccountForm
-          accountTypes={accountTypes}
+          account={currentAccount}  /* Pass currentAccount to set the type to 'Goal' */
+          accountTypes={accountTypes.filter(type => type && type.account_type === 'Goal')}
           onSubmit={handleAddAccount}
           onCancel={() => setIsAddModalOpen(false)}
+          showTypeSelector={false}
+          hideInBankFeed={true}
         />
       </Modal>
 
@@ -363,9 +372,11 @@ export default function Goals() {
       >
         <AccountForm
           account={currentAccount}
-          accountTypes={accountTypes}
+          accountTypes={accountTypes.filter(type => type && type.account_type === 'Goal')}
           onSubmit={handleUpdateAccount}
           onCancel={() => setIsEditModalOpen(false)}
+          showTypeSelector={false}
+          hideInBankFeed={true}
         />
       </Modal>
 
