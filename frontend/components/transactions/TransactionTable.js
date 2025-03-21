@@ -19,8 +19,77 @@ const TransactionTable = ({
   onDelete,
   onUpdateStatus,
   onRefresh,
-  merchants = []
+  merchants = [],
+  showAllColumns = false, // New prop to control which columns to show
+  initialColumnFilters = {} // Initial column filters
 }) => {
+  // State for column filters - now we'll pass changes up to the parent
+  const [columnFilters, setColumnFilters] = useState(initialColumnFilters);
+
+  // Effect to sync columnFilters with initialColumnFilters when they change from parent
+  useEffect(() => {
+    setColumnFilters(initialColumnFilters);
+  }, [initialColumnFilters]);
+
+  // Function to check if any filters are active
+  const hasActiveFilters = () => {
+    // Check date filter
+    if (columnFilters.date && (columnFilters.date.from || columnFilters.date.to)) {
+      return true;
+    }
+
+    // Check merchant filter
+    if (columnFilters.merchant) {
+      return true;
+    }
+
+    // Check amount filter
+    if (columnFilters.amount && (columnFilters.amount.min || columnFilters.amount.max)) {
+      return true;
+    }
+
+    // Check debit account filter
+    if (columnFilters.debit) {
+      return true;
+    }
+
+    // Check credit account filter
+    if (columnFilters.credit) {
+      return true;
+    }
+
+    // Check description filter
+    if (columnFilters.description) {
+      return true;
+    }
+
+    // Check status filter
+    if (columnFilters.status) {
+      return true;
+    }
+
+    return false;
+  };
+
+  // Function to clear all filters
+  const handleClearAllFilters = () => {
+    const resetFilters = {
+      date: { from: '', to: '' },
+      merchant: '',
+      amount: { min: '', max: '' },
+      debit: '',
+      credit: '',
+      description: '',
+      status: ''
+    };
+
+    setColumnFilters(resetFilters);
+
+    // Pass changes up to parent component
+    if (onSort) {
+      onUpdate('columnFilters', resetFilters);
+    }
+  };
   // Debug: Log transactions to see their structure
   console.log('Transactions in table:', transactions);
   const [editingId, setEditingId] = useState(null);
@@ -359,6 +428,17 @@ const TransactionTable = ({
 
   return (
     <div className={styles.tableContainer}>
+      {/* Clear All Filters button - only shown when filters are active */}
+      {hasActiveFilters() && (
+        <div className={styles.clearFiltersContainer}>
+          <button
+            className={styles.clearFiltersButton}
+            onClick={handleClearAllFilters}
+          >
+            Clear All Filters
+          </button>
+        </div>
+      )}
       {/* Modals */}
       <ModalContainer
         isBulkEditModalOpen={isBulkEditModalOpen}
@@ -386,23 +466,46 @@ const TransactionTable = ({
         styles={styles}
       />
 
-      {transactions.length === 0 ? (
-        <div className={styles.noTransactions}>
-          <p>No transactions found for this account.</p>
-        </div>
-      ) : (
-        <table className={styles.transactionsTable}>
-          {/* Table Header */}
-          <TransactionTableHeader
-            selectAll={selectAll}
-            handleSelectAll={handleSelectAll}
-            sortField={sortField}
-            sortDirection={sortDirection}
-            onSort={onSort}
-            styles={styles}
-          />
+      <table className={styles.transactionsTable}>
+        {/* Table Header - Always displayed */}
+        <TransactionTableHeader
+          selectAll={selectAll}
+          handleSelectAll={handleSelectAll}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSort={onSort}
+          styles={styles}
+          showAllColumns={showAllColumns}
+          columnFilters={columnFilters}
+          onColumnFilterChange={(column, value) => {
+            // Update local state
+            const newFilters = {
+              ...columnFilters,
+              [column]: value
+            };
+            setColumnFilters(newFilters);
 
-          {/* Table Body */}
+            // Pass changes up to parent component
+            if (onSort) {
+              // We're using onSort as a proxy to check if we're in the all-transactions page
+              // where we need to pass filter changes up
+              onUpdate('columnFilters', newFilters);
+            }
+          }}
+          accounts={accounts}
+          merchants={merchants}
+        />
+
+        {/* Table Body - Conditionally display content */}
+        {transactions.length === 0 ? (
+          <tbody>
+            <tr>
+              <td colSpan={showAllColumns ? 8 : 6} className={styles.noTransactionsCell}>
+                No transactions found for this account.
+              </td>
+            </tr>
+          </tbody>
+        ) : (
           <TransactionTableBody
             transactions={transactions}
             editingId={editingId}
@@ -417,9 +520,10 @@ const TransactionTable = ({
             handleSelectTransaction={handleSelectTransaction}
             styles={styles}
             merchants={merchants}
+            showAllColumns={showAllColumns}
           />
-        </table>
-      )}
+        )}
+      </table>
     </div>
   );
 };

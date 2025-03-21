@@ -25,6 +25,7 @@ export const formatDate = (dateString) => {
  * @returns {string} Account name or "Unknown Account" if not found
  */
 export const getAccountName = (accounts, accountId) => {
+  if (!accountId) return '';
   const account = accounts.find(acc => acc.id === accountId);
   return account ? account.name : 'Unknown Account';
 };

@@ -14,13 +14,14 @@ const TransactionTableBody = ({
   selectedTransactions,
   handleSelectTransaction,
   styles,
-  merchants = []
+  merchants = [],
+  showAllColumns = false // New prop to control which columns to show
 }) => {
   if (transactions.length === 0) {
     return (
       <tbody>
         <tr>
-          <td colSpan="6" className={styles.noTransactions}>
+          <td colSpan={showAllColumns ? "9" : "7"} className={styles.noTransactions}>
             <p>No transactions found for this account.</p>
           </td>
         </tr>
@@ -46,6 +47,7 @@ const TransactionTableBody = ({
           onSelect={handleSelectTransaction}
           styles={styles}
           merchants={merchants}
+          showAllColumns={showAllColumns}
         />
       ))}
     </tbody>

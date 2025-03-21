@@ -15,7 +15,8 @@ const TransactionRow = ({
   isSelected,
   onSelect,
   styles,
-  merchants = []
+  merchants = [],
+  showAllColumns = false // New prop to control which columns to show
 }) => {
   // Determine if this row is being edited
   const isEditing = editingId === transaction.id;
@@ -35,6 +36,7 @@ const TransactionRow = ({
         onSelect={onSelect}
         styles={styles}
         merchants={merchants}
+        showAllColumns={showAllColumns}
       />
     );
   }
@@ -48,6 +50,7 @@ const TransactionRow = ({
       onSelect={onSelect}
       onClick={handleRowClick}
       styles={styles}
+      showAllColumns={showAllColumns}
     />
   );
 };

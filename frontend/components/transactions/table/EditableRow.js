@@ -11,7 +11,8 @@ const EditableRow = ({
   isSelected,
   onSelect,
   styles,
-  merchants = []
+  merchants = [],
+  showAllColumns = false // New prop to control which columns to show
 }) => {
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const merchantInputRef = useRef(null);
@@ -87,6 +88,13 @@ const EditableRow = ({
     onSelect(e, transaction.id);
   };
 
+  // Status options for dropdown
+  const statusOptions = [
+    { id: 'review', label: 'Review' },
+    { id: 'categorized', label: 'Categorized' },
+    { id: 'reconciled', label: 'Reconciled' }
+  ];
+
   return (
     <tr className={styles.editingRow}>
       <td className={styles.checkboxColumn}>
@@ -156,37 +164,108 @@ const EditableRow = ({
           className={styles.editInput}
         />
       </td>
-      <td className={styles.accountSelects}>
-        <div className={styles.accountSelectContainer}>
-          <select
-            name="category"
-            value={editFormData.category}
-            onChange={handleEditFormChange}
-            className={styles.editInput}
-          >
-            <option value="">Select Category</option>
-            {(() => {
-              // Get all account types
-              const accountTypes = [...new Set(accounts
-                .filter(account => account.id !== selectedAccountId)
-                .map(account => account.type))];
 
-              // Return grouped options
-              return accountTypes.map(type => (
-                <optgroup key={`type-${type}`} label={type}>
-                  {accounts
-                    .filter(account => account.type === type && account.id !== selectedAccountId)
-                    .map(account => (
-                      <option key={`category-${account.id}`} value={account.id}>
-                        {account.name}
-                      </option>
-                    ))}
-                </optgroup>
-              ));
-            })()}
-          </select>
-        </div>
-      </td>
+      {/* Show debit account in All Transactions view */}
+      {showAllColumns && (
+        <td className={styles.accountSelects}>
+          <div className={styles.accountSelectContainer}>
+            <select
+              name="debit"
+              value={editFormData.debit}
+              onChange={handleEditFormChange}
+              className={styles.editInput}
+            >
+              <option value="">Select Debit Account</option>
+              {(() => {
+                // Get all account types
+                const accountTypes = [...new Set(accounts.map(account => account.type))];
+
+                // Return grouped options
+                return accountTypes.map(type => (
+                  <optgroup key={`debit-type-${type}`} label={type}>
+                    {accounts
+                      .filter(account => account.type === type)
+                      .map(account => (
+                        <option key={`debit-${account.id}`} value={account.id}>
+                          {account.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                ));
+              })()}
+            </select>
+          </div>
+        </td>
+      )}
+
+      {/* Show credit account in All Transactions view */}
+      {showAllColumns && (
+        <td className={styles.accountSelects}>
+          <div className={styles.accountSelectContainer}>
+            <select
+              name="credit"
+              value={editFormData.credit}
+              onChange={handleEditFormChange}
+              className={styles.editInput}
+            >
+              <option value="">Select Credit Account</option>
+              {(() => {
+                // Get all account types
+                const accountTypes = [...new Set(accounts.map(account => account.type))];
+
+                // Return grouped options
+                return accountTypes.map(type => (
+                  <optgroup key={`credit-type-${type}`} label={type}>
+                    {accounts
+                      .filter(account => account.type === type)
+                      .map(account => (
+                        <option key={`credit-${account.id}`} value={account.id}>
+                          {account.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                ));
+              })()}
+            </select>
+          </div>
+        </td>
+      )}
+
+      {/* Show Category column in Bank Feed view */}
+      {!showAllColumns && (
+        <td className={styles.accountSelects}>
+          <div className={styles.accountSelectContainer}>
+            <select
+              name="category"
+              value={editFormData.category}
+              onChange={handleEditFormChange}
+              className={styles.editInput}
+            >
+              <option value="">Select Category</option>
+              {(() => {
+                // Get all account types
+                const accountTypes = [...new Set(accounts
+                  .filter(account => account.id !== selectedAccountId)
+                  .map(account => account.type))];
+
+                // Return grouped options
+                return accountTypes.map(type => (
+                  <optgroup key={`type-${type}`} label={type}>
+                    {accounts
+                      .filter(account => account.type === type && account.id !== selectedAccountId)
+                      .map(account => (
+                        <option key={`category-${account.id}`} value={account.id}>
+                          {account.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                ));
+              })()}
+            </select>
+          </div>
+        </td>
+      )}
+
       <td>
         <input
           type="text"
@@ -196,6 +275,28 @@ const EditableRow = ({
           className={styles.editInput}
         />
       </td>
+
+      {/* Status column */}
+      {showAllColumns && (
+        <td className={styles.accountSelects}>
+          <div className={styles.accountSelectContainer}>
+            <select
+              name="status"
+              value={editFormData.status || 'review'}
+              onChange={handleEditFormChange}
+              className={styles.editInput}
+            >
+              {statusOptions.map(option => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </td>
+      )}
+
+      {/* Action buttons - placed in the last cell */}
       <td className={styles.actionButtons}>
         <button
           type="button"

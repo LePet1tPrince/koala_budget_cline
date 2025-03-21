@@ -13,13 +13,31 @@ export default function Sidebar({ activePage }) {
     }
   }, [activePage]);
 
+  // State for transactions submenu
+  const [transactionsExpanded, setTransactionsExpanded] = useState(false);
+
   // Toggle the accounts accordion
   const toggleAccounts = () => {
     setAccountsExpanded(!accountsExpanded);
   };
 
+  // Toggle the transactions accordion
+  const toggleTransactions = () => {
+    setTransactionsExpanded(!transactionsExpanded);
+  };
+
   // Check if any accounts sub-page is active
   const isAccountsActive = ['accounts', 'categories', 'goals'].includes(activePage);
+
+  // Check if any transactions sub-page is active
+  const isTransactionsActive = ['transactions', 'all-transactions'].includes(activePage);
+
+  // Auto-expand the transactions section if any of its sub-pages are active
+  useEffect(() => {
+    if (['transactions', 'all-transactions'].includes(activePage)) {
+      setTransactionsExpanded(true);
+    }
+  }, [activePage]);
 
   return (
     <aside className={styles.sidebar}>
@@ -81,14 +99,42 @@ export default function Sidebar({ activePage }) {
               </ul>
             )}
           </li>
+          {/* Transactions Accordion */}
           <li className={styles.sidebarMenuItem}>
-            <Link
-              href="/transactions"
-              className={`${styles.sidebarMenuLink} ${activePage === 'transactions' ? styles.active : ''}`}
+            <button
+              onClick={toggleTransactions}
+              className={`${styles.sidebarMenuLink} ${styles.accordionButton} ${isTransactionsActive ? styles.active : ''}`}
             >
               <span className={styles.sidebarMenuIcon}>💸</span>
               Transactions
-            </Link>
+              <span className={styles.accordionIcon}>
+                {transactionsExpanded ? '▼' : '▶'}
+              </span>
+            </button>
+
+            {/* Transactions sub-menu items */}
+            {transactionsExpanded && (
+              <ul className={styles.submenu}>
+                <li className={styles.submenuItem}>
+                  <Link
+                    href="/transactions"
+                    className={`${styles.sidebarMenuLink} ${styles.submenuLink} ${activePage === 'transactions' ? styles.active : ''}`}
+                  >
+                    <span className={styles.sidebarMenuIcon}>🏦</span>
+                    Bank Feed
+                  </Link>
+                </li>
+                <li className={styles.submenuItem}>
+                  <Link
+                    href="/all-transactions"
+                    className={`${styles.sidebarMenuLink} ${styles.submenuLink} ${activePage === 'all-transactions' ? styles.active : ''}`}
+                  >
+                    <span className={styles.sidebarMenuIcon}>📋</span>
+                    All Transactions
+                  </Link>
+                </li>
+              </ul>
+            )}
           </li>
           <li className={styles.sidebarMenuItem}>
             <Link

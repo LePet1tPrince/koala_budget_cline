@@ -1,12 +1,14 @@
 .tableContainer {
   margin-top: 1.5rem;
   overflow-x: auto;
+  width: 100%;
 }
 
 /* Checkbox styles */
 .checkboxColumn {
   width: 40px;
   text-align: center;
+  padding: 0.75rem 0.5rem;
 }
 
 .checkbox {
@@ -136,6 +138,7 @@
 
 .transactionsTable {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   margin-bottom: 1.5rem;
   background-color: white;
@@ -149,6 +152,9 @@
   padding: 0.75rem 1rem;
   text-align: left;
   border-bottom: 1px solid rgba(138, 140, 142, 0.2); /* Light Gray with opacity */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .transactionsTable th {
@@ -159,6 +165,53 @@
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   font-family: Arial, sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Column width definitions */
+.transactionsTable th:nth-child(1) {
+  width: 40px; /* Checkbox column */
+}
+
+.transactionsTable th:nth-child(2) {
+  width: 110px; /* Date column */
+}
+
+.transactionsTable th:nth-child(3) {
+  width: 150px; /* Merchant column */
+}
+
+.transactionsTable th:nth-child(4) {
+  width: 100px; /* Amount column */
+}
+
+/* Debit/Credit account columns (when showAllColumns is true) */
+.transactionsTable th:nth-child(5),
+.transactionsTable th:nth-child(6) {
+  width: 150px;
+}
+
+/* Category column (when showAllColumns is false) */
+.transactionsTable th:nth-child(5):not(:last-child) {
+  width: 150px;
+}
+
+/* Description column */
+.transactionsTable th:nth-child(6),
+.transactionsTable th:nth-child(7) {
+  width: 200px;
+}
+
+/* Status column (when showAllColumns is true) */
+.transactionsTable th:nth-child(8) {
+  width: 100px;
+}
+
+/* Action buttons column (for EditableRow) */
+.transactionsTable td:last-child.actionButtons {
+  width: 180px;
 }
 
 .transactionsTable tr:last-child td {
@@ -188,6 +241,8 @@
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+  white-space: nowrap;
+  width: 100%;
 }
 
 /* Save and Cancel buttons in edit mode */
@@ -311,6 +366,40 @@ input[type="date"].editInput {
   font-family: 'Roboto Flex', sans-serif;
 }
 
+.noTransactionsCell {
+  text-align: center;
+  padding: 2rem !important;
+  color: #8A8C8E; /* Light Gray */
+  font-family: 'Roboto Flex', sans-serif;
+  background-color: white;
+  border-bottom: none !important;
+}
+
+/* Clear All Filters button */
+.clearFiltersContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.clearFiltersButton {
+  padding: 8px 16px;
+  background-color: #2E83B7; /* Primary Blue */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.clearFiltersButton:hover {
+  background-color: #50A6D3; /* Light Blue */
+}
+
 .accountSelects {
   display: flex;
   flex-direction: column;
@@ -338,6 +427,7 @@ input[type="date"].editInput {
   user-select: none;
   position: relative;
   transition: background-color 0.2s;
+  vertical-align: middle;
 }
 
 .sortableHeader:hover {
@@ -431,4 +521,248 @@ input[type="date"].editInput {
 
 .suggestionItem:hover {
   background-color: rgba(80, 166, 211, 0.1);
+}
+
+/* Column Filters Styles */
+.columnFiltersContainer {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.columnFiltersContainer h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  color: #404040;
+  font-family: Arial, sans-serif;
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.filterGroup label {
+  font-size: 0.875rem;
+  color: #404040;
+  margin-bottom: 5px;
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+}
+
+.filterInput {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #8A8C8E;
+  font-size: 0.875rem;
+  font-family: 'Roboto Flex', sans-serif;
+}
+
+.dateRangeInputs, .rangeInputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dateRangeInputs span, .rangeInputs span {
+  font-size: 0.875rem;
+  color: #8A8C8E;
+}
+
+.filterActions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.resetButton {
+  padding: 8px 16px;
+  background-color: #8A8C8E;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+}
+
+.resetButton:hover {
+  background-color: #404040;
+}
+
+/* Status cell styling */
+.statusCell {
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+}
+
+.statusCell.review {
+  color: #8A8C8E;
+}
+
+.statusCell.categorized {
+  color: #E77338;
+}
+
+.statusCell.reconciled {
+  color: #289A82;
+}
+
+/* Header content with filter button */
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+/* Filter button styles */
+.filterButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #8A8C8E;
+  padding: 2px 5px;
+  margin-left: 5px;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+
+.filterButton:hover {
+  background-color: rgba(138, 140, 142, 0.2);
+  color: #404040;
+}
+
+.filterActive {
+  color: #2E83B7;
+  background-color: rgba(46, 131, 183, 0.1);
+}
+
+.filterIcon {
+  font-size: 0.75rem;
+}
+
+/* Column Filter Tooltip */
+.columnFilterTooltip {
+  position: absolute;
+  z-index: 1000;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 250px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.tooltipArrow {
+  position: absolute;
+  top: -8px;
+  left: 20px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid white;
+}
+
+.tooltipHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(138, 140, 142, 0.2);
+}
+
+.tooltipHeader h4 {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #404040;
+  text-transform: capitalize;
+}
+
+.tooltipCloseButton {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: #8A8C8E;
+  cursor: pointer;
+  padding: 0;
+}
+
+.tooltipCloseButton:hover {
+  color: #404040;
+}
+
+.tooltipContent {
+  padding: 15px;
+}
+
+.tooltipFilterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tooltipFilterGroup label {
+  font-size: 0.75rem;
+  color: #8A8C8E;
+}
+
+.tooltipFilterInput {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #8A8C8E;
+  font-size: 0.875rem;
+}
+
+.tooltipFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 15px;
+  border-top: 1px solid rgba(138, 140, 142, 0.2);
+}
+
+.tooltipClearButton, .tooltipApplyButton {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+}
+
+.tooltipClearButton {
+  background-color: rgba(138, 140, 142, 0.1);
+  color: #404040;
+}
+
+.tooltipClearButton:hover {
+  background-color: rgba(138, 140, 142, 0.2);
+}
+
+.tooltipApplyButton {
+  background-color: #2E83B7;
+  color: white;
+}
+
+.tooltipApplyButton:hover {
+  background-color: #50A6D3;
 }
