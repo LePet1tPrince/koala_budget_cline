@@ -44,14 +44,14 @@ export const getCategoryName = (transaction, selectedAccountId, accounts, styles
         <span className={styles.categoryIcon}>{transaction.credit_account.icon || '💰'}</span>
         {transaction.credit_account.name}
       </span>
-    ) : getAccountName(accounts, transaction.credit);
+    ) : 'Select Category';
   } else {
     return transaction.debit_account ? (
       <span className={styles.categoryWithIcon}>
         <span className={styles.categoryIcon}>{transaction.debit_account.icon || '💰'}</span>
         {transaction.debit_account.name}
       </span>
-    ) : getAccountName(accounts, transaction.debit);
+    ) : 'Select Category';
   }
 };
 

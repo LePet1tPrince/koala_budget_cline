@@ -147,9 +147,10 @@ const TransactionForm = ({ accounts, selectedAccountId, onSubmit, onCancel, merc
       newErrors.amount = 'Amount must be a number';
     }
 
-    if (!formData.category) {
-      newErrors.category = 'Category is required';
-    }
+    // Category is no longer required
+    // if (!formData.category) {
+    //   newErrors.category = 'Category is required';
+    // }
 
     if (!selectedAccountId) {
       newErrors.general = 'A bank feed account must be selected';
@@ -251,7 +252,7 @@ const TransactionForm = ({ accounts, selectedAccountId, onSubmit, onCancel, merc
       </div>
 
       <div className={styles.formGroup}>
-        <label htmlFor="category">Category</label>
+        <label htmlFor="category">Category (Optional)</label>
         <select
           id="category"
           name="category"

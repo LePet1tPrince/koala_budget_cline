@@ -315,18 +315,27 @@ export default function Transactions() {
   };
 
   // Open delete confirmation modal
-  const handleDeleteClick = (id) => {
-    setTransactionToDelete(id);
+  const handleDeleteClick = (ids) => {
+    // If ids is a single number, convert it to an array for consistency
+    const transactionIds = Array.isArray(ids) ? ids : [ids];
+    setTransactionToDelete(transactionIds);
     setIsDeleteModalOpen(true);
   };
 
-  // Handle deleting a transaction
+  // Handle deleting transactions
   const handleDeleteTransaction = async () => {
     try {
-      await deleteTransaction(transactionToDelete);
-      console.log(`Deleted transaction ${transactionToDelete}`);
+      // If transactionToDelete is an array, delete all transactions
+      if (Array.isArray(transactionToDelete)) {
+        await Promise.all(transactionToDelete.map(id => deleteTransaction(id)));
+        console.log(`Deleted ${transactionToDelete.length} transactions`);
+      } else {
+        // Fallback for single transaction (should not happen with updated code)
+        await deleteTransaction(transactionToDelete);
+        console.log(`Deleted transaction ${transactionToDelete}`);
+      }
 
-      // Refresh transactions list after deleting a transaction
+      // Refresh transactions list after deleting transactions
       if (selectedAccountId) {
         // If an account is selected, fetch transactions for that account
         const updatedTransactions = await getTransactionsByAccount(selectedAccountId);
@@ -346,8 +355,8 @@ export default function Transactions() {
       setTransactionToDelete(null);
       setError(null);
     } catch (err) {
-      console.error(`Error deleting transaction ${transactionToDelete}:`, err);
-      alert('Failed to delete transaction. Error: ' + (err.message || 'Unknown error'));
+      console.error(`Error deleting transactions:`, err);
+      alert('Failed to delete transactions. Error: ' + (err.message || 'Unknown error'));
     }
   };
 
@@ -524,6 +533,7 @@ export default function Transactions() {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteTransaction}
+        transactionCount={Array.isArray(transactionToDelete) ? transactionToDelete.length : 1}
       />
 
       {/* CSV Upload Modal */}

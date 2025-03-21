@@ -83,6 +83,16 @@ class TransactionSerializer(serializers.ModelSerializer):
             )
             validated_data['merchant'] = merchant
 
+        # Set status to 'categorized' if both debit and credit accounts are provided
+        # and they're not the same as the default accounts
+        if 'debit' in validated_data and 'credit' in validated_data:
+            # We'll consider a transaction categorized if both accounts are explicitly set
+            # This logic can be adjusted based on your specific requirements
+            validated_data['status'] = 'categorized'
+        else:
+            # Default to 'review' status if not categorized
+            validated_data['status'] = 'review'
+
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 
@@ -96,6 +106,12 @@ class TransactionSerializer(serializers.ModelSerializer):
                 user=user
             )
             validated_data['merchant'] = merchant
+
+        # Update status to 'categorized' if both debit and credit accounts are provided
+        # and they're not the same as the default accounts
+        if 'debit' in validated_data and 'credit' in validated_data:
+            # We'll consider a transaction categorized if both accounts are explicitly set
+            validated_data['status'] = 'categorized'
 
         return super().update(instance, validated_data)
 

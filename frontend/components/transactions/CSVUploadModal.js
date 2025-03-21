@@ -327,20 +327,23 @@ const CSVUploadModal = ({ isOpen, onClose, onUpload, selectedAccountId }) => {
           </div>
 
           <div className={formStyles.formGroup}>
-            <label htmlFor="category-column">Category Column (optional):</label>
+            <label htmlFor="category-column">Category Column (optional - leave blank to categorize later):</label>
             <select
               id="category-column"
               value={columnMapping.category === null ? '' : columnMapping.category}
               onChange={(e) => handleMappingChange('category', e.target.value)}
               className={formStyles.input}
             >
-              <option value="">Select a column</option>
+              <option value="">Leave uncategorized</option>
               {csvData[0].map((header, index) => (
                 <option key={index} value={index}>
                   {columnMapping.has_header ? header : `Column ${index + 1}`}
                 </option>
               ))}
             </select>
+            <p className={formStyles.fieldHint}>
+              Transactions will be uploaded without a category if none is selected, allowing you to categorize them later.
+            </p>
           </div>
 
           {error && <p className={formStyles.errorText}>{error}</p>}

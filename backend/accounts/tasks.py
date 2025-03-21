@@ -23,38 +23,9 @@ def parse_date(date_str):
 
 def find_or_create_category_account(user, category, is_positive):
     """Find or create a category account based on the transaction type."""
-    # If category is not provided, use a default expense or income account
+    # If category is not provided, return None to indicate no category
     if not category:
-        if is_positive:
-            # For positive amounts, use a default income account
-            category_account = Account.objects.filter(
-                user=user,
-                type='Income'
-            ).first()
-
-            if not category_account:
-                # Create a default income account if none exists
-                category_account = Account.objects.create(
-                    name='Uncategorized Income',
-                    num=90000,  # Use a high number to avoid conflicts
-                    type='Income',
-                    user=user
-                )
-        else:
-            # For negative amounts, use a default expense account
-            category_account = Account.objects.filter(
-                user=user,
-                type='Expense'
-            ).first()
-
-            if not category_account:
-                # Create a default expense account if none exists
-                category_account = Account.objects.create(
-                    name='Uncategorized Expense',
-                    num=80000,  # Use a high number to avoid conflicts
-                    type='Expense',
-                    user=user
-                )
+        return None
     else:
         # Try to find an account with a matching name
         category_account = Account.objects.filter(
@@ -78,7 +49,7 @@ def find_or_create_category_account(user, category, is_positive):
                 user=user
             )
 
-    return category_account
+        return category_account
 
 @shared_task
 def process_csv_transactions(file_content, column_mapping, selected_account_id, user_id):
@@ -177,20 +148,6 @@ def process_csv_transactions(file_content, column_mapping, selected_account_id, 
 
             # Create the transaction
             try:
-                # For positive amounts (income):
-                # - Debit the selected account (money coming in)
-                # - Credit the category account (source of the money)
-                #
-                # For negative amounts (expense):
-                # - Debit the category account (where money is going)
-                # - Credit the selected account (money going out)
-                if is_positive:
-                    debit_account = selected_account
-                    credit_account = category_account
-                else:
-                    debit_account = category_account
-                    credit_account = selected_account
-
                 # Find or create merchant if provided
                 merchant_obj = None
                 if merchant:
@@ -199,17 +156,48 @@ def process_csv_transactions(file_content, column_mapping, selected_account_id, 
                         user=user
                     )
 
+                # We already have the category_account from earlier
+                # No need to call find_or_create_category_account again
+
+                # For positive amounts (income):
+                # - Debit the selected account (money coming in)
+                # - Credit the category account (source of the money) if provided
+                #
+                # For negative amounts (expense):
+                # - Debit the category account (where money is going) if provided
+                # - Credit the selected account (money going out)
+
+                # Create transaction data
+                transaction_data = {
+                    'date': parsed_date,
+                    'amount': amount,
+                    'notes': description or '',
+                    'merchant': merchant_obj,
+                    'user': user,
+                    'status': 'review'  # Default status is review
+                }
+
+                if category_account:
+                    # If we have a category, set the appropriate debit/credit accounts
+                    if is_positive:
+                        transaction_data['debit'] = selected_account
+                        transaction_data['credit'] = category_account
+                    else:
+                        transaction_data['debit'] = category_account
+                        transaction_data['credit'] = selected_account
+
+                    # Set status to categorized since we have a category
+                    transaction_data['status'] = 'categorized'
+                else:
+                    # If no category, we need to handle this differently
+                    # For now, we'll use the selected account for both debit and credit
+                    # This is a placeholder that will need to be categorized later
+                    transaction_data['debit'] = selected_account
+                    transaction_data['credit'] = selected_account
+
                 # Create the transaction using atomic transaction
                 with transaction.atomic():
-                    Transaction.objects.create(
-                        date=parsed_date,
-                        amount=amount,
-                        debit=debit_account,
-                        credit=credit_account,
-                        notes=description or '',
-                        merchant=merchant_obj,
-                        user=user
-                    )
+                    Transaction.objects.create(**transaction_data)
 
                 results['success'] += 1
             except Exception as e:

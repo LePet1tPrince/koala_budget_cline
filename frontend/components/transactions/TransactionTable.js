@@ -87,17 +87,8 @@ const TransactionTable = ({
 
   // Bulk action handlers
   const handleBulkDelete = () => {
-    if (confirm(`Are you sure you want to delete ${selectedTransactions.length} transactions?`)) {
-      Promise.all(selectedTransactions.map(id => onDelete(id)))
-        .then(() => {
-          setSelectedTransactions([]);
-          setSelectAll(false);
-        })
-        .catch(error => {
-          console.error('Error deleting transactions:', error);
-          alert('Failed to delete some transactions. Please try again.');
-        });
-    }
+    // Pass all selected transactions to onDelete as an array
+    onDelete(selectedTransactions);
   };
 
   const handleBulkEdit = () => {
